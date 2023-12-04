@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "graph_visualizer"
+dynamic = ["version"]
+dependencies = [
+    "Django == 5.0",
+    "asgiref==3.7.2",
+    "sqlparse==0.4.4",
+    "typing-extensions==4.8.0"
+]
+requires-python = ">= 3.10"
+authors = [
+    {name = "Balsa Bulatović"},
+    {name = "Momir Milutinović"},
+    {name = "Teodor Vidaković"},
+    {name = "Vladimir Popov"},
+]
