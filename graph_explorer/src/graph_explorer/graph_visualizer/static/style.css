@@ -45,3 +45,24 @@ a .material-symbols-outlined {
     margin-left: 0.5em;
 }
 
+.panel-block button.button {
+    margin-left: 2em;
+    box-sizing: border-box;
+    width: 8em;
+}
+
+.panel-block .filter-form {
+    width: 100%;
+}
+
+#filter-attribute-input, #filter-value-input {
+    width: 45%;
+}
+
+.filter-form .select {
+    width: 9.2%;
+}
+
+.filter-form .select select{
+    width: 100%;
+}

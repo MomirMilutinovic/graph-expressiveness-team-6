@@ -74,17 +74,14 @@
                     Search and filter
                 </p>
                 <div class="panel-block">
-                    <p class="control has-icons-left">
-                        <input class="input" type="text" placeholder="Search">
-                        <span class="icon is-left">
-                            <i class="fas fa-search" aria-hidden="true"></i>
-                        </span>
-                    </p>
+                    <div class="filter-form">
+                        <input id="search-input" class="input" type="text" placeholder="Search" />
+                    </div>
                     <button class="button is-light">Search</button>
                 </div>
                 <div class="panel-block">
-                    <p class="control has-icons-left">
-                        <input class="input" type="text" placeholder="Attribute">
+                    <span class="filter-form">
+                        <input id="filter-attribute-input" class="input" type="text" placeholder="Attribute" />
                         <div class="select">
                             <select>
                                 <option>&lt;</option>
@@ -95,11 +92,12 @@
                                 <option>!=</option>
                             </select>
                         </div>
-                    </p>
+                        <input id="filter-value-input" class="input" type="text" placeholder="Value" />
+                    </span>
                     <button class="button is-light">Filter</button>
                 </div>
                 <div class="panel-block">
-                <p>Active filters: </p>
+                    <p>Active filters: </p>
                 </div>
             </nav>
             <nav class="panel" id="main-view-panel">
