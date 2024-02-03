@@ -30,7 +30,7 @@ html, body, #container {
 }
 
 #tree-view-panel {
-    flex-grow: 4;
+    flex-grow: 2;
 }
 #bird-view-panel, #main-view-panel {
     flex-grow: 1;
