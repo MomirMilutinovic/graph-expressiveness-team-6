@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Graph Expressiveness</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}"/>
+</head>
+<body>
+    <div id="container">
+        <aside class="menu" id="workspace-bar">
+            <p class="menu-label">
+                Workspaces
+            </p>
+            <ul class="menu-list">
+                <li><a>Workspace 1</a></li>
+                <li><a>Workspace 2</a></li>
+                <li><a>Create a new workspace</a></li>
+            </ul>
+        </aside>
+        <div class="vertical-container" id="left-panel">
+            <nav class="panel" id="visualizer-select-panel">
+                <p class="panel-heading">
+                    Visualizer
+                </p>
+                <div class="panel-block">
+                    <div class="select">
+                      <select>
+                        <option>Simple visualizer</option>
+                        <option>Block visualizer</option>
+                      </select>
+                    </div>
+                </div>
+            </nav>
+            <nav class="panel" id="tree-view-panel">
+                <p class="panel-heading">
+                    Tree View
+                </p>
+                <div class="panel-block">
+                    <p class="control has-icons-left">
+                        <input class="input" type="text" placeholder="Search">
+                        <span class="icon is-left">
+                <i class="fas fa-search" aria-hidden="true"></i>
+              </span>
+                    </p>
+                </div>
+                <p class="panel-tabs">
+                    <a class="is-active">All</a>
+                    <a>Public</a>
+                    <a>Private</a>
+                    <a>Sources</a>
+                    <a>Forks</a>
+                </p>
+                <a class="panel-block is-active">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+                    bulma
+                </a>
+                <a class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+                    marksheet
+                </a>
+                <label class="panel-block">
+                    <input type="checkbox">
+                    remember me
+                </label>
+                <div class="panel-block">
+                    <button class="button is-link is-outlined is-fullwidth">
+                        Reset all filters
+                    </button>
+                </div>
+            </nav>
+            <nav class="panel" id="bird-view-panel">
+                <p class="panel-heading">
+                    Bird View
+                </p>
+                <div class="panel-block">
+                    <p class="control has-icons-left">
+                        <input class="input" type="text" placeholder="Search">
+                        <span class="icon is-left">
+                <i class="fas fa-search" aria-hidden="true"></i>
+              </span>
+                    </p>
+                </div>
+                <p class="panel-tabs">
+                    <a class="is-active">All</a>
+                    <a>Public</a>
+                    <a>Private</a>
+                    <a>Sources</a>
+                    <a>Forks</a>
+                </p>
+                <a class="panel-block is-active">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+                    bulma
+                </a>
+                <a class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+                    marksheet
+                </a>
+                <label class="panel-block">
+                    <input type="checkbox">
+                    remember me
+                </label>
+                <div class="panel-block">
+                    <button class="button is-link is-outlined is-fullwidth">
+                        Reset all filters
+                    </button>
+                </div>
+            </nav>
+        </div>
+        <div class="vertical-container">
+            <nav class="panel" id="search-and-filter-panel">
+                <p class="panel-heading">
+                    Search and filter
+                </p>
+                <div class="panel-block">
+                    <p class="control has-icons-left">
+                        <input class="input" type="text" placeholder="Search">
+                        <span class="icon is-left">
+                            <i class="fas fa-search" aria-hidden="true"></i>
+                        </span>
+                    </p>
+                    <button class="button is-light">Search</button>
+                </div>
+                <div class="panel-block">
+                    <p class="control has-icons-left">
+                        <input class="input" type="text" placeholder="Attribute">
+                        <div class="select">
+                            <select>
+                                <option>&lt;</option>
+                                <option>&gt;</option>
+                                <option>&lt;=</option>
+                                <option>&gt;=</option>
+                                <option>==</option>
+                                <option>!=</option>
+                            </select>
+                        </div>
+                    </p>
+                    <button class="button is-light">Filter</button>
+                </div>
+                <div class="panel-block">
+                <p>Active filters: </p>
+                </div>
+            </nav>
+            <nav class="panel" id="main-view-panel">
+                <p class="panel-heading">
+                    Main View
+                </p>
+                <p class="panel-tabs">
+                    <a class="is-active">All</a>
+                    <a>Public</a>
+                    <a>Private</a>
+                    <a>Sources</a>
+                    <a>Forks</a>
+                </p>
+                <a class="panel-block is-active">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+                    bulma
+                </a>
+                <a class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+                    marksheet
+                </a>
+                <label class="panel-block">
+                    <input type="checkbox">
+                    remember me
+                </label>
+                <div class="panel-block">
+                    <button class="button is-link is-outlined is-fullwidth">
+                        Reset all filters
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+html, body, #container {
+    height: 100%;
+}
+
+#container {
+    display: flex;
+    padding: 0.5em;
+}
+
+#workspace-bar {
+    margin-right: 1em;
+}
+
+.vertical-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#left-panel {
+    width: 20%;
+    margin-right: 4em;
+}
+
+.vertical-container:last-child {
+    flex-grow: 1;
+}
+
+#visualizer-select-panel .select, #visualizer-select-panel select {
+    width: 100%;
+}
+
+#tree-view-panel {
+    flex-grow: 4;
+}
+#bird-view-panel, #main-view-panel {
+    flex-grow: 1;
+}
