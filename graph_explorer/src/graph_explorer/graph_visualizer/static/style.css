@@ -35,3 +35,13 @@ html, body, #container {
 #bird-view-panel, #main-view-panel {
     flex-grow: 1;
 }
+
+a.row {
+    display: flex;
+    align-items: center;
+}
+
+a .material-symbols-outlined {
+    margin-left: 0.5em;
+}
+

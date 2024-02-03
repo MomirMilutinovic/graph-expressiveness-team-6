@@ -4,9 +4,9 @@
     <title>Graph Expressiveness</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     {% load static %}
-    <link rel="stylesheet" href="{% static 'style.css' %}"/>
+    <link rel="stylesheet" href="{% static 'style.css' %}?{% now "U" %}"/>
 </head>
 <body>
     <div id="container">
@@ -15,9 +15,10 @@
                 Workspaces
             </p>
             <ul class="menu-list">
-                <li><a>Workspace 1</a></li>
-                <li><a>Workspace 2</a></li>
-                <li><a>Create a new workspace</a></li>
+                {% for workspace in workspaces %}
+                <li><a href="{%url 'workspace' workspace.id %}">{{ workspace.name }}</a></li>
+                {% endfor %}
+                <li><a href="" id="create-workspace" class="row">Create a new workspace <span class="material-symbols-outlined">add_circle</span></a></li>
             </ul>
         </aside>
         <div class="vertical-container" id="left-panel">
