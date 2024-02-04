@@ -1,9 +1,14 @@
-from .edge import Edge
+from __future__ import annotations
+
+if False:
+    from api.models.edge import Edge
 
 
 class Node:
 
-    def __init__(self, id: str, data: dict, edges: list[Edge] = []):
+    def __init__(self, id: str, data: dict, edges: 'Edge' = None):
+        if edges is None:
+            edges = []
         self.id = id
         self.data = data
         self.edges = edges
@@ -18,3 +23,6 @@ class Node:
                 neighbours.append(edge.dest)
 
         return neighbours
+
+    def __str__(self):
+        return f"Node: {self.id} with data: {self.data}"
