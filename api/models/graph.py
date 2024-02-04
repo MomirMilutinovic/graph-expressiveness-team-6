@@ -4,7 +4,11 @@ from .node import Node
 
 class Graph:
 
-    def __init__(self, edges: list[Edge] = [], nodes: set[Node] = set()):
+    def __init__(self, edges=None, nodes=None):
+        if nodes is None:
+            nodes = set()
+        if edges is None:
+            edges = []
         self.edges = edges
         self.nodes = nodes
 
