@@ -56,24 +56,24 @@ class HtmlDataSource(DataSource):
         graph.add_node(node_from_element)
         return node_from_element
 
-    def provide(self) -> Graph:
+    def provide(self, **kwargs) -> Graph:
+        url = kwargs.get("url", "www.google.com")
         g = Graph([], set())
-        response = requests.get(self.url)
+        response = requests.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
         root = soup.html
 
         self.recursive_html_traversal(g, root)
         return g
 
-    def __init__(self, url):
-        self.url = url
-
 
 if __name__ == '__main__':
     # Create an instance of the HTML data source
     src = "https://www.google.com"
-    html_data_source = HtmlDataSource(src)
+    html_data_source = HtmlDataSource()
 
     # Get the data from the HTML page
-    gg = html_data_source.provide()
+    gg = html_data_source.provide(url=src)
     found_element = next(filter(lambda x: x.data["tag"] == "html", gg.nodes), None)
+
+    pass
