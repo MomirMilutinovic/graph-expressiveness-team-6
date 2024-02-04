@@ -1,14 +1,7 @@
 from jinja2 import Environment, FileSystemLoader
 import os
-
-
-# TODO: Remove when real implementation of graph is available
-class Graph:
-    def get_nodes(self):
-        pass
-
-    def get_edges(self):
-        pass
+from api.components.visualizer import Visualizer
+from api.models.graph import Graph
 
 
 class MockGraph(Graph):
@@ -25,10 +18,18 @@ class MockGraph(Graph):
                     "src": {"id": str(i)},
                     "dest": {"id": str(j)}
                 })
+        edges.append({
+            "src": {"id": "10"},
+            "dest": {"id": "11"}
+        })
+        edges.append({
+            "src": {"id": "11"},
+            "dest": {"id": "12"}
+        })
         return edges
 
 
-class SimpleVisualizer():
+class SimpleVisualizer(Visualizer):
     def __init__(self):
         path=os.path.join(os.path.dirname(__file__))
         self.environment = Environment(loader=FileSystemLoader(path))
