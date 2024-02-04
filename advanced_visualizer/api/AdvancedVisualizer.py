@@ -9,63 +9,58 @@ from api.models.node import Node
 
 
 class AdvancedVisualizer(Visualizer):
+
+    def __init__(self):
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        templates_dir = os.path.join(current_dir, '..', 'templates')
+        self.environment = Environment(loader=FileSystemLoader(templates_dir))
+        self.template = self.environment.get_template("advanced_visualizer.html")
+
     def get_name(self) -> str:
         return "advanced_visualizer_plugin"
 
     def display(self, graph: Graph):
-        try:
-            nodes_data = [{'id': node.id, 'data': node.data} for node in graph.get_nodes()]
-            if not nodes_data:
-                raise ValueError("No nodes found in the graph.")
+        # try:
+        #     nodes_data = [{'id': node.id, 'data': node.data} for node in graph.get_nodes()]
+        #     if not nodes_data:
+        #         raise ValueError("No nodes found in the graph.")
+        #
+        #     edges_data = [{'source': edge.src.id, 'target': edge.dest.id, 'data': edge.data} for edge in graph.get_edges()]
+        #
+        # except Exception as e:
+        #     return f"<html><body><h2>Error: Invalid graph data.</h2><p>Details: {e}</p></body></html>"
+        #
+        # content = {
+        #     "nodes": nodes_data,
+        #     "edges": edges_data
+        # }
 
-            edges_data = [{'src': edge.src.id, 'dest': edge.dest.id, 'data': edge.data} for edge in graph.get_edges()]
+        #return self.template.render(nodes=content['nodes'], edges=content['edges'])
+        return self.template.render(nodes=graph.get_nodes(), edges=graph.get_edges(), name=self.get_name())
 
-        except Exception as e:
-            return f"<html><body><h2>Error: Invalid graph data.</h2><p>Details: {e}</p></body></html>"
 
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        templates_dir = os.path.join(current_dir, '..', 'templates')
-        env = Environment(loader=FileSystemLoader(templates_dir))
+class MockGraph(Graph):
+    def get_nodes(self):
+        # Create mock nodes with IDs and labels
+        return [Node(id=str(i), data={"label": f"Node {i}", "extraInfo": f"Info {i}"}) for i in range(1, 21)]
 
-        template = env.get_template("advanced_visualizer.html")
+    def get_edges(self):
+        # Create mock edges between nodes with some data
+        edges = []
+        for i in range(1, 10):  # Creating edges from each node to the next
+            edges.append(Edge(src=Node(id=str(i), data={"label": f"Node {i}"}),
+                              dest=Node(id=str(i+1), data={"label": f"Node {i+1}"}),
+                              data={"weight": i}))
 
-        content = {
-            "nodes": nodes_data,
-            "edges": edges_data
-        }
-
-        return template.render(nodes=content['nodes'], edges=content['edges'])
-
+        edges.append(Edge(src=Node(id=str(1), data={"label": "Node 1"}),  # Creating an edge from the first node to the last
+                          dest=Node(id=str(20), data={"label": "Node 20"}),
+                          data={"weight": 10}))
+        return edges
 
 if __name__ == "__main__":
     # Test the AdvancedVisualizer class
-    node1 = Node(id="1", data={"label": "Node 1"})
-    node2 = Node(id="2", data={"label": "Node 2"})
-    node3 = Node(id="3", data={"label": "Node 3"})
-    node4 = Node(id="4", data={"label": "Node 4"})
-    node5 = Node(id="5", data={"label": "Node 5"})
-    node6 = Node(id="6", data={"label": "Node 6"})
-    node7 = Node(id="7", data={"label": "Node 7"})
-    node8 = Node(id="8", data={"label": "Node 8"})
-    node9 = Node(id="9", data={"label": "Node 9"})
-    node10 = Node(id="10", data={"label": "Node 10"})
-
-    test_nodes = {node1, node2, node3, node4, node5, node6, node7, node8, node9, node10}
-
-    edge1 = Edge(data={"weight": 5}, src=node1, dest=node2)
-    edge2 = Edge(data={"weight": 3}, src=node1, dest=node3)
-    edge3 = Edge(data={"weight": 7}, src=node1, dest=node4)
-    edge4 = Edge(data={"weight": 2}, src=node2, dest=node5)
-    edge5 = Edge(data={"weight": 1}, src=node2, dest=node6)
-    edge6 = Edge(data={"weight": 4}, src=node3, dest=node7)
-    edge7 = Edge(data={"weight": 6}, src=node3, dest=node8)
-    edge8 = Edge(data={"weight": 8}, src=node4, dest=node9)
-    edge9 = Edge(data={"weight": 9}, src=node4, dest=node10)
-
-    test_edges = [edge1, edge2, edge3, edge4, edge5, edge6, edge7, edge8, edge9]
-
-    test_graph = Graph(edges=test_edges, nodes=test_nodes)
-
     visualizer = AdvancedVisualizer()
-    html_output = visualizer.display(test_graph)
+    mock_graph = MockGraph()
+    html_output = visualizer.display(mock_graph)
     print(html_output)
+
