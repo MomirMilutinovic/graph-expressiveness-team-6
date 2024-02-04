@@ -42,7 +42,7 @@ class AdvancedVisualizer(Visualizer):
 class MockGraph(Graph):
     def get_nodes(self):
         # Create mock nodes with IDs and labels
-        return [Node(id=str(i), data={"label": f"Node {i}", "extraInfo": f"Info {i}"}) for i in range(1, 21)]
+        return [Node(id=str(i), data={"label": f"Node {i}", "extraInfo": f"Info {i}", "info2": f"Info {i}"}) for i in range(1, 21)]
 
     def get_edges(self):
         # Create mock edges between nodes with some data
@@ -54,6 +54,9 @@ class MockGraph(Graph):
 
         edges.append(Edge(src=Node(id=str(1), data={"label": "Node 1"}),  # Creating an edge from the first node to the last
                           dest=Node(id=str(20), data={"label": "Node 20"}),
+                          data={"weight": 10}))
+        edges.append(Edge(src=Node(id=str(20), data={"label": "Node 20"}),  # Creating an edge from the last node to the first
+                          dest=Node(id=str(1), data={"label": "Node 1"}),
                           data={"weight": 10}))
         return edges
 

@@ -92,27 +92,38 @@
 
     console.log(force.nodes());
 
+    // Initialize a map to track links between the same nodes
+    var linkCounts = {};
+
+    links.forEach(function(link) {
+        var key = link.source.id + "-" + link.target.id;
+        var reverseKey = link.target.id + "-" + link.source.id;
+
+        if (!linkCounts[key] && !linkCounts[reverseKey]) {
+            linkCounts[key] = 0;
+        }
+
+        linkCounts[key]++;
+        link.index = linkCounts[key];
+    });
+
+    // Function to generate a path for each link
+    function linkPath(d) {
+        var dx = d.target.x - d.source.x,
+            dy = d.target.y - d.source.y,
+            dr = Math.sqrt(dx * dx + dy * dy) * d.index; // Increase the curvature based on the link's index
+
+        return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+    }
+
     // Stvarno iscrtavanje linkova koji su prikazani linijama.
     var link = g.selectAll('.link')
         .data(links)
-        .enter().append('line')
+        .enter().append('path')
         .attr('class', 'link')
         .style('stroke-width', function(d) {
             return d.data.weight ? 1 + d.data.weight * 0.5 : 1; // Default stroke width is 1 if weight is not defined
         });
-
-    // show the weight of the link
-    g.selectAll('.link-text')
-    .data(links)
-    .enter().append('text')
-    .attr('class', 'link-text')
-    .attr('x', function(d) { return (d.source.x + d.target.x) / 2; }) // Position text in the middle of the link, horizontally
-    .attr('y', function(d) { return (d.source.y + d.target.y) / 2; }) // Position text in the middle of the link, vertically
-    .attr('text-anchor', 'middle')
-    .text(function(d) { return d.data.weight !== undefined ? d.data.weight : ''; })
-    .attr('font-family', 'sans-serif')
-    .attr('font-size', '10px')
-    .attr('fill', 'black');
 
     // Stvarno iscrtavanje cvorova reprezentovanih g tagom.
     var node = g.selectAll('.node')
@@ -180,16 +191,7 @@
             .call(force.drag);
 
         // Korekcija pozicija ivica (linkova)
-        link.attr('x1', function(d) { return d.source.x; })
-            .attr('y1', function(d) { return d.source.y; })
-            .attr('x2', function(d) { return d.target.x; })
-            .attr('y2', function(d) { return d.target.y; });
-
-        // Update link text positions
-        g.selectAll('.link-text')
-            .attr('x', function(d) { return (d.source.x + d.target.x) / 2; })
-            .attr('y', function(d) { return (d.source.y + d.target.y) / 2; });
-
+         link.attr('d', linkPath);
     }
 
 </script>
