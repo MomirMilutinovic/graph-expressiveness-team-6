@@ -10,3 +10,7 @@ class DataSource(ABC):
     @abstractmethod
     def provide(self) -> Graph:
         pass
+
+    @abstractmethod
+    def get_configuration_parameters(self) -> dict[str, str]:
+        pass
