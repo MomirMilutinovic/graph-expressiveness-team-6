@@ -23,15 +23,19 @@ def make_node(tag):
     return node
 
 
-def add_edges(nodes: list[Node], node: Node):
+def add_edges(nodes: list[Node], node: Node, graph: Graph):
     if node.edges is None:
         node.edges = []
     for n in nodes:
         e = Edge({}, node, n)
         node.edges.append(e)
+        graph.add_edge(e)
 
 
 class HtmlDataSource(DataSource):
+    def get_configuration_parameters(self) -> dict[str, str]:
+        return {"url": "str"}
+
     def get_name(self):
         return "HTML Data Source"
 
@@ -48,7 +52,7 @@ class HtmlDataSource(DataSource):
             nodes.append(node_from_child)
 
         node_from_element = make_node(element)
-        add_edges(nodes, node_from_element)
+        add_edges(nodes, node_from_element, graph)
         graph.add_node(node_from_element)
         return node_from_element
 
@@ -73,5 +77,3 @@ if __name__ == '__main__':
     # Get the data from the HTML page
     gg = html_data_source.provide()
     found_element = next(filter(lambda x: x.data["tag"] == "html", gg.nodes), None)
-
-    pass
