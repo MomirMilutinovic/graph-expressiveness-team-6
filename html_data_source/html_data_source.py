@@ -8,14 +8,18 @@ from bs4 import BeautifulSoup
 
 
 def make_node(tag):
-    guid = str(hash(tag))
+    id_ = tag.attrs.get("id", "")
+    if id_ == "":
+        id_ = str(hash(tag))
     data = {"tag": tag.name}
     if tag.name in ["a", "img"]:
         data["href"] = tag.attrs.get("href", "")
     if tag.name in ["h1", "h2", "h3", "h4", "h5", "h6", "p", "title"]:
         data["text"] = tag.text
+    if tag.name == "input":
+        data["type"] = tag.attrs.get("type", "")
 
-    node = Node(guid, data)
+    node = Node(id_, data)
     return node
 
 
@@ -50,13 +54,8 @@ class HtmlDataSource(DataSource):
 
     def provide(self) -> Graph:
         g = Graph([], set())
-        # response = requests.get(self.url)
-        # soup = BeautifulSoup(response.content, 'html.parser')
-        with open(self.url, 'r', encoding='utf-8') as file:
-            html_content = file.read()
-
-        # Parse the HTML content using BeautifulSoup
-        soup = BeautifulSoup(html_content, 'html.parser')
+        response = requests.get(self.url)
+        soup = BeautifulSoup(response.content, 'html.parser')
         root = soup.html
 
         self.recursive_html_traversal(g, root)
@@ -68,7 +67,7 @@ class HtmlDataSource(DataSource):
 
 if __name__ == '__main__':
     # Create an instance of the HTML data source
-    src = "E:/balsa/faks/treca godina/softverski obrasci i komponente/index.html"
+    src = "https://www.google.com"
     html_data_source = HtmlDataSource(src)
 
     # Get the data from the HTML page
