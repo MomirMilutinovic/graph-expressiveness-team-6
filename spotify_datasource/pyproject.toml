@@ -1,3 +1,6 @@
 [project]
 name = "spotify-datasource"
 dynamic = ["version"]
+
+[project.entry-points."datasources"]
+spotify = "spotify_datasource.implementation:SpotifyDataSource"
