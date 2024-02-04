@@ -32,22 +32,26 @@ class HtmlDataSource(DataSource):
         for child in element.children:
             if child.name is None:
                 continue
-            if child.name in ["script", "style"]:
+            if child.name in ["script", "style", "meta", "link"]:
                 continue
 
-            node = make_node(child)
-            nodes.append(node)
-            graph.add_node(node)
-            self.recursive_html_traversal(graph, child)
+            node_from_child = self.recursive_html_traversal(graph, child)
+            nodes.append(node_from_child)
 
-        node = make_node(element)
-        add_edges(nodes, node)
-        graph.add_node(node)
+        node_from_element = make_node(element)
+        add_edges(nodes, node_from_element)
+        graph.add_node(node_from_element)
+        return node_from_element
 
     def provide(self) -> Graph:
         g = Graph([], set())
-        response = requests.get(self.url)
-        soup = BeautifulSoup(response.content, 'html.parser')
+        # response = requests.get(self.url)
+        # soup = BeautifulSoup(response.content, 'html.parser')
+        with open(self.url, 'r', encoding='utf-8') as file:
+            html_content = file.read()
+
+        # Parse the HTML content using BeautifulSoup
+        soup = BeautifulSoup(html_content, 'html.parser')
         root = soup.html
 
         self.recursive_html_traversal(g, root)
@@ -59,7 +63,7 @@ class HtmlDataSource(DataSource):
 
 if __name__ == '__main__':
     # Create an instance of the HTML data source
-    src = "file:///E:/balsa/faks/treca%20godina/softverski%20obrasci%20i%20komponente/index.html"
+    src = "E:/balsa/faks/treca godina/softverski obrasci i komponente/index.html"
     html_data_source = HtmlDataSource(src)
 
     # Get the data from the HTML page
