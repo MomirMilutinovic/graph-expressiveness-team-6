@@ -57,7 +57,7 @@ class HtmlDataSource(DataSource):
         return node_from_element
 
     def provide(self, **kwargs) -> Graph:
-        url = kwargs.get("url", "www.google.com")
+        url = kwargs.get("url", "https://www.google.com")
         g = Graph([], set())
         response = requests.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
