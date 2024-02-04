@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "simple_visualizer"
+dynamic = ["version"]
+dependencies = [
+    "typing-extensions==4.8.0",
+    "Jinja2==3.1.3",
+    "MarkupSafe==2.1.5"
+]
+requires-python = ">= 3.10"
+authors = [
+    {name = "Momir Milutinović"}
+]
+
+[project.entrypoints."graph_explorer.visualization"]
+simple_visualizer = "src.simple_visualizer.simple_visualizer:SimpleVisualizer"

@@ -1,0 +1,99 @@
+<style>
+.node {
+  cursor: pointer;
+  color: #3182bd;
+
+}
+
+.link {
+  fill: none;
+  stroke: #9ecae1;
+  stroke-width: 1.5px;
+}
+
+</style>
+<script>
+    function nodeClick(el){
+       alert("ID: "+el.id);
+    }
+</script>
+<div>
+  <svg width="500" height="500">
+
+  </svg>
+</div>
+<script>
+    var nodes={
+        // Prodavnice
+        {% for n in nodes %}
+            "node_{n.id}": {
+                name: "node_{{n.id}}",
+            },
+        {% endfor %}
+    };
+
+    var links=[
+        {% for e in edges %}
+            {source: "node_{{e.src.id}}", target: "node_{{e.dest.id}}"},
+        {% endfor %}
+    ];
+
+    links.forEach(function(link) {
+        link.source = nodes[link.source];
+        link.target = nodes[link.target];
+    });
+
+    // Force layout vrsi numericku simulaciju n-tela (n-cestica).
+    // https://d3-wiki.readthedocs.io/zh_CN/master/Force-Layout/
+    var force = d3.layout.force() // kreiranje force layout-a
+        .size([400, 400]) // raspoloziv prostor za iscrtavanje
+        .nodes(d3.values(nodes)) // dodavanje informacija o cvorovima grafa
+        .links(links) // dodavanje informacije o ivicama grafa
+        .on("tick", tick) // Dogadjaj tick okida se prilikokm svakog koraka simulacije.
+                          // Tada se poziva dolenavedena "tick" funckija koja koriguje pozicije
+                          // elemenata grafa.
+                          // Vise informacija mozete pronaci ovde:
+                          // https://d3-wiki.readthedocs.io/zh_CN/master/Force-Layout/#tick
+        .linkDistance(300) // duzina ivice grafa
+        .charge(-100) // koliko da se elementi odbijaju (pozitivna vrednost kaze koliko se elementi privlace)
+        .start(); //pokreni simulaciju
+
+    var svg=d3.select('svg');
+
+    // Stvarno iscrtavanje linkova koji su prikazani linijama.
+    var link = svg.selectAll('.link')
+        .data(links)
+        .enter().append('line')
+        .attr('class', 'link');
+
+    // Stvarno iscrtavanje cvorova reprezentovanih g tagom.
+    var node = svg.selectAll('.node')
+        .data(force.nodes()) //add
+        .enter().append('g')
+        .attr('class', 'node')
+        .attr('id', function(d){return d.name;})
+        .on('click',function(){
+           nodeClick(this);
+        });
+
+    function tick(e) {
+        // Korak simulacije koji koriguje pozicije cvorova i ivica grafa.
+
+        // translacija cvorova
+        node.attr("transform", function(d) {
+            return "translate(" + d.x + "," + d.y + ")";
+        })
+            // Omogucavamo interaktivno prevlacenje cvorova.
+            // Vise informacija na
+            // https://d3-wiki.readthedocs.io/zh_CN/master/Force-Layout/#drag
+            .call(force.drag);
+
+        // Korekcija pozicija ivica (linkova)
+        link.attr('x1', function(d) { return d.source.x; })
+            .attr('y1', function(d) { return d.source.y; })
+            .attr('x2', function(d) { return d.target.x; })
+            .attr('y2', function(d) { return d.target.y; });
+
+    }
+
+</script>
