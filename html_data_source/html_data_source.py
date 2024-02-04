@@ -9,7 +9,12 @@ from bs4 import BeautifulSoup
 
 def make_node(tag):
     guid = str(hash(tag))
-    data = {"tag": tag.name, "text": tag.text}
+    data = {"tag": tag.name}
+    if tag.name in ["a", "img"]:
+        data["href"] = tag.attrs.get("href", "")
+    if tag.name in ["h1", "h2", "h3", "h4", "h5", "h6", "p", "title"]:
+        data["text"] = tag.text
+
     node = Node(guid, data)
     return node
 
