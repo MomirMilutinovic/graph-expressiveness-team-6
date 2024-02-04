@@ -1,12 +1,6 @@
-from __future__ import annotations
-
-if False:
-    from api.models.edge import Edge
-
-
 class Node:
 
-    def __init__(self, id: str, data: dict, edges: 'Edge' = None):
+    def __init__(self, id: str, data: dict, edges=None):
         if edges is None:
             edges = []
         self.id = id
@@ -24,5 +18,10 @@ class Node:
 
         return neighbours
 
-    def __str__(self):
-        return f"Node: {self.id} with data: {self.data}"
+    def __eq__(self, __value: object) -> bool:
+        if isinstance(__value, Node):
+            return self.id == __value.id
+        return False
+
+    def __hash__(self) -> int:
+        return hash(self.id)
