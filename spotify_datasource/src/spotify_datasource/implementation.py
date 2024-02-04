@@ -11,3 +11,11 @@ class SpotifyDataSource(DataSource):
         auth_token = kwargs["auth_token"]
 
         return get_graph(auth_token)
+
+    def get_configuration_parameters(self) -> dict[str, str]:
+        return {
+            "auth_token": "str",
+            "artist_name": "str",
+            "max_neighbours": "int",
+            "recursion_depth": "int",
+        }
