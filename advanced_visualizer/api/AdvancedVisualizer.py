@@ -26,5 +26,5 @@ class AdvancedVisualizer(Visualizer):
             "nodes": nodes,
             "edges": edges
         }
-        return render_to_string("advanced_visualizer/advanced_visualizer.html", context=content)
+        return render_to_string("advanced_visualizer.html", context=content)
 
