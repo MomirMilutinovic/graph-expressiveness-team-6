@@ -1,0 +1,68 @@
+html, body, #container {
+    height: 100%;
+}
+
+#container {
+    display: flex;
+    padding: 0.5em;
+}
+
+#workspace-bar {
+    margin-right: 1em;
+}
+
+.vertical-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#left-panel {
+    width: 20%;
+    margin-right: 4em;
+}
+
+.vertical-container:last-child {
+    flex-grow: 1;
+}
+
+#visualizer-select-panel .select, #visualizer-select-panel select {
+    width: 100%;
+}
+
+#tree-view-panel {
+    flex-grow: 2;
+}
+#bird-view-panel, #main-view-panel {
+    flex-grow: 1;
+}
+
+a.row {
+    display: flex;
+    align-items: center;
+}
+
+a .material-symbols-outlined {
+    margin-left: 0.5em;
+}
+
+.panel-block button.button {
+    margin-left: 2em;
+    box-sizing: border-box;
+    width: 8em;
+}
+
+.panel-block .filter-form {
+    width: 100%;
+}
+
+#filter-attribute-input, #filter-value-input {
+    width: 45%;
+}
+
+.filter-form .select {
+    width: 9.2%;
+}
+
+.filter-form .select select{
+    width: 100%;
+}
