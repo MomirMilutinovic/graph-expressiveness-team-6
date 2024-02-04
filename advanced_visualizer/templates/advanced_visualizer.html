@@ -14,17 +14,22 @@
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <svg width="100%" height="100%"></svg>
 <script>
-    var nodes = {{ nodes|safe }};
-    var links = {{ edges|safe }};
+    var nodes = {{ nodes|tojson }};
+    var links = {{ edges|tojson }};
 
     var svg = d3.select("svg"),
         width = +svg.attr("width"),
         height = +svg.attr("height");
 
+    console.log("Nodes: ", JSON.stringify(nodes, null, 2));
+    console.log("Links: ", JSON.stringify(links, null, 2));
+
     var simulation = d3.forceSimulation(nodes)
-        .force("link", d3.forceLink(links).id(d => d.id))
         .force("charge", d3.forceManyBody())
         .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("link", d3.forceLink(links).id(d => d.id))
+
+
 
     // Render links
     var link = svg.append("g")
@@ -33,6 +38,7 @@
     .data(links)
     .enter().append("line")
     .attr("class", "link")
+    .attr("stroke-width", d => Math.sqrt(d.data.weight));
 
     // Render nodes
     var node = svg.append("g")
@@ -45,7 +51,7 @@
         .call(d3.drag()
             .on("start", dragStarted)
             .on("drag", dragged)
-            .on("end", dragended));
+            .on("end", dragEnded));
 
 
     // Drag functions
@@ -60,9 +66,22 @@
         d.fy = event.y;
     }
 
-    function dragended(event, d) {
+    function dragEnded(event, d) {
         if (!event.active) simulation.alphaTarget(0);
         d.fx = null;
         d.fy = null;
     }
+
+    // Update positions each tick
+    simulation.on("tick", () => {
+            link
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+
+            node
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y);
+        });
 </script>
