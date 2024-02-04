@@ -15,5 +15,5 @@ authors = [
     {name = "Momir Milutinović"}
 ]
 
-[project.entrypoints."graph_explorer.visualization"]
-simple_visualizer = "src.simple_visualizer.simple_visualizer:SimpleVisualizer"
+[project.entry-points."graph_explorer.visualization"]
+simple_visualizer = "simple_visualizer.simple_visualizer_src:SimpleVisualizer"
