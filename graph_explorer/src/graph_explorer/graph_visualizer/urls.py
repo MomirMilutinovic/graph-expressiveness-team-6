@@ -14,10 +14,20 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('workspace/<int:workspace_id>', views.workspace, name='workspace')
+    path("", views.index, name="index"),
+    path("workspace/<str:workspace_id>", views.workspace, name="workspace"),
+    path(
+        "workspace-config",
+        views.workspace_configuration,
+        name="workspace_config",
+    ),
+    path(
+        "workspace-config/<str:datasource_name>",
+        views.workspace_configuration,
+    ),
 ]
