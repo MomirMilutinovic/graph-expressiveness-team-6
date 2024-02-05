@@ -1,6 +1,14 @@
 [project]
 name = "html-datasource"
 dynamic = ["version"]
+dependencies = [
+    "requests==2.31.0",
+    "beautifulsoup4==4.12.3"
+]
+requires-python = ">= 3.10"
+authors = [
+    {name = "Balsa Bulatović"},
+]
 
 [project.entry-points."datasources"]
 html = "html_datasource.implementation:HtmlDataSource"
