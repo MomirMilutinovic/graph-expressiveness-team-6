@@ -12,12 +12,12 @@ class AdvancedVisualizer(Visualizer):
 
     def __init__(self):
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        templates_dir = os.path.join(current_dir, '..', 'templates')
+        templates_dir = os.path.join(current_dir, "../templates")
         self.environment = Environment(loader=FileSystemLoader(templates_dir))
         self.template = self.environment.get_template("advanced_visualizer.html")
 
     def get_name(self) -> str:
-        return "advanced_visualizer"
+        return "Advanced Visualizer"
 
     def display(self, graph: Graph):
         try:
@@ -43,16 +43,16 @@ class MockGraph(Graph):
                               dest=Node(id=str(i+1), data={"label": f"Node {i+1}"}),
                               data={"weight": i}))
 
-        edges.append(Edge(src=Node(id=str(1), data={"label": "Node 1"}),  # Creating an edge from the first node to the last
+        edges.append(Edge(src=Node(id=str(1), data={"label": "Node 1"}),
                           dest=Node(id=str(20), data={"label": "Node 20"}),
                           data={"weight": 10}))
-        edges.append(Edge(src=Node(id=str(20), data={"label": "Node 20"}),  # Creating an edge from the last node to the first
+        edges.append(Edge(src=Node(id=str(20), data={"label": "Node 20"}),
                           dest=Node(id=str(1), data={"label": "Node 1"}),
                           data={"weight": 10}))
         return edges
 
+
 if __name__ == "__main__":
-    # Test the AdvancedVisualizer class
     visualizer = AdvancedVisualizer()
     mock_graph = MockGraph()
     html_output = visualizer.display(mock_graph)
