@@ -8,7 +8,7 @@ class ContentModule:
         self.data_source_plugins = data_source_plugins
         self.visualizer_plugins = visualizer_plugins
         self.current_data_source: DataSource | None = self.data_source_plugins[0]  # until workspaces are implemented
-        self.current_visualizer: Visualizer | None = None
+        self.current_visualizer: Visualizer | None = self.visualizer_plugins[0] if self.visualizer_plugins else None
         self.graph: Graph = self.current_data_source.provide()  # until workspaces are implemented
 
     def select_data_source(self, data_source_name):
