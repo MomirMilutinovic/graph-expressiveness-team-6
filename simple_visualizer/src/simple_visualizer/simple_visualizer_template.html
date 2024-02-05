@@ -56,7 +56,6 @@
         {% endfor %}
     ];
 
-
     const handleZoom = (e) => g.attr('transform', e.transform);
     const zoom = d3.zoom().on('zoom', handleZoom);
 
@@ -68,22 +67,7 @@
         .force("x", d3.forceX(600))
         .force("y", d3.forceY(300))    
         .force("collide", d3.forceCollide().radius(80))
-        .on("tick", tick); // Dogadjaj tick okida se prilikokm svakog koraka simulacije.
-  
-
-
-    /*
-    // Stvarno iscrtavanje cvorova reprezentovanih g tagom.
-    var node = g.selectAll('.node')
-        .data(force.nodes()) //add
-        .enter().append('g')
-        .attr('class', 'node')
-        .attr('id', function(d){return d.name;})
-        .on('click',function(){
-           nodeClick(this);
-        });
-
-    */
+        .on("tick", tick);
 
     const link = g.selectAll(".link")
         .data(links).enter()
@@ -101,7 +85,6 @@
         })
         .call(drag(simulation));
     
-
     const radius=30;
     const textSize=20;
     d3.selectAll('.node').append('circle')
@@ -120,7 +103,6 @@
         });
 
     function tick() {
-        // Korak simulacije koji koriguje pozicije cvorova i ivica grafa.
         link
         .attr("x1", d => d.source.x)
         .attr("y1", d => d.source.y)
@@ -130,7 +112,6 @@
         node.attr("transform", function(d) {
             return "translate(" + d.x + "," + d.y + ")";
         })
-
     }
 
     function drag(simulation) {    
