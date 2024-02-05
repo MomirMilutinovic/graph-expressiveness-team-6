@@ -1,5 +1,7 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.apps.registry import apps
+from django.urls import reverse
 
 from .module.content import ContentModule
 
@@ -10,7 +12,6 @@ content_module = ContentModule(apps.get_app_config('graph_visualizer').data_sour
 def index(request):
     context = content_module.get_context()
     context["workspaces"] = [
-
         {
             "name": "Workspace 1",
             "id": 1
@@ -22,6 +23,11 @@ def index(request):
     ]
 
     return render(request, 'index.html', context)
+
+
+def select_visualizer(request, visualizer_name):
+    content_module.select_visualizer(visualizer_name)
+    return HttpResponseRedirect(reverse('index'))
 
 
 def workspace(request, workspace_id):
