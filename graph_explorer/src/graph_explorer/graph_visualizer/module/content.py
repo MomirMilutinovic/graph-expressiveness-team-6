@@ -9,7 +9,7 @@ class ContentModule:
         self.visualizer_plugins = visualizer_plugins
         self.current_data_source: DataSource | None = None
         self.current_visualizer: Visualizer | None = None
-        self.graph: Graph
+        self.graph: Graph = Graph()
 
     def select_data_source(self, data_source_name):
         self.current_data_source = \
@@ -31,3 +31,6 @@ class ContentModule:
             "data_source_params": self.get_data_source_params()
         }
         return content
+
+    def search(self, query):
+        self.graph.nodes = [node for node in self.graph.nodes if query in node]

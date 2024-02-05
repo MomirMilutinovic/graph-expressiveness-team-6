@@ -35,6 +35,11 @@ def load_views(request):
     pass
 
 
+def search(request, query):
+    content_module.search(query)
+    return HttpResponseRedirect(reverse('index'))
+
+
 def workspace(request, workspace_id):
     return render(request, 'index.html', {
         "workspaces": [
