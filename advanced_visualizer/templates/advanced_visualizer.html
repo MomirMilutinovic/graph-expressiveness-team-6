@@ -50,7 +50,6 @@
         {% endfor %}
     ];
 
-
     links.forEach(function(link) {
         link.source = nodes[link.source];
         link.target = nodes[link.target];
@@ -140,42 +139,50 @@
     var textSize = 12; // Size of the text
     var lineSpacing = 15; // Spacing between lines of text
 
-   node.each(function(d) {
-    var nodeGroup = d3.select(this);
-    var keys = Object.keys(d.data);
-    var rectHeight = initialRectHeight + (keys.length - 1) * lineSpacing+5; // Calculate dynamic height based on data
+    node.each(function(d) {
+        var nodeGroup = d3.select(this);
+        var keys = Object.keys(d.data);
 
-    // Append rectangle
-    nodeGroup.append('rect')
-        .attr('width', rectWidth)
-        .attr('height', rectHeight)
-        .attr('x', -rectWidth / 2)
-        .attr('y', -rectHeight / 2)
-        .style('fill', 'white')
-        .style('stroke', 'black')
-        .style('stroke-width', '1.5px');
+        var totalTextLines = 1 + keys.length; // 1 for the name, rest for data keys
+        var totalHeightNeeded = textSize + (totalTextLines * lineSpacing);
 
-    // Append name text
-    nodeGroup.append('text')
-        .attr('text-anchor', 'middle')
-        .attr('dy', "-0.8em") // Adjusts the vertical position of the name
-        .attr('font-size', textSize + 'px')
-        .attr('font-family', 'sans-serif')
-        .attr('fill', '#9ecae1')
-        .text(d.name);
+        // Adjust the rectangle height to fit all text
+        var rectHeight = Math.max(initialRectHeight, totalHeightNeeded + 10); // Add some padding
 
-    // Append data texts
-    keys.forEach((key, index) => {
+        // Append rectangle
+        nodeGroup.append('rect')
+            .attr('width', rectWidth)
+            .attr('height', rectHeight)
+            .attr('x', -rectWidth / 2)
+            .attr('y', -rectHeight / 2)
+            .style('fill', 'white')
+            .style('stroke', 'black')
+            .style('stroke-width', '1.5px');
+
+        var startYPosition = -rectHeight / 2 + (rectHeight - totalHeightNeeded) / 2 + textSize;
+
+        // Append name text first
         nodeGroup.append('text')
             .attr('text-anchor', 'middle')
             .attr('x', 0)
-            .attr('y', (lineSpacing * index) - rectHeight / 2 + initialRectHeight)
+            .attr('y', startYPosition)
             .attr('font-size', textSize + 'px')
             .attr('font-family', 'sans-serif')
-            .attr('fill', 'black')
-            .text(key + ": " + d.data[key]);
+            .attr('fill', '#9ecae1')
+            .text(d.name);
+
+        // Append data texts below the name text
+        keys.forEach((key, index) => {
+            nodeGroup.append('text')
+                .attr('text-anchor', 'middle')
+                .attr('x', 0)
+                .attr('y', startYPosition + (lineSpacing * (index + 1)))
+                .attr('font-size', textSize + 'px')
+                .attr('font-family', 'sans-serif')
+                .attr('fill', 'black')
+                .text(key + ": " + d.data[key]);
+        });
     });
-});
 
 
     function tick(e) {

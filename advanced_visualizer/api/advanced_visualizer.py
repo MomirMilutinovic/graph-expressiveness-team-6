@@ -17,25 +17,16 @@ class AdvancedVisualizer(Visualizer):
         self.template = self.environment.get_template("advanced_visualizer.html")
 
     def get_name(self) -> str:
-        return "advanced_visualizer_plugin"
+        return "advanced-visualizer-plugin"
 
     def display(self, graph: Graph):
-        # try:
-        #     nodes_data = [{'id': node.id, 'data': node.data} for node in graph.get_nodes()]
-        #     if not nodes_data:
-        #         raise ValueError("No nodes found in the graph.")
-        #
-        #     edges_data = [{'source': edge.src.id, 'target': edge.dest.id, 'data': edge.data} for edge in graph.get_edges()]
-        #
-        # except Exception as e:
-        #     return f"<html><body><h2>Error: Invalid graph data.</h2><p>Details: {e}</p></body></html>"
-        #
-        # content = {
-        #     "nodes": nodes_data,
-        #     "edges": edges_data
-        # }
+        try:
+            nodes = graph.get_nodes()
+            if not nodes:
+                raise ValueError("No nodes found in the graph.")
+        except Exception as e:
+            return f"<html><body><h2>Error: Invalid graph data.</h2><p>Details: {e}</p></body></html>"
 
-        #return self.template.render(nodes=content['nodes'], edges=content['edges'])
         return self.template.render(nodes=graph.get_nodes(), edges=graph.get_edges(), name=self.get_name())
 
 
