@@ -30,8 +30,13 @@ def select_visualizer(request, visualizer_name):
     return HttpResponseRedirect(reverse('index'))
 
 
+def load_main_view():
+    return HttpResponseRedirect(reverse('index'))
+
+
 def load_views(request):
     # TODO: Load main, bird and tree views
+    load_main_view()
     pass
 
 
