@@ -9,6 +9,9 @@ class FilterChain(Filter):
 
     def add_filter(self, filter: Filter) -> None:
         self.filters.append(filter)
+
+    def remove_filter(self, filter: Filter) -> None:
+        self.filters.remove(filter)
     
     def filter(self, graph: Graph) -> Graph:
         for filter in self.filters:

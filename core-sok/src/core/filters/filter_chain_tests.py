@@ -87,5 +87,24 @@ class SearchFilterTests(unittest.TestCase):
         self.assertEqual(filtered_graph.get_edges(), [])
         self.assertNotEqual(filtered_graph, graph)
 
+    def test_filter_chain_remove_filter(self):
+        node1 = Node("1", {"name": "node1"})
+        node2 = Node("2", {"word": "name"})
+        node3 = Node("3", {"name": "node3"})
+        node4 = Node("4", {"name": "armor"})
+        edge1 = Edge(None, node1, node2)
+        edge2 = Edge(None, node2, node3)
+        graph = Graph([edge1, edge2], [node1, node2, node3, node4])
+        search_filter = SearchFilter("or")
+        another_search_filter = SearchFilter("me")
+        filter_chain = FilterChain()
+        filter_chain.add_filter(search_filter)
+        filter_chain.add_filter(another_search_filter)
+        filter_chain.remove_filter(search_filter)
+        filtered_graph = filter_chain.filter(graph)
+        self.assertEqual(filtered_graph.get_nodes(), [node1, node2, node3, node4])
+        self.assertEqual(filtered_graph.get_edges(), [edge1, edge2])
+        self.assertNotEqual(filtered_graph, graph)
+
 if __name__ == '__main__':
     unittest.main()

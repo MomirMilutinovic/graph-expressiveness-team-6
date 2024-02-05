@@ -15,6 +15,11 @@ class SearchFilter(Filter):
         """
         self.search_term = search_term
 
+    def __eq__(self, __value: object) -> bool:
+        if not isinstance(__value, SearchFilter):
+            return False
+        return self.search_term == __value.search_term
+
     def satisfiesQuery(self, node):
         return self.search_term in node.id or any(self.search_term in value for value in node.data.values()) or any(self.search_term in key for key in node.data.keys())
 
