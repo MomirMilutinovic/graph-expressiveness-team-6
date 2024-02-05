@@ -11,7 +11,7 @@
   stroke-width: 1.5px;
 }
 
-#main-svg-{{name}} {
+#main-svg-advanced-visualizer {
     width: 100%;
     height: 100%;
 }
@@ -29,77 +29,106 @@
 }
 
 </style>
-<script src="https://d3js.org/d3.v3.js"></script>
+<script src="https://d3js.org/d3.v7.js"></script>
 <script>
-    function nodeClick(el) {
+    function nodeClick(event, d) {
+    // Prevent any default action
+    event.preventDefault();
+
     // Reset the style of any previously active node
-    d3.selectAll(".active-node")
-      .select("rect")
-      .style("fill", "white")
+    d3.selectAll(".active-node rect")
+      .style("fill", "white");
 
     // Remove the active-node class from all nodes
     d3.selectAll(".active-node").classed("active-node", false);
 
     // Add the active-node class to the clicked node and update its style
-    d3.select(el)
+    // Use d3.select(this) or d3.select(event.currentTarget) to select the clicked element
+    d3.select(event.currentTarget)
       .classed("active-node", true)
       .select("rect")
-      .style("fill", "#e5e4e4")
+      .style("fill", "#e5e4e4");
     }
 </script>
-<svg id="main-svg-{{name}}">
+<svg id="main-svg-advanced-visualizer">
 
 </svg>
-<div id="tooltip" class="tooltip" style="position: absolute; display: none; padding: 5px; background: rgba(0, 0, 0, 0.6); color: white; border-radius: 5px; font-size: 6px; pointer-events: none;"></div>
+<div id="tooltip" class="tooltip" style="position: absolute; display: none; padding: 10px; background: rgba(0, 0, 0, 0.6); color: white; border-radius: 5px; font-size: 16px; pointer-events: none; min-width: 100px;"></div>
 <script>
-    var nodes={
+    var nodes = [
         {% for n in nodes %}
-            "node_{{n.id}}": {
-                name: "node_{{n.id}}",
-                    data: {{ n.data | tojson }},
-            },
-        {% endfor %}
-    };
-
-    var links=[
-        {% for e in edges %}
-            {source: "node_{{e.src.id}}", target: "node_{{e.dest.id}}", data: {{e.data | tojson}}},
+        {
+            name: "node_{{n.id}}",
+            data: {{ n.data | tojson }},
+        },
         {% endfor %}
     ];
 
-    links.forEach(function(link) {
-        link.source = nodes[link.source];
-        link.target = nodes[link.target];
-    });
+    var links = [
+        {% for e in edges %}
+        {
+            source: "node_{{e.src.id}}",
+            target: "node_{{e.dest.id}}",
+            data: {{ e.data | tojson }},
+        },
+        {% endfor %}
+    ];
 
-    var g = d3.select('#main-svg-{{name}}')
-        .call(d3.behavior.zoom().on("zoom", function () {
-            console.log("okida se dogadjaj")
-            g.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
-        }))
-        .append('g');
+    links = links.map(link => ({
+        ...link,
+        source: nodes.find(n => n.name === link.source),
+        target: nodes.find(n => n.name === link.target),
+    }));
 
-    var force = d3.layout.force()
-        .size([700, 700])
-        .nodes(d3.values(nodes))
-        .links(links)
-        .on("tick", tick)
-        .linkDistance(400)
-        .charge(-100)
-        .gravity(0.02)
-        .start();
+    var svg = d3.select('#main-svg-advanced-visualizer');
+    var g = svg.append('g');
 
-    var drag = d3.behavior.drag()
-    .on("dragstart", function() { d3.event.sourceEvent.stopPropagation(); })
-    .on("drag", function() { /* handle drag event here */ });
+    var zoom = d3.zoom()
+        .on("zoom", function (event) {
+            g.attr("transform", event.transform);
+        });
 
-    var drag = force.drag()
-        .on("dragstart", function() { d3.event.sourceEvent.stopPropagation(); });
+    svg.call(zoom);
 
-    // Append a tooltip element to your SVG, but keep it hidden initially
+    console.log(nodes);
+    console.log(links);
+
+    var simulation = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(links).id(function(d) { return d.id; }).distance(300))
+    .force("charge", d3.forceManyBody().strength(100))
+    .force("center", d3.forceCenter(700 / 2, 700 / 2))
+    .force("gravity", d3.forceManyBody().strength(-100))
+        .force("collide", d3.forceCollide().radius(80))
+    .on("tick", tick);
+
+    function drag(simulation) {
+        function dragstarted(event) {
+          if (!event.active) simulation.alphaTarget(0.3).restart();
+          event.subject.fx = event.subject.x;
+          event.subject.fy = event.subject.y;
+        }
+
+        function dragged(event) {
+          event.subject.fx = event.x;
+          event.subject.fy = event.y;
+        }
+
+        function dragended(event) {
+          if (!event.active) simulation.alphaTarget(0);
+          event.subject.fx = null;
+          event.subject.fy = null;
+        }
+
+        return d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended);
+    }
+
+    // Assuming the tooltip element already exists in your HTML/CSS with id="tooltip"
     var tooltip = d3.select("#tooltip");
 
-    function showTooltip(d) {
+    function showTooltip(event, d) {
       var dataStrings = Object.entries(d.data).map(function([key, value]) {
         return `${key}: ${value}`;
       });
@@ -109,11 +138,10 @@
       tooltip
         .html(tooltipText)
         .style('display', 'inline-block')
-        .style('left', (d3.event.pageX + 10) + 'px')
-        .style('top', (d3.event.pageY + 10) + 'px');
+        .style('left', (event.pageX + 10) + 'px')
+        .style('top', (event.pageY + 10) + 'px');
     }
 
-    // Function to hide the tooltip
     function hideTooltip() {
       tooltip.style('display', 'none');
     }
@@ -143,25 +171,23 @@
     }
 
     var link = g.selectAll('.link')
-        .data(links)
-        .enter().append('path')
-        .attr('class', 'link')
-        .style('stroke-width', function(d) {
-            return d.data.weight ? 1 + d.data.weight * 0.5 : 1; // Default stroke width is 1 if weight is not defined
-        })
-        .on('mouseover', showTooltip)
-        .on('mouseout', hideTooltip);
+    .data(links)
+    .enter().append('path')
+    .attr('class', 'link')
+    .style('stroke-width', d => d.data.weight ? 1 + d.data.weight * 0.5 : 1)
+    .attr('d', linkPath)
+    .on('mouseover', showTooltip)
+    .on('mouseout', hideTooltip);
 
     var node = g.selectAll('.node')
-        .data(force.nodes()) //add
-        .enter().append('g')
-        .attr('class', 'node')
-        .attr('id', function(d){return d.name;})
-        .on('click',function(){
-           nodeClick(this);
-        })
-        .on('mouseover', showTooltip)
-        .on('mouseout', hideTooltip);
+    .data(nodes)
+    .enter().append('g')
+    .attr('class', 'node')
+    .attr('id', d => d.name)
+    .call(drag(simulation))
+    .on('click', nodeClick)
+    .on('mouseover', showTooltip)
+    .on('mouseout', hideTooltip);
 
     var rectWidth = 100; // Width of the rectangle
     var initialRectHeight = 30; // Initial height of the rectangle
@@ -214,12 +240,9 @@
     });
 
 
-    function tick(e) {
-        node.attr("transform", function(d) {
-            return "translate(" + d.x + "," + d.y + ")";
-        }).call(force.drag);
-
-         link.attr('d', linkPath);
+    function tick() {
+    node.attr("transform", d => `translate(${d.x},${d.y})`);
+    link.attr("d", linkPath);
     }
 
 </script>
