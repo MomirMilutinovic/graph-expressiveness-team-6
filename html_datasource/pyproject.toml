@@ -3,4 +3,4 @@ name = "html-datasource"
 dynamic = ["version"]
 
 [project.entry-points."datasources"]
-html = "html_datasource.implementation:HtmlDatasource"
+html = "html_datasource.implementation:HtmlDataSource"
