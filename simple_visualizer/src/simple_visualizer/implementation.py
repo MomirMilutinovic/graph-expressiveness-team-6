@@ -4,30 +4,6 @@ from api.components.visualizer import Visualizer
 from api.models.graph import Graph
 
 
-class MockGraph(Graph):
-    def get_nodes(self):
-        return [{"id": str(i)} for i in range(20)]
-
-    def get_edges(self):
-        edges = []
-        for i in range(10):
-            for j in range(10):
-                if i == j:
-                    continue
-                edges.append({
-                    "src": {"id": str(i)},
-                    "dest": {"id": str(j)}
-                })
-        edges.append({
-            "src": {"id": "10"},
-            "dest": {"id": "11"}
-        })
-        edges.append({
-            "src": {"id": "11"},
-            "dest": {"id": "12"}
-        })
-        return edges
-
 
 class SimpleVisualizer(Visualizer):
     def __init__(self):

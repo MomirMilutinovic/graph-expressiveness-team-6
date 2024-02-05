@@ -16,4 +16,4 @@ authors = [
 ]
 
 [project.entry-points."visualizers"]
-simple_visualizer = "simple_visualizer.simple_visualizer_src:SimpleVisualizer"
+simple_visualizer = "simple_visualizer.implementation:SimpleVisualizer"
