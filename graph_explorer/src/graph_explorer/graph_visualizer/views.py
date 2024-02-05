@@ -40,6 +40,14 @@ def search(request, query):
     return HttpResponseRedirect(reverse('index'))
 
 
+def provide_data(request):
+    if request.method != 'POST':
+        return
+    kwargs = request.body.decode('utf-8')
+    content_module.provide_data(kwargs)
+    return HttpResponseRedirect(reverse('index'))
+
+
 def workspace(request, workspace_id):
     return render(request, 'index.html', {
         "workspaces": [

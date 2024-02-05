@@ -34,3 +34,9 @@ class ContentModule:
 
     def search(self, query):
         self.graph.nodes = [node for node in self.graph.nodes if query in node]
+
+    def provide_data(self, kwargs: dict):
+        if self.current_data_source is None:
+            return
+        self.graph = self.current_data_source.provide(**kwargs)
+
