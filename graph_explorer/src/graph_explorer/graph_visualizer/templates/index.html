@@ -83,11 +83,11 @@
         </nav>
         <nav class="panel" id="main-view-panel">
           <p class="panel-heading">Main View</p>
-          <div>
-            {%if main_views %} {% for main_view in main_views %}
-            <div class="main-view is-hidden" id="main-view-{{ main_view.visualizer_id }}">{{ main_view.html|safe }}</div>
-            {% endfor %} {% else %}
-            <h2 color="red">No workspace selected</h2>
+          <div style="height: 100%">
+            {% if content %}
+              {{ content|safe }}
+            {% else %}
+              <h2 style="color: red;">No workspace selected</h2>
             {% endif %}
           </div>
         </nav>
