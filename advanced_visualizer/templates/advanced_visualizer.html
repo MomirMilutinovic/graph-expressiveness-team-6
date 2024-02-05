@@ -16,25 +16,43 @@
     height: 100%;
 }
 
-.active-node {
-    stroke: black;
-    stroke-width: 1px;
+.active-node rect { /* Update selector based on your SVG elements */
+  stroke-width: 2px; /* Make the stroke width larger for better visibility */
+  fill: #e5e4e4; /* Use a distinct fill color for active nodes */
+}
+
+/* Consider adding hover styles for better interactivity */
+.node:hover rect {
+  fill: #e6f7ff; /* Light fill on hover */
+  stroke: #b3daff; /* Light stroke on hover */
+  cursor: pointer;
 }
 
 </style>
 <script src="https://d3js.org/d3.v3.js"></script>
 <script>
-    function nodeClick(el){
-        d3.select(".active-node").select("circle").style("fill","white");
-        d3.select(".active-node").classed("active-node",false);
-        d3.select(el).classed("active-node",true);
-        d3.select(el).select("circle").style("fill","red");
+    function nodeClick(el) {
+    // Reset the style of any previously active node
+    d3.selectAll(".active-node")
+      .select("rect") // Assuming nodes are represented by <rect>. Use the appropriate selector for your SVG element.
+      .style("fill", "white") // Reset fill to default or previous color
+
+    // Remove the active-node class from all nodes
+    d3.selectAll(".active-node").classed("active-node", false);
+
+    // Add the active-node class to the clicked node and update its style
+    d3.select(el)
+      .classed("active-node", true)
+      .select("rect") // Use the appropriate selector for your SVG element.
+      .style("fill", "#e5e4e4") // Highlight fill color for active node
+
+    // Optional: Display additional information or perform other actions related to the clicked node
     }
 </script>
 <svg id="main-svg-{{name}}">
 
 </svg>
-<div id="tooltip" class="tooltip" style="position: absolute; display: none; padding: 10px; background: rgba(0, 0, 0, 0.6); color: white; border-radius: 5px; font-size: 12px; pointer-events: none;"></div>
+<div id="tooltip" class="tooltip" style="position: absolute; display: none; padding: 5px; background: rgba(0, 0, 0, 0.6); color: white; border-radius: 5px; font-size: 6px; pointer-events: none;"></div>
 <script>
     var nodes={
         {% for n in nodes %}
@@ -181,7 +199,7 @@
             .attr('x', -rectWidth / 2)
             .attr('y', -rectHeight / 2)
             .style('fill', 'white')
-            .style('stroke', 'black')
+            .style("stroke", "#9ecae1")
             .style('stroke-width', '1.5px');
 
         var startYPosition = -rectHeight / 2 + (rectHeight - totalHeightNeeded) / 2 + textSize;
@@ -204,7 +222,7 @@
                 .attr('y', startYPosition + (lineSpacing * (index + 1)))
                 .attr('font-size', textSize + 'px')
                 .attr('font-family', 'sans-serif')
-                .attr('fill', 'black')
+                .attr('fill', 'gray')
                 .text(key + ": " + d.data[key]);
         });
     });
