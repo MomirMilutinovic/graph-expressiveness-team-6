@@ -66,3 +66,7 @@ a .material-symbols-outlined {
 .filter-form .select select{
     width: 100%;
 }
+
+.highlight {
+    background-color: #efefef;
+}
