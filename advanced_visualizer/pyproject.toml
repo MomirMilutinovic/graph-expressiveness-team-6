@@ -1,0 +1,6 @@
+[project]
+name = 'advanced-visualizer-plugin'
+dynamic = ["version"]
+
+[project.entry-points."visualizers"]
+advanced-visualizer = "api.advanced_visualizer_plugin:AdvancedVisualizer"
