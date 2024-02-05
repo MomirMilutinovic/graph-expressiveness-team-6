@@ -30,6 +30,11 @@ def select_visualizer(request, visualizer_name):
     return HttpResponseRedirect(reverse('index'))
 
 
+def load_views(request):
+    # TODO: Load main, bird and tree views
+    pass
+
+
 def workspace(request, workspace_id):
     return render(request, 'index.html', {
         "workspaces": [
