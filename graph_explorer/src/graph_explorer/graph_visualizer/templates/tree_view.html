@@ -1,0 +1,171 @@
+<style>
+  .node {
+    cursor: pointer;
+    color: #3182bd;
+  }
+
+  .link {
+    fill: none;
+    stroke: #9ecae1;
+    stroke-width: 1.5px;
+  }
+</style>
+<script>
+  function nodeClick(el) {
+    console.log(el);
+    alert("ID: " + el.name);
+  }
+</script>
+<div>
+  <svg width="350" height="500" id="tree-view-svg"></svg>
+</div>
+<script>
+  let data = {
+    name: "Gunna",
+    expanded: true,
+    children: [
+      {
+        name: "Young Thug",
+        expanded: true,
+        children: [
+          {
+            name: "Takeoff",
+            expanded: true,
+          },
+        ],
+        og_children: [
+          {
+            name: "Takeoff",
+            expanded: true,
+          },
+        ],
+      },
+      {
+        name: "Future",
+        expanded: true,
+        children: [
+          {
+            name: "Travis Scott",
+            expanded: true,
+          },
+        ],
+        og_children: [
+          {
+            name: "Travis Scott",
+            expanded: true,
+          },
+        ],
+      },
+    ],
+    og_children: [
+      {
+        name: "Young Thug",
+        expanded: true,
+        children: [
+          {
+            name: "Takeoff",
+            expanded: true,
+          },
+        ],
+        og_children: [
+          {
+            name: "Takeoff",
+            expanded: true,
+          },
+        ],
+      },
+      {
+        name: "Future",
+        children: [
+          {
+            name: "Travis Scott",
+          },
+        ],
+        og_children: [
+          {
+            name: "Travis Scott",
+          },
+        ],
+      },
+    ],
+  };
+
+  function emptySvg() {
+    d3.select("#tree-view-svg").selectAll("*").remove();
+  }
+
+  function render() {
+    emptySvg();
+
+    const nodeSize = 20;
+    const root = d3.hierarchy(data).eachBefore(
+      (
+        (i) => (d) =>
+          (d.index = i++)
+      )(0)
+    );
+    const nodes = root.descendants();
+    const width = 350;
+    const height = (nodes.length + 1) * nodeSize;
+
+    const svg = d3
+      .select("#tree-view-svg")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("viewBox", [-nodeSize / 2, (-nodeSize * 3) / 2, width, height])
+      .attr("style", "max-width: 100%; height: auto; font: 15px sans-serif; overflow: visible;");
+
+    const link = svg
+      .append("g")
+      .attr("fill", "none")
+      .attr("stroke", "#999")
+      .selectAll()
+      .data(root.links())
+      .join("path")
+      .attr(
+        "d",
+        (d) => `
+        M${d.source.depth * nodeSize},${d.source.index * nodeSize}
+        V${d.target.index * nodeSize}
+        h${nodeSize}
+      `
+      );
+
+    const node = svg
+      .append("g")
+      .selectAll()
+      .data(nodes)
+      .join("g")
+      .attr("transform", (d) => `translate(0,${d.index * nodeSize})`)
+      .on("click", (ev, d) => {
+        d.data.expanded = !d.data.expanded;
+        if (d.data.expanded) d.data.children = d.data.og_children;
+        else d.data.children = [];
+        render();
+      });
+
+    node
+      .append("rect")
+      .attr("x", (d) => d.depth * nodeSize + 4)
+      .attr("width", 11)
+      .attr("height", 3)
+      .attr("fill", (d) => (d.children ? null : "#999"));
+
+    node
+      .filter((d) => !d.data.expanded)
+      .append("rect")
+      .attr("x", (d) => d.depth * nodeSize + 8)
+      .attr("y", (d) => -4)
+      .attr("width", 3)
+      .attr("height", 12)
+      .attr("fill", (d) => (d.children ? null : "#999"));
+
+    node
+      .append("text")
+      .attr("dy", "0.32em")
+      .attr("x", (d) => d.depth * nodeSize + 20)
+      .text((d) => d.data.name);
+  }
+
+  render();
+</script>
