@@ -16,9 +16,3 @@ class SimpleVisualizer(Visualizer):
 
     def display(self, graph: Graph) -> str:
         return self.template.render(nodes=graph.get_nodes(), edges=graph.get_edges(), name=self.get_name())
-
-
-if __name__ == "__main__":
-    sv = SimpleVisualizer()
-    graph = MockGraph()
-    print(sv.display(graph))
