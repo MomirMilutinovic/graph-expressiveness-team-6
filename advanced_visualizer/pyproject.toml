@@ -18,5 +18,5 @@ authors = [
     {name = "Teodor Vidakovic"}
 ]
 
-[project.entry-points."graph_explorer.visualization"]
+[project.entry-points."visualizers"]
 advanced_visualizer = "api.advanced_visualizer:AdvancedVisualizer"
