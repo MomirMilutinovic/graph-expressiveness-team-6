@@ -16,6 +16,3 @@ class GraphVisualizerConfig(AppConfig):
     def ready(self):
         self.data_source_plugins = load_plugins("datasources")
         self.visualizer_plugins = load_plugins("visualizers")
-        print("Loaded plugins")
-        print(self.data_source_plugins)
-        print(self.visualizer_plugins)
