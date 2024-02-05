@@ -4,7 +4,7 @@ from django.apps.registry import apps
 from .module.content import ContentModule
 
 content_module = ContentModule(apps.get_app_config('graph_visualizer').data_source_plugins,
-                        apps.get_app_config('graph_visualizer').visualizer_plugins)
+                               apps.get_app_config('graph_visualizer').visualizer_plugins)
 
 
 def index(request):

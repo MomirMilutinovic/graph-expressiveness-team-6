@@ -1,13 +1,15 @@
 from api.components.data_source import DataSource
 from api.components.visualizer import Visualizer
+from api.models.graph import Graph
 
 
 class ContentModule:
     def __init__(self, data_source_plugins: list[DataSource], visualizer_plugins: list[Visualizer]):
         self.data_source_plugins = data_source_plugins
         self.visualizer_plugins = visualizer_plugins
-        self.current_data_source: DataSource|None = None
-        self.current_visualizer: Visualizer|None = None
+        self.current_data_source: DataSource | None = None
+        self.current_visualizer: Visualizer | None = None
+        self.graph: Graph
 
     def select_data_source(self, data_source_name):
         self.current_data_source = \
@@ -29,4 +31,3 @@ class ContentModule:
             "data_source_params": self.get_data_source_params()
         }
         return content
-
