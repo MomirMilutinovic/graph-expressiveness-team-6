@@ -39,20 +39,20 @@
         {% for n in nodes %}
             {
                 index: {{ loop.index }},
-                name: "node_{{n.id}}",
+                name: "{{n.id}}",
             },
         {% endfor %}
     ];
 
     var name_to_index = {
         {% for n in nodes %}
-            "node_{{n.id}}": {{ loop.index }},
+            "{{n.id}}": {{ loop.index }},
         {% endfor %}
     };
 
     var links=[
         {% for e in edges %}
-            {source: name_to_index["node_{{e.src.id}}"], target: name_to_index["node_{{e.dest.id}}"]},
+            {source: name_to_index["{{e.src.id}}"], target: name_to_index["{{e.dest.id}}"]},
         {% endfor %}
     ];
 
