@@ -1,6 +1,8 @@
 class Node:
 
-    def __init__(self, id: str, data: dict, edges: list = []):
+    def __init__(self, id: str, data: dict, edges=None):
+        if edges is None:
+            edges = []
         self.id = id
         self.data = data
         self.edges = edges
