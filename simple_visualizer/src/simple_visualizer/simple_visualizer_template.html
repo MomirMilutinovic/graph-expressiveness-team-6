@@ -34,68 +34,45 @@
 
 </svg>
 <script>
-    var nodes={
+    var nodes=[
         // Prodavnice
         {% for n in nodes %}
-            "node_{{n.id}}": {
+            {
+                index: {{ loop.index }},
                 name: "node_{{n.id}}",
             },
+        {% endfor %}
+    ];
+
+    var name_to_index = {
+        {% for n in nodes %}
+            "node_{{n.id}}": {{ loop.index }},
         {% endfor %}
     };
 
     var links=[
         {% for e in edges %}
-            {source: "node_{{e.src.id}}", target: "node_{{e.dest.id}}"},
+            {source: name_to_index["node_{{e.src.id}}"], target: name_to_index["node_{{e.dest.id}}"]},
         {% endfor %}
     ];
 
 
-    links.forEach(function(link) {
-        link.source = nodes[link.source];
-        link.target = nodes[link.target];
-    });
+    const handleZoom = (e) => g.attr('transform', e.transform);
+    const zoom = d3.zoom().on('zoom', handleZoom);
 
-    var g = d3.select('#main-svg-{{name}}')
-        .call(d3.behavior.zoom().on("zoom", function () {
-            // Svaki put prilikom okidanja dogadjaja zoom-a (npr. rotacija tockica misa),
-            // poziva se ova funkcija koja radi translaciju i skaliranje na osnovu
-            // parametara koje cita iz dogadjaja
-            console.log("okida se dogadjaj")
-            g.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
-        }))
-        .append('g');
+    var g = d3.select('#main-svg-{{name}}').call(zoom).append('g');
+
+    const simulation = d3.forceSimulation(nodes)
+        .force("charge", d3.forceManyBody().strength(-100))
+        .force("link", d3.forceLink(links).distance(300))
+        .force("x", d3.forceX(600))
+        .force("y", d3.forceY(300))    
+        .force("collide", d3.forceCollide().radius(80))
+        .on("tick", tick); // Dogadjaj tick okida se prilikokm svakog koraka simulacije.
+  
 
 
-    // Force layout vrsi numericku simulaciju n-tela (n-cestica).
-    // https://d3-wiki.readthedocs.io/zh_CN/master/Force-Layout/
-    var force = d3.layout.force() // kreiranje force layout-a
-        .size([700, 700]) // raspoloziv prostor za iscrtavanje
-        .nodes(d3.values(nodes)) // dodavanje informacija o cvorovima grafa
-        .links(links) // dodavanje informacije o ivicama grafa
-        .on("tick", tick) // Dogadjaj tick okida se prilikokm svakog koraka simulacije.
-                          // Tada se poziva dolenavedena "tick" funckija koja koriguje pozicije
-                          // elemenata grafa.
-                          // Vise informacija mozete pronaci ovde:
-                          // https://d3-wiki.readthedocs.io/zh_CN/master/Force-Layout/#tick
-        .linkDistance(300) // duzina ivice grafa
-        .charge(-100) // koliko da se elementi odbijaju (pozitivna vrednost kaze koliko se elementi privlace)
-        .start(); //pokreni simulaciju
-
-    var drag = d3.behavior.drag()
-    .on("dragstart", function() { d3.event.sourceEvent.stopPropagation(); })
-    .on("drag", function() { /* handle drag event here */ });
-
-    var drag = force.drag()
-        .on("dragstart", function() { d3.event.sourceEvent.stopPropagation(); });
-
-    console.log(force.nodes());
-
-    // Stvarno iscrtavanje linkova koji su prikazani linijama.
-    var link = g.selectAll('.link')
-        .data(links)
-        .enter().append('line')
-        .attr('class', 'link');
-
+    /*
     // Stvarno iscrtavanje cvorova reprezentovanih g tagom.
     var node = g.selectAll('.node')
         .data(force.nodes()) //add
@@ -106,8 +83,27 @@
            nodeClick(this);
         });
 
-    var radius=30;
-    var textSize=20;
+    */
+
+    const link = g.selectAll(".link")
+        .data(links).enter()
+        .append("line")
+        .attr("class" , "link");
+  
+    const node = g.selectAll(".node")
+        .data(nodes)
+        .enter()
+        .append("g")
+        .attr("class", "node")
+        .attr("id", d => d.name)
+        .on('click',function(){
+            nodeClick(this);
+        })
+        .call(drag(simulation));
+    
+
+    const radius=30;
+    const textSize=20;
     d3.selectAll('.node').append('circle')
         .attr('r', radius+textSize)
         .style('fill', 'white')
@@ -123,25 +119,42 @@
             .text(d.name);
         });
 
-
-    function tick(e) {
+    function tick() {
         // Korak simulacije koji koriguje pozicije cvorova i ivica grafa.
-
-        // translacija cvorova
+        link
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+  
         node.attr("transform", function(d) {
             return "translate(" + d.x + "," + d.y + ")";
         })
-            // Omogucavamo interaktivno prevlacenje cvorova.
-            // Vise informacija na
-            // https://d3-wiki.readthedocs.io/zh_CN/master/Force-Layout/#drag
-            .call(force.drag);
 
-        // Korekcija pozicija ivica (linkova)
-        link.attr('x1', function(d) { return d.source.x; })
-            .attr('y1', function(d) { return d.source.y; })
-            .attr('x2', function(d) { return d.target.x; })
-            .attr('y2', function(d) { return d.target.y; });
+    }
 
+    function drag(simulation) {    
+        function dragstarted(event) {
+          if (!event.active) simulation.alphaTarget(0.3).restart();
+          event.subject.fx = event.subject.x;
+          event.subject.fy = event.subject.y;
+        }
+        
+        function dragged(event) {
+          event.subject.fx = event.x;
+          event.subject.fy = event.y;
+        }
+        
+        function dragended(event) {
+          if (!event.active) simulation.alphaTarget(0);
+          event.subject.fx = null;
+          event.subject.fy = null;
+        }
+        
+        return d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended);
     }
 
 </script>
