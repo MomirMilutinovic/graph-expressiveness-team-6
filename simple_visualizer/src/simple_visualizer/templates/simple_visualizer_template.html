@@ -34,27 +34,30 @@
 
 </svg>
 <script>
-    var nodes=[
-        // Prodavnice
+    var nodes = [
         {% for n in nodes %}
-            {
-                index: {{ loop.index }},
-                name: "{{n.id}}",
-            },
+        {
+            name: "node_{{n.id}}",
+            data: {{ n.data | tojson }},
+        },
         {% endfor %}
     ];
 
-    var name_to_index = {
-        {% for n in nodes %}
-            "{{n.id}}": {{ loop.index }},
-        {% endfor %}
-    };
-
-    var links=[
+    var links = [
         {% for e in edges %}
-            {source: name_to_index["{{e.src.id}}"], target: name_to_index["{{e.dest.id}}"]},
+        {
+            source: "node_{{e.src.id}}",
+            target: "node_{{e.dest.id}}",
+            data: {{ e.data | tojson }},
+        },
         {% endfor %}
     ];
+
+    links = links.map(link => ({
+        ...link,
+        source: nodes.find(n => n.name === link.source),
+        target: nodes.find(n => n.name === link.target),
+    }));
 
     const handleZoom = (e) => g.attr('transform', e.transform);
     const zoom = d3.zoom().on('zoom', handleZoom);
