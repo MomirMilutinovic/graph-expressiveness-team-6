@@ -19,76 +19,9 @@
 <div>
   <svg width="350" height="500" id="tree-view-svg"></svg>
 </div>
+{{ tree_view_data|json_script:"tree-view-data" }}
 <script>
-  let data = {
-    name: "Gunna",
-    expanded: true,
-    children: [
-      {
-        name: "Young Thug",
-        expanded: true,
-        children: [
-          {
-            name: "Takeoff",
-            expanded: true,
-          },
-        ],
-        og_children: [
-          {
-            name: "Takeoff",
-            expanded: true,
-          },
-        ],
-      },
-      {
-        name: "Future",
-        expanded: true,
-        children: [
-          {
-            name: "Travis Scott",
-            expanded: true,
-          },
-        ],
-        og_children: [
-          {
-            name: "Travis Scott",
-            expanded: true,
-          },
-        ],
-      },
-    ],
-    og_children: [
-      {
-        name: "Young Thug",
-        expanded: true,
-        children: [
-          {
-            name: "Takeoff",
-            expanded: true,
-          },
-        ],
-        og_children: [
-          {
-            name: "Takeoff",
-            expanded: true,
-          },
-        ],
-      },
-      {
-        name: "Future",
-        children: [
-          {
-            name: "Travis Scott",
-          },
-        ],
-        og_children: [
-          {
-            name: "Travis Scott",
-          },
-        ],
-      },
-    ],
-  };
+  let data = JSON.parse(document.getElementById("tree-view-data").textContent);
 
   function emptySvg() {
     d3.select("#tree-view-svg").selectAll("*").remove();
