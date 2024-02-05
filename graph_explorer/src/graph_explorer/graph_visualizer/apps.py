@@ -1,12 +1,5 @@
 from django.apps import AppConfig
-from pkg_resources import iter_entry_points
-
-from api.components.data_source import DataSource
-from api.components.visualizer import Visualizer
-
-
-def load_plugins(entry_point_name):
-    return [x.load()() for x in iter_entry_points(entry_point_name)]
+from core.infrastructure import DataSource, Visualizer, get_plugins
 
 
 class GraphVisualizerConfig(AppConfig):
@@ -17,5 +10,4 @@ class GraphVisualizerConfig(AppConfig):
     visualizer_plugins: list[Visualizer] = []
 
     def ready(self):
-        self.data_source_plugins = load_plugins("datasources")
-        self.visualizer_plugins = load_plugins("visualizers")
+        self.data_source_plugins, self.visualizer_plugins = get_plugins()
