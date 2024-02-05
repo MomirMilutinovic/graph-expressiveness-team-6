@@ -19,5 +19,9 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('workspace/<int:workspace_id>', views.workspace, name='workspace')
+    path('workspace/<int:workspace_id>', views.workspace, name='workspace'),
+    path('select-visualizer/<str:visualizer_name>', views.select_visualizer, name='select_visualizer'),
+    path('load-views', views.load_views, name='load_views'),
+    path('search/<str:query>', views.search, name='search'),
+    path('provide-data', views.provide_data, name='provide_data'),
 ]
