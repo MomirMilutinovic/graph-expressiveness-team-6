@@ -27,4 +27,4 @@ class Node:
         return hash(self.id)
 
     def __contains__(self, item):
-        return any(item in (self.id, d, self.data[d]) for d in self.data)
+        return any(str(item).lower in (self.id.lower(), str(d).lower, str(self.data[d])) for d in self.data.keys())
