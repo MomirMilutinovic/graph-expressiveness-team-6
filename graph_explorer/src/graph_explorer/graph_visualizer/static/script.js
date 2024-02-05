@@ -10,3 +10,10 @@ function changeView(type) {
     }
     document.getElementById(type + "-view-" + selectedVisualizerId).classList.remove("is-hidden");
 }
+
+function selectVisualizer(name) {
+    alert("Selected: " + name);
+    const request = new XMLHttpRequest();
+    request.open("GET", "/select-visualizer/" + encodeURIComponent(name), true);
+    request.send();
+}
