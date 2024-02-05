@@ -32,7 +32,7 @@ class MockGraph(Graph):
 class SimpleVisualizer(Visualizer):
     def __init__(self):
         path=os.path.join(os.path.dirname(__file__))
-        self.environment = Environment(loader=FileSystemLoader(path))
+        self.environment = Environment(loader=FileSystemLoader(path + "/templates"))
         self.template = self.environment.get_template("simple_visualizer_template.html")
 
     def get_name(self):
