@@ -43,13 +43,18 @@
         <nav class="panel" id="bird-view-panel">
           <p class="panel-heading">Bird View</p>
           <div class="panel-block">
-            {%if bird_views %} {% for bird_view in bird_views %}
-            <div class="main-view is-hidden" id="bird-view-{{ bird_view.visualizer_id }}">{{ bird_view.html|safe }}</div>
-            {% endfor %} {% else %}
-            <h2 color="red">No workspace selected</h2>
-            {% endif %}
+<!--              {% if bird_views %}-->
+<!--                  {% for bird_view in bird_views %}-->
+<!--                      <div class="main-view" id="bird-view-{{ bird_view.visualizer_id }}">-->
+<!--                          {% include "bird_view.html" with bird_view=bird_view %}-->
+<!--                      </div>-->
+<!--                  {% endfor %}-->
+<!--              {% else %}-->
+<!--                  <h2>No workspace selected</h2>-->
+<!--              {% endif %}-->
+            {% include "bird_view.html" with bird_view=bird_view %}
           </div>
-        </nav>
+      </nav>
       </div>
       <div class="vertical-container">
         <nav class="panel" id="search-and-filter-panel">

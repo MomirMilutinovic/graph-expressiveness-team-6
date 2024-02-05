@@ -1,0 +1,141 @@
+<style>
+    #bird-view-content {
+        width: 100%;
+        height: 100%;
+    }
+
+    #bird-view-svg {
+        width: 100%;
+        height: 100%;
+    }
+
+    #viewport-overlay {
+        fill: rgba(255, 255, 255, 0.5);
+        stroke: rgb(128, 128, 128);
+        width: 100px;
+        height: 50px;
+    }
+
+</style>
+<div id="bird-view-content">
+    <svg id="bird-view-svg">
+        <!-- Your SVG content here, scaled appropriately -->
+        <rect id="viewport-overlay"/>
+    </svg>
+</div>
+<script>
+    document.getElementById('bird-view-content').addEventListener('click', function(event) {
+        const birdViewRect = this.getBoundingClientRect();
+        const clickX = event.clientX - birdViewRect.left;
+        const clickY = event.clientY - birdViewRect.top;
+
+        // Assuming birdViewRect.width and birdViewRect.height represent the full extent
+        // of the visualization in the bird's eye view
+        const birdViewWidth = document.getElementById('bird-view-svg').clientWidth;
+        const birdViewHeight = document.getElementById('bird-view-svg').clientHeight;
+
+        // Calculate the ratio based on dimensions
+        const ratioX = clickX / birdViewRect.width;
+        const ratioY = clickY / birdViewRect.height;
+
+        // Apply this ratio to the main view dimensions
+        // Assuming you have a mechanism to scroll or change the viewport of the main view
+        // This might be scrolling an overflow container, adjusting an SVG viewBox, or panning a canvas
+        scrollToMainView(ratioX * birdViewWidth, ratioY * birdViewHeight);
+    });
+
+    function scrollToMainView(x, y) {
+        // Implement the logic to change the viewport of the main view
+        // This is highly dependent on your main view's implementation
+        // For an SVG inside a scrollable container, for example:
+        // const mainViewContainer = document.getElementById('main-view-container');
+        // mainViewContainer.scrollLeft = x;
+        // mainViewContainer.scrollTop = y;
+    }
+
+    function updateViewportOverlay() {
+        const mainView = document.getElementById('main-view'); // Adjust based on your implementation
+        const birdViewSvg = document.getElementById('bird-view-svg');
+
+        const overlay = document.getElementById('viewport-overlay');
+        const ratioX = mainView.scrollLeft / mainView.scrollWidth;
+        const ratioY = mainView.scrollTop / mainView.scrollHeight;
+        const ratioWidth = mainView.clientWidth / mainView.scrollWidth;
+        const ratioHeight = mainView.clientHeight / mainView.scrollHeight;
+
+        overlay.setAttribute('x', ratioX * birdViewSvg.clientWidth);
+        overlay.setAttribute('y', ratioY * birdViewSvg.clientHeight);
+        overlay.setAttribute('width', ratioWidth * birdViewSvg.clientWidth);
+        overlay.setAttribute('height', ratioHeight * birdViewSvg.clientHeight);
+    }
+
+    var overlay = document.getElementById('viewport-overlay');
+    var svg = document.getElementById('bird-view-svg');
+
+    // Variables to keep track of dragging state
+    var isDragging = false;
+    var startX, startY;
+
+    // Function to start dragging
+    function startDrag(event) {
+        // Calculate and store the starting point
+        var rect = svg.getBoundingClientRect();
+        startX = event.clientX - rect.left - overlay.x.baseVal.value;
+        startY = event.clientY - rect.top - overlay.y.baseVal.value;
+        isDragging = true;
+    }
+
+    // Function to drag the overlay
+    function drag(event) {
+        if (isDragging) {
+            var rect = svg.getBoundingClientRect();
+            // Calculate the new position
+            var newX = event.clientX - rect.left - startX;
+            var newY = event.clientY - rect.top - startY;
+
+            // Update the overlay's position
+            overlay.setAttribute('x', newX);
+            overlay.setAttribute('y', newY);
+
+            // Optionally, update the main view's viewport here
+        }
+    }
+
+    // Function to stop dragging
+    function stopDrag() {
+        isDragging = false;
+    }
+
+    // Attach event listeners
+    overlay.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', stopDrag);
+
+    // Function to zoom the overlay
+    function zoom(event) {
+        event.preventDefault(); // Prevent the default scroll behavior
+
+        console.log("ZOOM")
+
+        // Determine the zoom factor
+        var zoomIntensity = 0.1;
+        var scaleAmount = event.deltaY > 0 ? 1 - zoomIntensity : 1 + zoomIntensity;
+
+        // Calculate the new width and height
+        var newWidth = overlay.width.baseVal.value * scaleAmount;
+        var newHeight = overlay.height.baseVal.value * scaleAmount;
+
+        // Update the overlay's dimensions
+        overlay.setAttribute('width', newWidth);
+        overlay.setAttribute('height', newHeight);
+
+        // update the main view's viewport here to reflect the zoom level
+    }
+
+    // Attach the zoom event listener to the SVG container
+    svg.addEventListener('wheel', zoom);
+
+    // Call updateViewportOverlay whenever the main view is scrolled, zoomed, or panned
+    //mainView.addEventListener('scroll', updateViewportOverlay);
+    // Plus any other event listeners for zooming or panning, depending on your implementation
+</script>
