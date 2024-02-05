@@ -17,7 +17,7 @@ class AdvancedVisualizer(Visualizer):
         self.template = self.environment.get_template("advanced_visualizer.html")
 
     def get_name(self) -> str:
-        return "advanced-visualizer-plugin"
+        return "advanced_visualizer"
 
     def display(self, graph: Graph):
         try:
