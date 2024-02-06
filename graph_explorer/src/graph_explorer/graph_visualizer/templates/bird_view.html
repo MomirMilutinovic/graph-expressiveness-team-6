@@ -12,15 +12,13 @@
     #viewport-overlay {
         fill: rgba(255, 255, 255, 0.5);
         stroke: rgb(128, 128, 128);
-        width: 100px;
-        height: 50px;
     }
 
 </style>
 <div id="bird-view-content">
     <svg id="bird-view-svg">
         <!-- Your SVG content here, scaled appropriately -->
-        <rect id="viewport-overlay"/>
+        <rect id="viewport-overlay" width="100" height="50"/>
     </svg>
 </div>
 <script>
@@ -72,6 +70,8 @@
     var overlay = document.getElementById('viewport-overlay');
     var svg = document.getElementById('bird-view-svg');
 
+    console.log(overlay);
+
     // Variables to keep track of dragging state
     var isDragging = false;
     var startX, startY;
@@ -111,25 +111,43 @@
     document.addEventListener('mousemove', drag);
     document.addEventListener('mouseup', stopDrag);
 
+    var svgRect = svg.getBoundingClientRect(); // Get the bounding rectangle of the SVG
+    var maxWidth = svgRect.width;
+    var maxHeight = svgRect.height;
+
+
     // Function to zoom the overlay
     function zoom(event) {
-        event.preventDefault(); // Prevent the default scroll behavior
+    event.preventDefault();
+    console.log("ZOOM");
 
-        console.log("ZOOM")
+    var zoomIntensity = 0.1;
+    // Invert the condition here: Zoom in (scroll up) decreases the overlay size, Zoom out (scroll down) increases it
+    var scaleAmount = event.deltaY > 0 ? 1 + zoomIntensity : 1 - zoomIntensity;
 
-        // Determine the zoom factor
-        var zoomIntensity = 0.1;
-        var scaleAmount = event.deltaY > 0 ? 1 - zoomIntensity : 1 + zoomIntensity;
+    // Calculate the new width and height
+    var newWidth = overlay.width.baseVal.value * scaleAmount;
+    var newHeight = overlay.height.baseVal.value * scaleAmount;
 
-        // Calculate the new width and height
-        var newWidth = overlay.width.baseVal.value * scaleAmount;
-        var newHeight = overlay.height.baseVal.value * scaleAmount;
+    console.log(newWidth);
+    console.log(newHeight);
 
-        // Update the overlay's dimensions
-        overlay.setAttribute('width', newWidth);
-        overlay.setAttribute('height', newHeight);
+    // Ensure the overlay doesn't become too small or too large
+    // Optional: Define minimum and maximum dimensions for the overlay
+    var minWidth = 10; // Example minimum width
+    var minHeight = 10; // Example minimum height
 
-        // update the main view's viewport here to reflect the zoom level
+        console.log(maxWidth);
+        console.log(maxHeight);
+
+    newWidth = Math.max(minWidth, Math.min(newWidth, maxWidth));
+    newHeight = Math.max(minHeight, Math.min(newHeight, maxHeight));
+
+    // Update the overlay's dimensions
+    overlay.setAttribute('width', newWidth);
+    overlay.setAttribute('height', newHeight);
+
+    // Optionally, update the main view's viewport here to reflect the zoom level
     }
 
     // Attach the zoom event listener to the SVG container
