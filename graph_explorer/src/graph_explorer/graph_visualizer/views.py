@@ -18,6 +18,7 @@ def index(request):
     context = content_module.get_context()
     context["workspaces"] = [vars(ws) for ws in app_config.workspaces]
     context["tree_view_data"] = {}
+    context["nodes_dict"] = {}
 
     return render(request, "index.html", context)
 
@@ -53,6 +54,7 @@ def workspace(request, workspace_id):
         filter(lambda ws: ws.id == workspace_id, app_config.workspaces)
     )[0]
     tree_view_data = get_tree_view_data(active_workspace.graph)
+    nodes_dict = get_node_dict(active_workspace.graph)
 
     content_module.workspaces = [vars(ws) for ws in app_config.workspaces]
     content_module.workspace_id = workspace_id
@@ -63,6 +65,7 @@ def workspace(request, workspace_id):
 
     context = content_module.get_context()
     context["tree_view_data"] = vars(tree_view_data)
+    context["nodes_dict"] = nodes_dict
 
     return render(request, "index.html", context)
 
