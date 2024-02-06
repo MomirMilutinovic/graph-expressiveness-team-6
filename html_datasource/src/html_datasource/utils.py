@@ -14,7 +14,7 @@ def make_node(tag) -> Node:
     if tag.name in ["a", "img"]:
         data["href"] = tag.attrs.get("href", "")
     if tag.name in ["h1", "h2", "h3", "h4", "h5", "h6", "p", "title"]:
-        data["text"] = tag.text
+        data["text"] = tag.text.replace("\n", "").strip()
     if tag.name == "input":
         data["type"] = tag.attrs.get("type", "")
 
