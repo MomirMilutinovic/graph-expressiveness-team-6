@@ -19,9 +19,9 @@
         <p class="panel-heading">Visualizer</p>
         <div class="panel-block">
           <div class="select">
-            <select id="visualizer-select" onchange="changeVisualizer()">
+            <select id="visualizer-select" onchange="selectVisualizer(this.value)">
               {% for visualizer in visualizers %}
-              <option value="{{ visualizer.id }}">{{ visualizer.name }}</option>
+              <option value="{{ visualizer.name }}">{{ visualizer.name }}</option>
               {% endfor %}
             </select>
           </div>
@@ -59,11 +59,6 @@
                 <option>&gt;=</option>
                 <option>==</option>
                 <option>!=</option>
-              </select>
-              <select id="visualizer-select" onchange="selectVisualizer(this.value)">
-                {% for visualizer in visualizers %}
-                <option value="{{ visualizer.name }}">{{ visualizer.name }}</option>
-                {% endfor %}
               </select>
             </div>
             <input id="filter-value-input" class="input" type="text" placeholder="Value" />
