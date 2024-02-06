@@ -52,7 +52,7 @@
 <!--              {% else %}-->
 <!--                  <h2>No workspace selected</h2>-->
 <!--              {% endif %}-->
-            {% include "bird_view.html" with bird_view=bird_view %}
+            {% include "bird_view.html" with bird_view_nodes=bird_view_nodes %}
           </div>
       </nav>
       </div>
@@ -88,7 +88,7 @@
         </nav>
         <nav class="panel" id="main-view-panel">
           <p class="panel-heading">Main View</p>
-          <div style="height: 100%">
+          <div style="height: 100%" id="main-view-graph">
             {% if content %}
               {{ content|safe }}
             {% else %}

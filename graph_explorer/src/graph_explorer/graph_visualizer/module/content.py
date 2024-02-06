@@ -29,7 +29,8 @@ class ContentModule:
             "current_visualizer": self.current_visualizer.get_name() if self.current_visualizer else None,
             "current_data_source": self.current_data_source.get_name() if self.current_data_source else None,
             "data_source_params": self.get_data_source_params(),
-            "content": self.current_visualizer.display(self.graph) if self.current_visualizer else None
+            "content": self.current_visualizer.display(self.graph) if self.current_visualizer else None,
+            "bird_view_nodes": len(self.graph.nodes) if self.graph else 0,
         }
         return content
 
