@@ -1,16 +1,12 @@
 from django.apps import apps
 from api.components.data_source import DataSource
 from api.models.node import Node
+from api.models.graph import Graph
 import random
 from .models import TreeViewNode
 
 
-def get_tree_view_data(datasource_name: str) -> TreeViewNode:
-    data_sources: list[DataSource] = apps.get_app_config(
-        "graph_visualizer"
-    ).data_source_plugins
-    graph = data_sources[1].provide(auth_token="placeholder")
-
+def get_tree_view_data(graph: Graph) -> TreeViewNode:
     graph_root = random.choice(list(graph.get_nodes()))
 
     tree_view_root = process_node(graph_root)
@@ -23,10 +19,12 @@ def process_node(node: Node, level: int = 0) -> TreeViewNode:
     neighbours = node.get_neighbours()
 
     for neighbour in neighbours:
-        child = vars(TreeViewNode(neighbour.id, False, []))
+        child = vars(TreeViewNode(neighbour.id, False, [], neighbour.data))
         children.append(child)
 
-    return TreeViewNode(node.id, True if level in [0, 1] else False, children)
+    return TreeViewNode(
+        node.id, True if level in [0, 1] else False, children, node.data
+    )
 
 
 def get_datasource_configuration(datasource_name) -> dict:

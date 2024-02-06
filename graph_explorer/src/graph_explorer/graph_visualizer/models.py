@@ -3,11 +3,12 @@ import uuid
 
 
 class TreeViewNode:
-    def __init__(self, name: str, expanded: bool, children: list) -> None:
+    def __init__(self, name: str, expanded: bool, children: list, data: dict) -> None:
         self.name = name
         self.expanded = expanded
         self.children = children if expanded else []
         self.og_children = children
+        self.data = data
 
 
 class Workspace:
