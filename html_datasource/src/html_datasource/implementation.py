@@ -3,8 +3,17 @@ from api.models.edge import Edge
 from api.models.graph import Graph
 from api.models.node import Node
 
-import requests
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+
+
+def create_webdriver():
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--headless')
+
+    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), options=chrome_options)
+    return driver
 
 
 def make_node(tag):
@@ -28,7 +37,6 @@ def add_edges(nodes: list[Node], node: Node, graph: Graph):
         node.edges = []
     for n in nodes:
         e = Edge({}, node, n)
-        node.edges.append(e)
         graph.add_edge(e)
 
 
@@ -59,17 +67,40 @@ class HtmlDataSource(DataSource):
     def provide(self, **kwargs) -> Graph:
         url = kwargs.get("url", "https://www.google.com")
         g = Graph([], set())
-        response = requests.get(url)
-        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # Create ChromeOptions and add the --headless argument
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument('--headless')
+
+        # Create a WebDriver with ChromeDriverManager and ChromeOptions
+        driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=chrome_options)
+
+        # Navigate to the URL
+        driver.get(url)
+
+        # Wait for some time if needed (you may adjust this)
+        driver.implicitly_wait(5)
+
+        # Get the HTML content after JavaScript execution
+        html_content = driver.page_source
+
+        # Close the WebDriver
+        driver.quit()
+
+        # Parse the HTML content with BeautifulSoup
+        soup = BeautifulSoup(html_content, 'html.parser')
+
+        # Find the root element and traverse the HTML as needed
         root = soup.html
 
         self.recursive_html_traversal(g, root)
+
         return g
 
 
 if __name__ == '__main__':
     # Create an instance of the HTML data source
-    src = "https://www.google.com"
+    src = "https://guthib.com"
     html_data_source = HtmlDataSource()
 
     # Get the data from the HTML page
