@@ -9,6 +9,14 @@
     stroke: #9ecae1;
     stroke-width: 1.5px;
   }
+
+  text {
+    white-space: pre-line;
+  }
+
+  #svg-container {
+    overflow: scroll;
+  }
 </style>
 <script>
   function nodeClick(el) {
@@ -16,7 +24,7 @@
     alert("ID: " + el.name);
   }
 </script>
-<div>
+<div id="svg-container">
   <svg width="350" height="500" id="tree-view-svg"></svg>
 </div>
 {{ tree_view_data|json_script:"tree-view-data" }}
@@ -25,6 +33,53 @@
 
   function emptySvg() {
     d3.select("#tree-view-svg").selectAll("*").remove();
+  }
+
+  function calculateSvgHeight(nodes, nodeSize) {
+    let height = 0;
+
+    for (const node of nodes) {
+      height += 1;
+      if (node.data.expanded) {
+        height += Object.keys(node.data.data).length + 1;
+      }
+    }
+
+    return (height + 10) * nodeSize;
+  }
+
+  function calculateSvgWidth(nodes, nodeSize) {
+    let maxWidth = 0;
+
+    for (const node of nodes) {
+      if (node.data.expanded) {
+        for (const [key, value] of Object.entries(node.data.data)) {
+          let elWidth = nodeSize * (node.depth + 2) + 10 * value.toString().length;
+          if (elWidth > maxWidth) maxWidth = elWidth;
+        }
+      }
+      let elWidth = nodeSize * (node.depth + 2) + 10 * node.data.name.toString().length;
+      if (elWidth > maxWidth) maxWidth = elWidth;
+    }
+
+    return maxWidth;
+  }
+
+  function getYOffset(node) {
+    if (node.parent == null) return Object.keys(node.data.data).length;
+
+    const siblings = node.parent.children;
+    const nodeChildIndex = siblings.indexOf(node);
+
+    if (nodeChildIndex == 0) {
+      return Object.keys(node.parent.data.data).length;
+    }
+
+    const prevSibling = siblings[nodeChildIndex - 1];
+
+    if (!prevSibling.data.expanded) return 0;
+
+    return Object.keys(siblings[nodeChildIndex - 1].data.data).length;
   }
 
   function render() {
@@ -38,15 +93,16 @@
       )(0)
     );
     const nodes = root.descendants();
-    const width = 350;
-    const height = (nodes.length + 1) * nodeSize;
+    let width = calculateSvgWidth(nodes, nodeSize);
+    let height = calculateSvgHeight(nodes, nodeSize);
 
-    const svg = d3
-      .select("#tree-view-svg")
-      .attr("width", width)
-      .attr("height", height)
-      .attr("viewBox", [-nodeSize / 2, (-nodeSize * 3) / 2, width, height])
-      .attr("style", "max-width: 100%; height: auto; font: 15px sans-serif; overflow: visible;");
+    if (width == 0) width = 350;
+    if (height == 0) height = nodeSize * 2;
+
+    console.log("height: ", height);
+    console.log("width: ", width);
+
+    const svg = d3.select("#tree-view-svg").attr("width", width).attr("height", height).attr("style", "height: auto; font: 15px sans-serif;");
 
     const link = svg
       .append("g")
@@ -58,8 +114,8 @@
       .attr(
         "d",
         (d) => `
-        M${d.source.depth * nodeSize},${d.source.index * nodeSize}
-        V${d.target.index * nodeSize}
+        M${d.source.depth * nodeSize},${d.source.index * nodeSize + nodeSize}
+        V${d.target.index * (getYOffset(d.target) + 1) * nodeSize + nodeSize}
         h${nodeSize}
       `
       );
@@ -69,7 +125,7 @@
       .selectAll()
       .data(nodes)
       .join("g")
-      .attr("transform", (d) => `translate(0,${d.index * nodeSize})`)
+      .attr("transform", (d) => `translate(0,${d.index * (getYOffset(d) + 1) * nodeSize + nodeSize})`)
       .on("click", (ev, d) => {
         d.data.expanded = !d.data.expanded;
         if (d.data.expanded) d.data.children = d.data.og_children;
@@ -98,6 +154,23 @@
       .attr("dy", "0.32em")
       .attr("x", (d) => d.depth * nodeSize + 20)
       .text((d) => d.data.name);
+
+    node
+      .filter((d) => d.data.expanded)
+      .append("text")
+      .attr("dy", "1.6em")
+      .attr("x", (d) => d.depth * nodeSize + 20)
+      .text((d) => {
+        let retStr = "";
+
+        for (const [key, value] of Object.entries(d.data.data)) {
+          retStr += `${key}: ${value}\n`;
+        }
+
+        return retStr;
+      });
+
+    console.log(nodes);
   }
 
   render();
