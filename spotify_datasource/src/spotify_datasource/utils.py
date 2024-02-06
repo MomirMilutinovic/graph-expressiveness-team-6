@@ -12,7 +12,10 @@ def get_artist_by_name(auth_token: str, artist_name: str) -> Artist:
         raise Exception("Error happened while fetching Spotify data")
 
     body = response.json()
-    artist_results = body["artists"]["items"]
+    try:
+        artist_results = body["artists"]["items"]
+    except Exception:
+        raise Exception("Auth token expired!")
 
     if len(artist_results) > 0:
         return Artist(artist_results[0])
