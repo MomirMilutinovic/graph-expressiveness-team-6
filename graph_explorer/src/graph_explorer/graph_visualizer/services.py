@@ -9,9 +9,7 @@ def get_tree_view_data(datasource_name: str) -> TreeViewNode:
     data_sources: list[DataSource] = apps.get_app_config(
         "graph_visualizer"
     ).data_source_plugins
-    graph = data_sources[1].provide(
-        auth_token="BQAP22lDj_nBchesUAyO79AAd15V8QRH5yDHrG0qh0QhG9lJSE2xZzMVPINL20v45nnuFZsBlQjv_Od17GIjyLsMjl4hxCz1Qbnwbvw7NzZaoA1zdMs"
-    )
+    graph = data_sources[1].provide(auth_token="placeholder")
 
     graph_root = random.choice(list(graph.get_nodes()))
 
