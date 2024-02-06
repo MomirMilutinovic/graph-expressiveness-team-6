@@ -16,7 +16,9 @@ class ContentModule:
     def select_data_source(self, data_source_name):
         self.current_data_source = \
             next((ds for ds in self.data_source_plugins if ds.get_name() == data_source_name), None)
-        self.graph = self.current_data_source.provide() if self.current_data_source else Graph()
+
+    def set_graph(self, graph: Graph):
+        self.graph = graph
 
     def select_visualizer(self, visualizer_name):
         self.current_visualizer = \

@@ -48,10 +48,10 @@ def workspace(request, workspace_id):
     if workspace_id not in list(map(lambda ws: ws.id, app_config.workspaces)):
         return HttpResponseNotFound("Workspace with given id not found.")
 
-    tree_data = {}
     content_module.workspaces = [vars(ws) for ws in app_config.workspaces]
     content_module.workspace_id = workspace_id
     content_module.select_data_source(app_config.get_workspace(workspace_id).selected_datasource)
+    content_module.set_graph(app_config.get_workspace(workspace_id).graph)
 
     context = content_module.get_context()
 
