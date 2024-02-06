@@ -1,0 +1,64 @@
+{% extends "base.html" %} {% block title %}Configure Data Source{% endblock title %} {% block head_css %}
+<style>
+  .main-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .input {
+    width: 35%;
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+
+  h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+  }
+
+  form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+</style>
+{% endblock head_css %} {% block body %}
+<body>
+  <div class="main-form">
+    <h1>Workspace Configuration</h1>
+    <form method="POST">
+      {% csrf_token %}
+      <input name="workspace-name" class="input" type="text" placeholder="Workspace Name" />
+      <div class="select">
+        <select id="data-source-select">
+          {% for data_source in data_sources %} {% if selected_ds is None and forloop.first or selected_ds == data_source %}
+          <option selected value="{{ data_source }}">{{ data_source }}</option>
+          {% else %}
+          <option value="{{ data_source }}">{{ data_source }}</option>
+          {% endif %} {% endfor %}
+        </select>
+      </div>
+      {% for param in parameters %} {% if param.1 == "str" %}
+      <input name="{{ param.0 }}" class="input" type="text" placeholder="{{ param.0 }}" />
+      {% endif %} {% if param.1 == "int" %}
+      <input name="{{ param.0 }}" class="input" type="number" min="1" placeholder="{{ param.0 }}" />
+      {% endif %} {% if param.1 == "date" %}
+      <input name="{{ param.0 }}" class="input" type="date" placeholder="{{ param.0 }}" />
+      {% endif %} {% endfor %}
+      <input class="button" type="submit" value="Confirm" />
+    </form>
+  </div>
+</body>
+<script>
+  selectEl = document.getElementById("data-source-select");
+
+  selectEl.addEventListener("change", (event) => {
+    const url = window.location.href;
+    const indexToSlice = url.indexOf("workspace-config") + "workspace-config".length;
+    const baseUrl = `${url.slice(0, indexToSlice)}/${encodeURIComponent(event.target.value.trim())}`;
+    window.location.replace(baseUrl);
+  });
+</script>
+{% endblock body %}
