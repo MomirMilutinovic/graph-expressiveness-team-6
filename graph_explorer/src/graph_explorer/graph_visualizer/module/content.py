@@ -6,6 +6,7 @@ from ..models import Workspace
 
 
 class ContentModule:
+    INVALID_WORKSPACE_ID = -1
     def __init__(self, data_source_plugins: list[DataSource], visualizer_plugins: list[Visualizer]):
         self.data_source_plugins = data_source_plugins
         self.visualizer_plugins = visualizer_plugins
@@ -13,7 +14,7 @@ class ContentModule:
         self.current_visualizer: Visualizer | None = self.visualizer_plugins[0] if self.visualizer_plugins else None
         self.graph: Graph = self.current_data_source.provide() if self.current_data_source else Graph()
         self.workspaces = []
-        self.workspace_id = -1
+        self.workspace_id = ContentModule.INVALID_WORKSPACE_ID
 
     def select_data_source(self, data_source_name):
         self.current_data_source = \
@@ -39,7 +40,7 @@ class ContentModule:
             "content": self.current_visualizer.display(self.get_filtered_graph()) if self.current_visualizer else None,
             "workspaces": [vars(ws) for ws in self.workspaces],
             "active_ws_id": self.workspace_id,
-            "filters": list(map(lambda filter: filter.to_json(), self.get_current_workspace().get_filters())) if self.workspace_id != -1 else []
+            "filters": list(map(lambda filter: filter.to_json(), self.get_current_workspace().get_filters())) if self.workspace_id != ContentModule.INVALID_WORKSPACE_ID else []
         }
         return content
 
