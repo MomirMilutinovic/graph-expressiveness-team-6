@@ -10,6 +10,7 @@ from .services import *
 from .models import Workspace
 from .module.content import ContentModule
 from core.filters.search_filter import SearchFilter
+from core.filters.operator_filter import OperatorFilter
 
 content_module = ContentModule(
     apps.get_app_config("graph_visualizer").data_source_plugins,
@@ -124,7 +125,23 @@ def delete_filter(request):
         if filter_json["type"] == "SearchFilter":
             search_filter = SearchFilter(filter_json["search_term"])
             current_workspace.get_filter_chain().remove_filter(search_filter)
+        elif filter_json["type"] == "OperatorFilter":
+            operator_filter = OperatorFilter(filter_json["attribute"], filter_json["operator"], filter_json["value"])
+            current_workspace.get_filter_chain().remove_filter(operator_filter)
     except KeyError:
         return
 
     return HttpResponse(200, content_type="application/json")
+
+def add_filter(request):
+    try:
+        attribute: str = request.POST["attribute"]
+        operator: str = request.POST["operator"]
+        value: str = request.POST["value"]
+        current_workspace = content_module.get_current_workspace()
+        operator_filter: OperatorFilter = OperatorFilter(attribute, operator, value)
+        current_workspace.add_filter(operator_filter)
+    except (KeyError, ValueError):
+        return
+
+    return HttpResponseRedirect(reverse('index'))

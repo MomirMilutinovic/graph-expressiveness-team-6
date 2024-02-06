@@ -40,4 +40,5 @@ urlpatterns = [
     path("provide-data", views.provide_data, name="provide_data"),
     path("search", views.search, name="search"),
     path("delete-filter", views.delete_filter, name="delete_filter"),
+    path("add-filter", views.add_filter, name="add_filter"),
 ]

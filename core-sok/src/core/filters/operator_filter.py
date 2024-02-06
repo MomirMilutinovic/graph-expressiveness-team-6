@@ -74,7 +74,7 @@ class OperatorFilter(Filter):
 
     def to_json(self) -> dict:
         return {
-            "type": "AttributeFilter",
+            "type": "OperatorFilter",
             "attribute": self.attribute,
             "operator": self.operator,
             "value": self.value
