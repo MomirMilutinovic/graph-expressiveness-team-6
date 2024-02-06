@@ -25,8 +25,12 @@ class Graph:
         self.add_node(edge.src)
         self.add_node(edge.dest)
         self.edges.append(edge)
-        edge.src.edges.append(edge)
-        edge.dest.edges.append(edge)
+
+        for node in self.nodes:
+            if node == edge.src:
+                node.edges.append(edge)
+            if node == edge.dest:
+                node.edges.append(edge)
 
     def get_nodes(self) -> set[Node]:
         return self.nodes
