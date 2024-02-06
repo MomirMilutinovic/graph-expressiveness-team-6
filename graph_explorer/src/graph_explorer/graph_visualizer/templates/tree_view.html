@@ -27,9 +27,10 @@
 <div id="svg-container">
   <svg width="350" height="500" id="tree-view-svg"></svg>
 </div>
-{{ tree_view_data|json_script:"tree-view-data" }}
+{{ tree_view_data|json_script:"tree-view-data" }} {{ nodes_dict|json_script:"nodes-dict" }}
 <script>
   let data = JSON.parse(document.getElementById("tree-view-data").textContent);
+  let allNodes = JSON.parse(document.getElementById("nodes-dict").textContent);
 
   function emptySvg() {
     d3.select("#tree-view-svg").selectAll("*").remove();
@@ -74,6 +75,17 @@
     }
 
     return maxWidth;
+  }
+
+  function populateNodeChildren(node) {
+    nodeChildrenIds = node.data.children_ids;
+
+    for (const childrenId of nodeChildrenIds) {
+      const childClone = structuredClone(allNodes[childrenId]);
+      childClone.expanded = false;
+      childClone.children = [];
+      node.data.children.push(childClone);
+    }
   }
 
   function render() {
@@ -127,7 +139,7 @@
       .attr("transform", (d) => `translate(0,${d.index * nodeSize + nodeSize})`)
       .on("click", (ev, d) => {
         d.data.expanded = !d.data.expanded;
-        if (d.data.expanded) d.data.children = d.data.og_children;
+        if (d.data.expanded) populateNodeChildren(d);
         else d.data.children = [];
         render();
       });
