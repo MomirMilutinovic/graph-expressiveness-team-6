@@ -1,3 +1,5 @@
+import uuid
+
 from api.components.data_source import DataSource
 from api.models.edge import Edge
 from api.models.graph import Graph
@@ -9,9 +11,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 def make_node(tag):
-    id_ = tag.attrs.get("id", "")
-    if id_ == "":
-        id_ = str(hash(tag))
+    id_ = generate_id(tag)
     data = {"tag": tag.name}
     if tag.name in ["a", "img"]:
         data["href"] = tag.attrs.get("href", "")
@@ -22,6 +22,14 @@ def make_node(tag):
 
     node = Node(id_, data)
     return node
+
+
+def generate_id(tag):
+    id_ = tag.attrs.get("id", "")
+    if id_ == "":
+        id_ = uuid.uuid4().hex
+    id_ = f'{tag.name}#{id_}'
+    return id_
 
 
 def add_edges(nodes: list[Node], node: Node, graph: Graph):
