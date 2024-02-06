@@ -9,8 +9,11 @@ class SpotifyDataSource(DataSource):
 
     def provide(self, **kwargs) -> Graph:
         auth_token = kwargs["auth_token"]
+        artist_name = kwargs["artist_name"]
+        max_neighbours = kwargs["max_neighbours"]
+        recursion_depth = kwargs["recursion_depth"]
 
-        return get_graph(auth_token)
+        return get_graph(auth_token, artist_name, max_neighbours, recursion_depth)
 
     def get_configuration_parameters(self) -> dict[str, str]:
         return {
