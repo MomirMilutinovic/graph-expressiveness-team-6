@@ -1,10 +1,15 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
+from django.apps.registry import apps
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 from .services import *
 from .models import Workspace
 from .module.content import ContentModule
+from core.filters.search_filter import SearchFilter
 
 content_module = ContentModule(
     apps.get_app_config("graph_visualizer").data_source_plugins,
@@ -12,6 +17,7 @@ content_module = ContentModule(
 )
 
 app_config = apps.get_app_config("graph_visualizer")
+content_module.workspaces = app_config.workspaces
 
 
 def index(request):
@@ -33,8 +39,15 @@ def load_views(_):
     return HttpResponseRedirect(reverse("index"))
 
 
-def search(_, query):
-    content_module.search(query)
+def search(request):
+    try:
+        query: str = request.POST["query"]
+        current_workspace = content_module.get_current_workspace()
+        search_filter: SearchFilter = SearchFilter(query)
+        current_workspace.add_filter(search_filter)
+    except (KeyError, ValueError):
+        return
+
     return HttpResponseRedirect(reverse("index"))
 
 
@@ -100,3 +113,17 @@ def workspace_configuration(request, datasource_name=None):
         return HttpResponseRedirect(
             reverse("workspace", kwargs={"workspace_id": new_workspace.id})
         )
+
+
+@csrf_exempt
+def delete_filter(request):
+    try:
+        current_workspace = content_module.get_current_workspace()
+        filter_json = json.loads(request.body)
+        if filter_json["type"] == "SearchFilter":
+            search_filter = SearchFilter(filter_json["search_term"])
+            current_workspace.get_filter_chain().remove_filter(search_filter)
+    except KeyError:
+        return
+
+    return HttpResponse(200, content_type="application/json")

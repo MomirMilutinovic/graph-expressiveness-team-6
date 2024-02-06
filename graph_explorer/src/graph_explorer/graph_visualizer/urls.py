@@ -37,6 +37,7 @@ urlpatterns = [
         name="select_visualizer",
     ),
     path("load-views", views.load_views, name="load_views"),
-    path("search/<str:query>", views.search, name="search"),
     path("provide-data", views.provide_data, name="provide_data"),
+    path("search", views.search, name="search"),
+    path("delete-filter", views.delete_filter, name="delete_filter"),
 ]

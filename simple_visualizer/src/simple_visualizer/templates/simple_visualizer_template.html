@@ -97,7 +97,7 @@
             .style('stroke', 'black')
             .style('stroke-width', '1.5px')
             .each(function(d) {
-                d3.select("g#"+d.name)
+                d3.select("g[id=\""+d.name+"\"]")
                 .append('text')
                 .attr('text-anchor','middle')
                 .attr('font-size',textSize)
