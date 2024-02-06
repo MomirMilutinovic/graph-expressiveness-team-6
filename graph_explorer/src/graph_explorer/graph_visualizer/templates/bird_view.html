@@ -212,11 +212,9 @@
         // Apply scale and translate to the wrapper
         gWrapper.attr("transform", "translate("+ t +") scale("+ scale +")");
 
-        setTimeout(function() { isLoaded = false; }, nodeLength);
+        setTimeout(function() { isLoaded = false; }, 50);
     }
 
-    let nodeLength = {{ bird_view_nodes|safe }}
-    console.log(nodeLength)
     let isLoaded = false;
     window.onload = () => {
         let mainSvg = d3.select("#main-svg-advanced-visualizer");
