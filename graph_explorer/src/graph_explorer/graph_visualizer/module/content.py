@@ -7,9 +7,9 @@ class ContentModule:
     def __init__(self, data_source_plugins: list[DataSource], visualizer_plugins: list[Visualizer]):
         self.data_source_plugins = data_source_plugins
         self.visualizer_plugins = visualizer_plugins
-        self.current_data_source: DataSource | None = None
-        self.current_visualizer: Visualizer | None = None
-        self.graph: Graph = Graph()
+        self.current_data_source: DataSource | None = self.data_source_plugins[0]  # until workspaces are implemented
+        self.current_visualizer: Visualizer | None = self.visualizer_plugins[0] if self.visualizer_plugins else None
+        self.graph: Graph = self.current_data_source.provide()  # until workspaces are implemented
 
     def select_data_source(self, data_source_name):
         self.current_data_source = \
@@ -28,7 +28,8 @@ class ContentModule:
             "data_sources": [{"name": ds.get_name(), "id": i} for i, ds in enumerate(self.data_source_plugins)],
             "current_visualizer": self.current_visualizer.get_name() if self.current_visualizer else None,
             "current_data_source": self.current_data_source.get_name() if self.current_data_source else None,
-            "data_source_params": self.get_data_source_params()
+            "data_source_params": self.get_data_source_params(),
+            "content": self.current_visualizer.display(self.graph) if self.current_visualizer else None
         }
         return content
 

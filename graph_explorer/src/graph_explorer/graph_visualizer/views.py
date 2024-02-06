@@ -32,7 +32,7 @@ def select_visualizer(request, visualizer_name):
 
 def load_views(request):
     # TODO: Load main, bird and tree views
-    pass
+    return HttpResponseRedirect(reverse('index'))
 
 
 def search(request, query):
