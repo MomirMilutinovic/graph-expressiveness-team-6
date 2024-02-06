@@ -31,7 +31,7 @@ class OperatorFilter(Filter):
 
     def satisfiesQuery(self, node: Node) -> bool:
         """
-        Chcecks if the node satisfies the query.
+        Checks if the node satisfies the query.
         :param node: The node to check.
         :type node: Node
         :return: True if the node satisfies the query, False otherwise. 
