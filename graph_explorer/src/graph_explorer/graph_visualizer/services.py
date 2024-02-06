@@ -14,16 +14,49 @@ def get_tree_view_data(graph: Graph) -> TreeViewNode:
     return tree_view_root
 
 
+def get_node_dict(graph: Graph) -> dict:
+    nodes = graph.get_nodes()
+    node_dict = {
+        node.id: vars(
+            TreeViewNode(
+                node.id,
+                False,
+                [],
+                node.data,
+                list(map(lambda node: node.id, node.get_neighbours())),
+            )
+        )
+        for node in nodes
+    }
+
+    for node in nodes:
+        print(list(map(lambda node: node.id, node.get_neighbours())))
+
+    return node_dict
+
+
 def process_node(node: Node, level: int = 0) -> TreeViewNode:
     children = []
     neighbours = node.get_neighbours()
 
     for neighbour in neighbours:
-        child = vars(TreeViewNode(neighbour.id, False, [], neighbour.data))
+        child = vars(
+            TreeViewNode(
+                neighbour.id,
+                False,
+                [],
+                neighbour.data,
+                list(map(lambda node: node.id, neighbour.get_neighbours())),
+            )
+        )
         children.append(child)
 
     return TreeViewNode(
-        node.id, True if level in [0, 1] else False, children, node.data
+        node.id,
+        True if level in [0, 1] else False,
+        children,
+        node.data,
+        list(map(lambda node: node.id, node.get_neighbours())),
     )
 
 
