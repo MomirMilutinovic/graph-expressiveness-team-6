@@ -21,3 +21,6 @@ class GraphVisualizerConfig(AppConfig):
 
     def add_workspace(self, workspace: Workspace):
         self.workspaces.append(workspace)
+
+    def get_workspace(self, id_) -> Workspace:
+        return next((ws for ws in self.workspaces if ws.id == id_), None)
