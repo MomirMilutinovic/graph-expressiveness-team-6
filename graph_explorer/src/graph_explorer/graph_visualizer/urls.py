@@ -14,14 +14,29 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('workspace/<int:workspace_id>', views.workspace, name='workspace'),
-    path('select-visualizer/<str:visualizer_name>', views.select_visualizer, name='select_visualizer'),
-    path('load-views', views.load_views, name='load_views'),
-    path('search/<str:query>', views.search, name='search'),
-    path('provide-data', views.provide_data, name='provide_data'),
+    path("", views.index, name="index"),
+    path("workspace/<str:workspace_id>", views.workspace, name="workspace"),
+    path(
+        "workspace-config",
+        views.workspace_configuration,
+        name="workspace_config",
+    ),
+    path(
+        "workspace-config/<str:datasource_name>",
+        views.workspace_configuration,
+    ),
+    path("", views.index, name="index"),
+    path(
+        "select-visualizer/<str:visualizer_name>",
+        views.select_visualizer,
+        name="select_visualizer",
+    ),
+    path("load-views", views.load_views, name="load_views"),
+    path("search/<str:query>", views.search, name="search"),
+    path("provide-data", views.provide_data, name="provide_data"),
 ]
