@@ -35,3 +35,6 @@ class Workspace:
 
     def get_filters(self) -> List[Filter]:
         return self.filter_props.get_filters()
+
+    def get_filter_chain(self) -> FilterChain:
+        return self.filter_props

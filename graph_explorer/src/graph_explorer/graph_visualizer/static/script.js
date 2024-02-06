@@ -20,4 +20,16 @@ function selectVisualizer(name) {
     };
     request.open("GET", "/select-visualizer/" + encodeURIComponent(name), true);
     request.send();
+    changeView("main");
+}
+
+function deleteFilter(filter) {
+    const request = new XMLHttpRequest();
+    request.open("DELETE", "/delete-filter", true);
+    request.send(JSON.stringify(filter));
+    request.onload = function () {
+        if (request.status === 200) {
+            location.reload();
+        }
+    };
 }

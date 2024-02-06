@@ -79,7 +79,7 @@
             <span>Active filters:</span>
             {% for filter in filters %}
               {% if filter.type == 'SearchFilter' %}
-                <div class="filter has-background-primary has-text-white">{{ filter.search_term }} <span class="material-symbols-outlined">remove</span></div>
+                <div class="filter has-background-primary has-text-white" onclick="deleteFilter({{ filter|safe }})">{{ filter.search_term }} <span class="material-symbols-outlined">remove</span></div>
               {% endif %}
             {% endfor %}
           </div>

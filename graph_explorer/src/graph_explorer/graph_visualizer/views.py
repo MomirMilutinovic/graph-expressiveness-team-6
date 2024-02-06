@@ -3,6 +3,8 @@ from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
 from django.apps.registry import apps
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 from .services import *
 from .models import Workspace
@@ -98,3 +100,15 @@ def workspace_configuration(request, datasource_name=None):
             reverse("workspace", kwargs={"workspace_id": new_workspace.id})
         )
 
+@csrf_exempt
+def delete_filter(request):
+    try:
+        current_workspace = content_module.get_current_workspace()
+        filter_json = json.loads(request.body)
+        if filter_json["type"] == "SearchFilter":
+            search_filter = SearchFilter(filter_json["search_term"])
+            current_workspace.get_filter_chain().remove_filter(search_filter)
+    except KeyError:
+        return
+
+    return HttpResponse(200, content_type="application/json")
