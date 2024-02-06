@@ -65,10 +65,12 @@
   }
 
   function calculateSvgHeight(nodes, nodeSize) {
-    const lastNode = nodes[nodes.length - 1];
-    const lastNodeKeysOffset = Object.keys(lastNode.data.data).length + 1;
+    const maxIndex = Math.max(...nodes.map((n) => n.index));
+    const maxIndexElem = nodes.filter((n) => n.index == maxIndex)[0];
 
-    return (lastNode.index + lastNodeKeysOffset) * nodeSize + nodeSize;
+    const maxIndexKeysOffset = Object.keys(maxIndexElem.data.data).length + 1;
+
+    return (maxIndex + maxIndexKeysOffset) * nodeSize + nodeSize;
   }
 
   function calculateSvgWidth(nodes, nodeSize) {
