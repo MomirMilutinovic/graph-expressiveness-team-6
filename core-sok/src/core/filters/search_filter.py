@@ -21,7 +21,7 @@ class SearchFilter(Filter):
         return self.search_term == __value.search_term
 
     def satisfiesQuery(self, node):
-        return self.search_term in node.id or any(self.search_term in value for value in node.data.values()) or any(self.search_term in key for key in node.data.keys())
+        return self.search_term in node.id or any(self.search_term in str(value) for value in node.data.values()) or any(self.search_term in str(key) for key in node.data.keys())
 
     def filter(self, graph: Graph) -> Graph:
         """
