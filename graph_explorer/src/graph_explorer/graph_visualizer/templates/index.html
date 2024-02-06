@@ -21,7 +21,7 @@
           <div class="select">
             <select id="visualizer-select" onchange="selectVisualizer(this.value)">
               {% for visualizer in visualizers %}
-              <option value="{{ visualizer.name }}">{{ visualizer.name }}</option>
+                <option value="{{ visualizer.name }}" {% if visualizer.name == current_visualizer %}selected{% endif %}>{{ visualizer.name }}</option>
               {% endfor %}
             </select>
           </div>
@@ -71,11 +71,11 @@
       </nav>
       <nav class="panel" id="main-view-panel">
         <p class="panel-heading">Main View</p>
-        <div>
-          {%if main_views %} {% for main_view in main_views %}
-          <div class="main-view is-hidden" id="main-view-{{ main_view.visualizer_id }}">{{ main_view.html|safe }}</div>
-          {% endfor %} {% else %}
-          <h2 color="red">No workspace selected</h2>
+        <div style="height: 100%">
+          {% if content %}
+            {{ content|safe }}
+          {% else %}
+            <h2 style="color: red;">No workspace selected</h2>
           {% endif %}
         </div>
       </nav>

@@ -1,8 +1,6 @@
-from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
-from django.apps.registry import apps
 
 from .services import *
 from .models import Workspace
@@ -24,17 +22,17 @@ def index(request):
     return render(request, "index.html", context)
 
 
-def select_visualizer(request, visualizer_name):
+def select_visualizer(_, visualizer_name):
     content_module.select_visualizer(visualizer_name)
     return HttpResponseRedirect(reverse("index"))
 
 
-def load_views(request):
+def load_views(_):
     # TODO: Load main, bird and tree views
-    pass
+    return HttpResponseRedirect(reverse("index"))
 
 
-def search(request, query):
+def search(_, query):
     content_module.search(query)
     return HttpResponseRedirect(reverse("index"))
 
@@ -56,39 +54,17 @@ def workspace(request, workspace_id):
     )[0]
     tree_view_data = get_tree_view_data(active_workspace.graph)
 
-    return render(
-        request,
-        "index.html",
-        {
-            "workspaces": [vars(ws) for ws in app_config.workspaces],
-            "active_ws_id": workspace_id,
-            "visualizers": [
-                {"name": "Simple visualizer", "id": 1},
-                {"name": "Block visualizer", "id": 2},
-            ],
-            "main_views": [
-                {
-                    "visualizer_id": 2,
-                    "html": "<h2>Visualizer 2</h2>",
-                },
-                {
-                    "visualizer_id": 1,
-                    "html": "<h2>Visualizer 1</h2>",
-                },
-            ],
-            "bird_views": [
-                {
-                    "visualizer_id": 2,
-                    "html": "<h2>Bird view 2</h2>",
-                },
-                {
-                    "visualizer_id": 1,
-                    "html": "<h2>Bird view 1</h2>",
-                },
-            ],
-            "tree_view_data": vars(tree_view_data),
-        },
+    content_module.workspaces = [vars(ws) for ws in app_config.workspaces]
+    content_module.workspace_id = workspace_id
+    content_module.select_data_source(
+        app_config.get_workspace(workspace_id).selected_datasource
     )
+    content_module.set_graph(app_config.get_workspace(workspace_id).graph)
+
+    context = content_module.get_context()
+    context["tree_view_data"] = vars(tree_view_data)
+
+    return render(request, "index.html", context)
 
 
 def workspace_configuration(request, datasource_name=None):
