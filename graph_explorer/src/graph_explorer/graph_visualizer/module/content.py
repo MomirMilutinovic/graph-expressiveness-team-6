@@ -8,12 +8,17 @@ class ContentModule:
         self.data_source_plugins = data_source_plugins
         self.visualizer_plugins = visualizer_plugins
         self.current_data_source: DataSource | None = None
-        self.current_visualizer: Visualizer | None = None
-        self.graph: Graph = Graph()
+        self.current_visualizer: Visualizer | None = self.visualizer_plugins[0] if self.visualizer_plugins else None
+        self.graph: Graph = self.current_data_source.provide() if self.current_data_source else Graph()
+        self.workspaces = []
+        self.workspace_id = -1
 
     def select_data_source(self, data_source_name):
         self.current_data_source = \
             next((ds for ds in self.data_source_plugins if ds.get_name() == data_source_name), None)
+
+    def set_graph(self, graph: Graph):
+        self.graph = graph
 
     def select_visualizer(self, visualizer_name):
         self.current_visualizer = \
@@ -28,7 +33,10 @@ class ContentModule:
             "data_sources": [{"name": ds.get_name(), "id": i} for i, ds in enumerate(self.data_source_plugins)],
             "current_visualizer": self.current_visualizer.get_name() if self.current_visualizer else None,
             "current_data_source": self.current_data_source.get_name() if self.current_data_source else None,
-            "data_source_params": self.get_data_source_params()
+            "data_source_params": self.get_data_source_params(),
+            "content": self.current_visualizer.display(self.graph) if self.current_visualizer else None,
+            "workspaces": self.workspaces,
+            "active_ws_id": self.workspace_id,
         }
         return content
 
@@ -39,4 +47,3 @@ class ContentModule:
         if self.current_data_source is None:
             return
         self.graph = self.current_data_source.provide(**kwargs)
-
