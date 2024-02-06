@@ -1,7 +1,6 @@
 from api.components.data_source import DataSource
 from api.components.visualizer import Visualizer
 from api.models.graph import Graph
-from core.filters.filter_chain import FilterChain
 from ..models import Workspace
 
 
