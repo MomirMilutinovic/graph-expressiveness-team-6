@@ -22,15 +22,6 @@ class SearchFilter(Filter):
             return False
         return self.search_term == __value.search_term
 
-    def satisfiesQuery(self, node: Node) -> bool:
-        """
-        Chcecks if the node satisfies the query.
-        :param node: The node to check.
-        :type node: Node
-        :return: True if the node satisfies the query, False otherwise. 
-        """
-        return self.search_term in node.id or any(self.search_term in str(value) for value in node.data.values()) or any(self.search_term in str(key) for key in node.data.keys())
-
     def filter(self, graph: Graph) -> Graph:
         """
         Filters the graph.
@@ -40,7 +31,7 @@ class SearchFilter(Filter):
         :return: The filtered graph.
         :rtype: Graph
         """
-        nodes = list(filter(lambda node: self.satisfiesQuery(node), graph.nodes))
+        nodes = list(filter(lambda node: self.search_term in node, graph.nodes))
         edges = list(filter(lambda edge: edge.src in nodes and edge.dest in nodes, graph.edges))
         return Graph(edges, nodes)
 
