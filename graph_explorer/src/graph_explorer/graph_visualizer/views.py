@@ -13,82 +13,13 @@ content_module = ContentModule(
     apps.get_app_config("graph_visualizer").visualizer_plugins,
 )
 
-tree_view_data = {
-    "name": "Gunna",
-    "expanded": True,
-    "children": [
-        {
-            "name": "Young Thug",
-            "expanded": "true",
-            "children": [
-                {
-                    "name": "Takeoff",
-                    "expanded": True,
-                },
-            ],
-            "og_children": [
-                {
-                    "name": "Takeoff",
-                    "expanded": True,
-                },
-            ],
-        },
-        {
-            "name": "Future",
-            "expanded": True,
-            "children": [
-                {
-                    "name": "Travis Scott",
-                    "expanded": True,
-                },
-            ],
-            "og_children": [
-                {
-                    "name": "Travis Scott",
-                    "expanded": True,
-                },
-            ],
-        },
-    ],
-    "og_children": [
-        {
-            "name": "Young Thug",
-            "expanded": True,
-            "children": [
-                {
-                    "name": "Takeoff",
-                    "expanded": True,
-                },
-            ],
-            "og_children": [
-                {
-                    "name": "Takeoff",
-                    "expanded": True,
-                },
-            ],
-        },
-        {
-            "name": "Future",
-            "children": [
-                {
-                    "name": "Travis Scott",
-                },
-            ],
-            "og_children": [
-                {
-                    "name": "Travis Scott",
-                },
-            ],
-        },
-    ],
-}
-
 app_config = apps.get_app_config("graph_visualizer")
 
 
 def index(request):
     context = content_module.get_context()
     context["workspaces"] = [vars(ws) for ws in app_config.workspaces]
+    context["tree_view_data"] = {}
 
     return render(request, "index.html", context)
 
@@ -120,7 +51,10 @@ def workspace(request, workspace_id):
     if workspace_id not in list(map(lambda ws: ws.id, app_config.workspaces)):
         return HttpResponseNotFound("Workspace with given id not found.")
 
-    tree_view_data = {}
+    active_workspace: Workspace = list(
+        filter(lambda ws: ws.id == workspace_id, app_config.workspaces)
+    )[0]
+    tree_view_data = get_tree_view_data(active_workspace.graph)
 
     return render(
         request,
@@ -152,7 +86,7 @@ def workspace(request, workspace_id):
                     "html": "<h2>Bird view 1</h2>",
                 },
             ],
-            "tree_view_data": tree_view_data,
+            "tree_view_data": vars(tree_view_data),
         },
     )
 
