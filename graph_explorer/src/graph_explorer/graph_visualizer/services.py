@@ -29,9 +29,6 @@ def get_node_dict(graph: Graph) -> dict:
         for node in nodes
     }
 
-    for node in nodes:
-        print(list(map(lambda node: node.id, node.get_neighbours())))
-
     return node_dict
 
 

@@ -32,6 +32,17 @@
   let data = JSON.parse(document.getElementById("tree-view-data").textContent);
   let allNodes = JSON.parse(document.getElementById("nodes-dict").textContent);
 
+  // initialization of root node
+  data.children = [];
+  for (const childrenId of data.children_ids) {
+    const childClone = structuredClone(allNodes[childrenId]);
+    childClone.expanded = false;
+    childClone.children = [];
+    data.children.push(childClone);
+  }
+
+  console.log(data);
+
   function emptySvg() {
     d3.select("#tree-view-svg").selectAll("*").remove();
   }
