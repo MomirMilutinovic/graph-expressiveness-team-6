@@ -1,9 +1,17 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
+from django.apps.registry import apps
+
 from .services import *
 from .models import Workspace
+from .module.content import ContentModule
 
+content_module = ContentModule(
+    apps.get_app_config("graph_visualizer").data_source_plugins,
+    apps.get_app_config("graph_visualizer").visualizer_plugins,
+)
 
 tree_view_data = {
     "name": "Gunna",
@@ -79,20 +87,33 @@ app_config = apps.get_app_config("graph_visualizer")
 
 
 def index(request):
-    tree_view_data = {}
+    context = content_module.get_context()
+    context["workspaces"] = [vars(ws) for ws in app_config.workspaces]
 
-    return render(
-        request,
-        "index.html",
-        {
-            "workspaces": [vars(ws) for ws in app_config.workspaces],
-            "visualizers": [
-                {"name": "Simple visualizer", "id": 1},
-                {"name": "Block visualizer", "id": 2},
-            ],
-            "tree_view_data": tree_view_data,
-        },
-    )
+    return render(request, "index.html", context)
+
+
+def select_visualizer(request, visualizer_name):
+    content_module.select_visualizer(visualizer_name)
+    return HttpResponseRedirect(reverse("index"))
+
+
+def load_views(request):
+    # TODO: Load main, bird and tree views
+    pass
+
+
+def search(request, query):
+    content_module.search(query)
+    return HttpResponseRedirect(reverse("index"))
+
+
+def provide_data(request):
+    if request.method != "POST":
+        return
+    kwargs = request.body.decode("utf-8")
+    content_module.provide_data(kwargs)
+    return HttpResponseRedirect(reverse("index"))
 
 
 def workspace(request, workspace_id):

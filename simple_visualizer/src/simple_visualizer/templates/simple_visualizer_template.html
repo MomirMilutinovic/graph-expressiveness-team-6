@@ -1,0 +1,146 @@
+<style>
+.node {
+  cursor: pointer;
+  color: #3182bd;
+
+}
+
+.link {
+  fill: none;
+  stroke: #9ecae1;
+  stroke-width: 1.5px;
+}
+
+#main-svg-{{name}} {
+    width: 100%;
+    height: 100%;
+}
+
+.active-node {
+    stroke: black;
+    stroke-width: 2px;
+}
+
+</style>
+<script>
+    function nodeClick(el){
+        d3.select(".active-node").select("circle").style("fill","white");
+        d3.select(".active-node").classed("active-node",false);
+        d3.select(el).classed("active-node",true);
+        d3.select(el).select("circle").style("fill","red");
+    }
+</script>
+<svg id="main-svg-{{name}}">
+
+</svg>
+<script>
+    function renderSimpleVisualization() {
+        var nodes = [
+            {% for n in nodes %}
+            {
+                name: "node_{{n.id}}",
+                data: {{ n.data | tojson }},
+            },
+            {% endfor %}
+        ];
+
+        var links = [
+            {% for e in edges %}
+            {
+                source: "node_{{e.src.id}}",
+                target: "node_{{e.dest.id}}",
+                data: {{ e.data | tojson }},
+            },
+            {% endfor %}
+        ];
+
+        links = links.map(link => ({
+            ...link,
+            source: nodes.find(n => n.name === link.source),
+            target: nodes.find(n => n.name === link.target),
+        }));
+
+        const handleZoom = (e) => g.attr('transform', e.transform);
+        const zoom = d3.zoom().on('zoom', handleZoom);
+
+        var g = d3.select('#main-svg-{{name}}').call(zoom).append('g');
+
+        const simulation = d3.forceSimulation(nodes)
+            .force("charge", d3.forceManyBody().strength(-100))
+            .force("link", d3.forceLink(links).distance(300))
+            .force("x", d3.forceX(600))
+            .force("y", d3.forceY(300))    
+            .force("collide", d3.forceCollide().radius(80))
+            .on("tick", tick);
+
+        const link = g.selectAll(".link")
+            .data(links).enter()
+            .append("line")
+            .attr("class" , "link");
+    
+        const node = g.selectAll(".node")
+            .data(nodes)
+            .enter()
+            .append("g")
+            .attr("class", "node")
+            .attr("id", d => d.name)
+            .on('click',function(){
+                nodeClick(this);
+            })
+            .call(drag(simulation));
+        
+        const radius=25;
+        const textSize=15;
+        d3.selectAll('.node').append('circle')
+            .attr('r', radius+textSize)
+            .style('fill', 'white')
+            .style('stroke', 'black')
+            .style('stroke-width', '1.5px')
+            .each(function(d) {
+                d3.select("g#"+d.name)
+                .append('text')
+                .attr('text-anchor','middle')
+                .attr('font-size',textSize)
+                .attr('font-family','sans-serif')
+                .attr('fill','green')
+                .text(d.name);
+            });
+
+        function tick() {
+            link
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y);
+    
+            node.attr("transform", function(d) {
+                return "translate(" + d.x + "," + d.y + ")";
+            })
+        }
+
+        function drag(simulation) {    
+            function dragstarted(event) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            event.subject.fx = event.subject.x;
+            event.subject.fy = event.subject.y;
+            }
+            
+            function dragged(event) {
+            event.subject.fx = event.x;
+            event.subject.fy = event.y;
+            }
+            
+            function dragended(event) {
+            if (!event.active) simulation.alphaTarget(0);
+            event.subject.fx = null;
+            event.subject.fy = null;
+            }
+            
+            return d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended);
+        }
+    }
+    renderSimpleVisualization();
+</script>

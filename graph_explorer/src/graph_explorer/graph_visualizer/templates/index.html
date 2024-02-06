@@ -60,6 +60,11 @@
                 <option>==</option>
                 <option>!=</option>
               </select>
+              <select id="visualizer-select" onchange="selectVisualizer(this.value)">
+                {% for visualizer in visualizers %}
+                <option value="{{ visualizer.name }}">{{ visualizer.name }}</option>
+                {% endfor %}
+              </select>
             </div>
             <input id="filter-value-input" class="input" type="text" placeholder="Value" />
           </span>
