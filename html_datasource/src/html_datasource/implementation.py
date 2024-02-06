@@ -8,14 +8,6 @@ from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-def create_webdriver():
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('--headless')
-
-    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), options=chrome_options)
-    return driver
-
-
 def make_node(tag):
     id_ = tag.attrs.get("id", "")
     if id_ == "":
@@ -38,6 +30,15 @@ def add_edges(nodes: list[Node], node: Node, graph: Graph):
     for n in nodes:
         e = Edge({}, node, n)
         graph.add_edge(e)
+
+
+def driver_setup(url):
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--headless')
+    driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=chrome_options)
+    driver.get(url)
+    driver.implicitly_wait(5)
+    return driver
 
 
 class HtmlDataSource(DataSource):
@@ -68,31 +69,12 @@ class HtmlDataSource(DataSource):
         url = kwargs.get("url", "https://www.google.com")
         g = Graph([], set())
 
-        # Create ChromeOptions and add the --headless argument
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument('--headless')
-
-        # Create a WebDriver with ChromeDriverManager and ChromeOptions
-        driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=chrome_options)
-
-        # Navigate to the URL
-        driver.get(url)
-
-        # Wait for some time if needed (you may adjust this)
-        driver.implicitly_wait(5)
-
-        # Get the HTML content after JavaScript execution
+        driver = driver_setup(url)
         html_content = driver.page_source
-
-        # Close the WebDriver
         driver.quit()
 
-        # Parse the HTML content with BeautifulSoup
         soup = BeautifulSoup(html_content, 'html.parser')
-
-        # Find the root element and traverse the HTML as needed
         root = soup.html
-
         self.recursive_html_traversal(g, root)
 
         return g
