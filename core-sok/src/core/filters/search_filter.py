@@ -1,4 +1,4 @@
-from base_filter import Filter
+from .base_filter import Filter
 from api.models.graph import Graph
 
 class SearchFilter(Filter):
@@ -35,3 +35,9 @@ class SearchFilter(Filter):
         nodes = list(filter(lambda node: self.satisfiesQuery(node), graph.nodes))
         edges = list(filter(lambda edge: edge.src in nodes and edge.dest in nodes, graph.edges))
         return Graph(edges, nodes)
+
+    def to_json(self) -> dict:
+        return {
+            "type": "SearchFilter",
+            "search_term": self.search_term
+        }

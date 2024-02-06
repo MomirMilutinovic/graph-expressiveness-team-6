@@ -1,6 +1,8 @@
 from api.components.data_source import DataSource
 from api.components.visualizer import Visualizer
 from api.models.graph import Graph
+from core.filters.filter_chain import FilterChain
+from ..models import Workspace
 
 
 class ContentModule:
@@ -34,16 +36,20 @@ class ContentModule:
             "current_visualizer": self.current_visualizer.get_name() if self.current_visualizer else None,
             "current_data_source": self.current_data_source.get_name() if self.current_data_source else None,
             "data_source_params": self.get_data_source_params(),
-            "content": self.current_visualizer.display(self.graph) if self.current_visualizer else None,
-            "workspaces": self.workspaces,
+            "content": self.current_visualizer.display(self.get_filtered_graph()) if self.current_visualizer else None,
+            "workspaces": [vars(ws) for ws in self.workspaces],
             "active_ws_id": self.workspace_id,
+            "filters": list(map(lambda filter: filter.to_json(), self.get_current_workspace().get_filters())) if self.workspace_id != -1 else []
         }
         return content
-
-    def search(self, query):
-        self.graph.nodes = [node for node in self.graph.nodes if query in node]
 
     def provide_data(self, kwargs: dict):
         if self.current_data_source is None:
             return
         self.graph = self.current_data_source.provide(**kwargs)
+
+    def get_filtered_graph(self):
+        return self.get_current_workspace().get_filtered_graph() if self.workspace_id != -1 else self.graph
+    
+    def get_current_workspace(self) -> Workspace:
+        return next((ws for ws in self.workspaces if ws.id == self.workspace_id), None)

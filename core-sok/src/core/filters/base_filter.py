@@ -17,3 +17,14 @@ class Filter(ABC):
         :rtype: Graph
         """
         pass
+
+    @abstractmethod
+    def to_json(self) -> dict:
+        """
+        Converts the filter to a JSON object.
+        The JSON object should contain a "type" field with the filter type.
+
+        :return: The JSON object.
+        :rtype: dict
+        """
+        pass

@@ -1,5 +1,5 @@
 from api.models.graph import Graph
-from base_filter import Filter
+from .base_filter import Filter
 from typing import List
 
 class FilterChain(Filter):
@@ -17,3 +17,12 @@ class FilterChain(Filter):
         for filter in self.filters:
             graph = filter.filter(graph)
         return graph
+
+    def to_json(self) -> dict:
+        return {
+            "type": "FilterChain",
+            "filters": [filter.to_json() for filter in self.filters]
+        }
+    
+    def get_filters(self) -> List[Filter]:
+        return self.filters

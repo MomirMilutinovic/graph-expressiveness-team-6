@@ -2,8 +2,8 @@ import unittest
 from api.models.graph import Graph
 from api.models.node import Node
 from api.models.edge import Edge
-from search_filter import SearchFilter
-from filter_chain import FilterChain
+from .search_filter import SearchFilter
+from .filter_chain import FilterChain
 
 
 class SearchFilterTests(unittest.TestCase):

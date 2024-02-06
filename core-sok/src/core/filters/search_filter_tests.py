@@ -1,5 +1,5 @@
 import unittest
-from search_filter import SearchFilter
+from .search_filter import SearchFilter
 from api.models.graph import Graph
 from api.models.node import Node
 from api.models.edge import Edge

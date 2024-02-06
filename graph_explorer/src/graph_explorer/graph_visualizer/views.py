@@ -1,10 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
+from django.apps.registry import apps
+from django.http import HttpResponse
 
 from .services import *
 from .models import Workspace
 from .module.content import ContentModule
+from core.filters.search_filter import SearchFilter
 
 content_module = ContentModule(
     apps.get_app_config("graph_visualizer").data_source_plugins,
@@ -12,11 +15,11 @@ content_module = ContentModule(
 )
 
 app_config = apps.get_app_config("graph_visualizer")
+content_module.workspaces = app_config.workspaces
 
 
 def index(request):
     context = content_module.get_context()
-    context["workspaces"] = [vars(ws) for ws in app_config.workspaces]
 
     return render(request, "index.html", context)
 
@@ -31,9 +34,16 @@ def load_views(_):
     return HttpResponseRedirect(reverse('index'))
 
 
-def search(_, query):
-    content_module.search(query)
-    return HttpResponseRedirect(reverse("index"))
+def search(request):
+    try:
+        query: str = request.POST['query']
+        current_workspace = content_module.get_current_workspace()
+        search_filter: SearchFilter = SearchFilter(query)
+        current_workspace.add_filter(search_filter)
+    except (KeyError, ValueError):
+        return
+
+    return HttpResponseRedirect(reverse('index'))
 
 
 def provide_data(request):
@@ -48,7 +58,6 @@ def workspace(request, workspace_id):
     if workspace_id not in list(map(lambda ws: ws.id, app_config.workspaces)):
         return HttpResponseNotFound("Workspace with given id not found.")
 
-    content_module.workspaces = [vars(ws) for ws in app_config.workspaces]
     content_module.workspace_id = workspace_id
     content_module.select_data_source(app_config.get_workspace(workspace_id).selected_datasource)
     content_module.set_graph(app_config.get_workspace(workspace_id).graph)
@@ -88,3 +97,4 @@ def workspace_configuration(request, datasource_name=None):
         return HttpResponseRedirect(
             reverse("workspace", kwargs={"workspace_id": new_workspace.id})
         )
+
