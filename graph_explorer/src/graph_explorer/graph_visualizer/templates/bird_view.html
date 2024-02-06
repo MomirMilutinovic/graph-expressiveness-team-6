@@ -43,12 +43,20 @@
     });
 
     function scrollToMainView(x, y) {
-        // Implement the logic to change the viewport of the main view
-        // This is highly dependent on your main view's implementation
-        // For an SVG inside a scrollable container, for example:
-        // const mainViewContainer = document.getElementById('main-view-container');
-        // mainViewContainer.scrollLeft = x;
-        // mainViewContainer.scrollTop = y;
+        const svgElement = document.getElementById('main-svg-advanced-visualizer');
+
+        const currentViewBox = svgElement.getAttribute('viewBox');
+        let viewWidth, viewHeight;
+        if (currentViewBox) {
+            const viewBoxValues = currentViewBox.split(' ');
+            viewWidth = viewBoxValues[2];
+            viewHeight = viewBoxValues[3];
+        } else {
+            viewWidth = 500;
+            viewHeight = 300;
+        }
+
+        svgElement.setAttribute('viewBox', `${x} ${y} ${viewWidth} ${viewHeight}`);
     }
 
     function updateViewportOverlay() {
@@ -78,8 +86,9 @@
 
     // Function to start dragging
     function startDrag(event) {
-        // Calculate and store the starting point
-        var rect = svg.getBoundingClientRect();
+        // Ensure 'svg' references the DOM element, not a D3 selection
+        var svgElement = svg.node(); // This gets the actual DOM element from the D3 selection
+        var rect = svgElement.getBoundingClientRect(); // Now you can call getBoundingClientRect
         startX = event.clientX - rect.left - overlay.x.baseVal.value;
         startY = event.clientY - rect.top - overlay.y.baseVal.value;
         isDragging = true;
@@ -88,7 +97,8 @@
     // Function to drag the overlay
     function drag(event) {
         if (isDragging) {
-            var rect = svg.getBoundingClientRect();
+            var svgElement = svg.node(); // This gets the actual DOM element from the D3 selection
+            var rect = svgElement.getBoundingClientRect(); // Now you can call getBoundingClientRect
             // Calculate the new position
             var newX = event.clientX - rect.left - startX;
             var newY = event.clientY - rect.top - startY;
@@ -112,48 +122,65 @@
     document.addEventListener('mouseup', stopDrag);
 
     var svgRect = svg.getBoundingClientRect(); // Get the bounding rectangle of the SVG
-    var maxWidth = svgRect.width;
-    var maxHeight = svgRect.height;
-
 
     // Function to zoom the overlay
     function zoom(event) {
-    event.preventDefault();
-    console.log("ZOOM");
+        event.preventDefault();
+        console.log("ZOOM");
 
-    var zoomIntensity = 0.1;
-    // Invert the condition here: Zoom in (scroll up) decreases the overlay size, Zoom out (scroll down) increases it
-    var scaleAmount = event.deltaY > 0 ? 1 + zoomIntensity : 1 - zoomIntensity;
+        var zoomIntensity = 0.1;
+        var scaleAmount = event.deltaY > 0 ? 1 + zoomIntensity : 1 - zoomIntensity;
 
-    // Calculate the new width and height
-    var newWidth = overlay.width.baseVal.value * scaleAmount;
-    var newHeight = overlay.height.baseVal.value * scaleAmount;
+        let currentWidth = overlay.width.baseVal.value;
+        let currentHeight = overlay.height.baseVal.value;
 
-    console.log(newWidth);
-    console.log(newHeight);
+        let newWidth = currentWidth * scaleAmount;
+        let newHeight = currentHeight * scaleAmount;
 
-    // Ensure the overlay doesn't become too small or too large
-    // Optional: Define minimum and maximum dimensions for the overlay
-    var minWidth = 10; // Example minimum width
-    var minHeight = 10; // Example minimum height
+        const minWidth = 30;
+        const minHeight = 10;
+        const svgElement = document.getElementById('main-svg-advanced-visualizer');
+        const maxWidth = svgElement.clientWidth;
+        const maxHeight = svgElement.clientHeight;
 
-        console.log(maxWidth);
-        console.log(maxHeight);
+        // Clamp the new dimensions to be within the min and max limits
+        newWidth = Math.max(minWidth, Math.min(newWidth, maxWidth));
+        newHeight = Math.max(minHeight, Math.min(newHeight, maxHeight));
 
-    newWidth = Math.max(minWidth, Math.min(newWidth, maxWidth));
-    newHeight = Math.max(minHeight, Math.min(newHeight, maxHeight));
+        let dx = (currentWidth - newWidth) / 2;
+        let dy = (currentHeight - newHeight) / 2;
 
-    // Update the overlay's dimensions
-    overlay.setAttribute('width', newWidth);
-    overlay.setAttribute('height', newHeight);
+        let currentX = overlay.x.baseVal.value + dx;
+        let currentY = overlay.y.baseVal.value + dy;
 
-    // Optionally, update the main view's viewport here to reflect the zoom level
+        console.log(newWidth, newHeight, currentX, currentY);
+
+        overlay.setAttribute('width', newWidth);
+        overlay.setAttribute('height', newHeight);
+
+        overlay.setAttribute('x', currentX);
+        overlay.setAttribute('y', currentY);
+
+        const viewBox = svgElement.getAttribute('viewBox').split(' ').map(Number);
+        const [x, y, width, height] = viewBox;
+
+        // Calculate the new viewBox dimensions to reflect the zoom level
+        const centerX = x + width / 2;
+        const centerY = y + height / 2;
+        const newViewBoxWidth = width * scaleAmount;
+        const newViewBoxHeight = height * scaleAmount;
+        const newX = centerX - newViewBoxWidth / 2;
+        const newY = centerY - newViewBoxHeight / 2;
+
+        console.log(newX, newY, newViewBoxWidth, newViewBoxHeight);
+
+        const clampedViewBoxWidth = Math.max(minWidth, Math.min(newViewBoxWidth, maxWidth));
+        const clampedViewBoxHeight = Math.max(minHeight, Math.min(newViewBoxHeight, maxHeight));
+
+        svgElement.setAttribute('viewBox', `${newX} ${newY} ${clampedViewBoxWidth} ${clampedViewBoxHeight}`);
     }
 
-    // Attach the zoom event listener to the SVG container
     svg.addEventListener('wheel', zoom);
 
-    // Call updateViewportOverlay whenever the main view is scrolled, zoomed, or panned
-    //mainView.addEventListener('scroll', updateViewportOverlay);
-    // Plus any other event listeners for zooming or panning, depending on your implementation
+    mainView.addEventListener('scroll', updateViewportOverlay);
 </script>
