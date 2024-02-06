@@ -1,9 +1,11 @@
 from .base_filter import Filter
 from api.models.graph import Graph
+from api.models.node import Node
 
 class SearchFilter(Filter):
     """
-    Filter for searching a graph.
+    SearchFilter filters the graph so only nodes where the search query occurs
+    remain in the graph.
     """
 
     def __init__(self, search_term: str):
@@ -20,7 +22,13 @@ class SearchFilter(Filter):
             return False
         return self.search_term == __value.search_term
 
-    def satisfiesQuery(self, node):
+    def satisfiesQuery(self, node: Node) -> bool:
+        """
+        Chcecks if the node satisfies the query.
+        :param node: The node to check.
+        :type node: Node
+        :return: True if the node satisfies the query, False otherwise. 
+        """
         return self.search_term in node.id or any(self.search_term in str(value) for value in node.data.values()) or any(self.search_term in str(key) for key in node.data.keys())
 
     def filter(self, graph: Graph) -> Graph:
@@ -37,6 +45,11 @@ class SearchFilter(Filter):
         return Graph(edges, nodes)
 
     def to_json(self) -> dict:
+        """
+        Returns a JSON representation of the filter.
+        :return: The JSON representation of the filter.
+        :rtype: dict
+        """
         return {
             "type": "SearchFilter",
             "search_term": self.search_term
