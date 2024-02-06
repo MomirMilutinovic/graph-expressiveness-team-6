@@ -22,19 +22,19 @@ class Workspace:
         self.name = name
         self.selected_datasource = selected_datasource
         self.datasource_config = datasource_config
-        self.filter_props = FilterChain()
+        self.filter_chain = FilterChain()
         self.graph = app_config.data_source_plugins_dict[selected_datasource].provide(
             **datasource_config
         )
     
     def add_filter(self, filter: Filter):
-        self.filter_props.add_filter(filter)
+        self.filter_chain.add_filter(filter)
 
     def get_filtered_graph(self) -> Graph:
-        return self.filter_props.filter(self.graph)
+        return self.filter_chain.filter(self.graph)
 
     def get_filters(self) -> List[Filter]:
-        return self.filter_props.get_filters()
+        return self.filter_chain.get_filters()
 
     def get_filter_chain(self) -> FilterChain:
-        return self.filter_props
+        return self.filter_chain
