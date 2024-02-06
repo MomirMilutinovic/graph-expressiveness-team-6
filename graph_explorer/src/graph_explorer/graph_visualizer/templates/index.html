@@ -1,102 +1,85 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Graph Expressiveness</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'style.css' %}?{% now 'U' %}" />
-    <script src="{% static 'script.js' %}?{% now 'U' %}"></script>
-  </head>
-  <body onload="changeVisualizer()">
-    <div id="container">
-      <aside class="menu" id="workspace-bar">
-        <p class="menu-label">Workspaces</p>
-        <ul class="menu-list">
-          {% for workspace in workspaces %}
-          <li><a href="{%url 'workspace' workspace.id %}">{{ workspace.name }}</a></li>
-          {% endfor %}
-          <li>
-            <a href="" id="create-workspace" class="row">Create a new workspace <span class="material-symbols-outlined">add_circle</span></a>
-          </li>
-        </ul>
-      </aside>
-      <div class="vertical-container" id="left-panel">
-        <nav class="panel" id="visualizer-select-panel">
-          <p class="panel-heading">Visualizer</p>
-          <div class="panel-block">
+{% extends "base.html" %} {% block title %}Graph Expressiveness{% endblock title %} {% block body %}
+<body onload="changeVisualizer()">
+  <div id="container">
+    <aside class="menu" id="workspace-bar">
+      <p class="menu-label">Workspaces</p>
+      <ul class="menu-list">
+        {% for workspace in workspaces %} {% if workspace.id == active_ws_id %}
+        <li class="highlight"><a href="{%url 'workspace' workspace.id %}">{{ workspace.name }}</a></li>
+        {% else %}
+        <li><a href="{%url 'workspace' workspace.id %}">{{ workspace.name }}</a></li>
+        {% endif %} {% endfor %}
+        <li>
+          <a href="/workspace-config" id="create-workspace" class="row">Create a new workspace <span class="material-symbols-outlined">add_circle</span></a>
+        </li>
+      </ul>
+    </aside>
+    <div class="vertical-container" id="left-panel">
+      <nav class="panel" id="visualizer-select-panel">
+        <p class="panel-heading">Visualizer</p>
+        <div class="panel-block">
+          <div class="select">
+            <select id="visualizer-select" onchange="selectVisualizer(this.value)">
+              {% for visualizer in visualizers %}
+                <option value="{{ visualizer.name }}" {% if visualizer.name == current_visualizer %}selected{% endif %}>{{ visualizer.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </nav>
+      <nav class="panel" id="tree-view-panel">{% include "tree_view.html" %}</nav>
+      <nav class="panel" id="bird-view-panel">
+        <p class="panel-heading">Bird View</p>
+        <div class="panel-block">
+          {%if content %}
+            {% include "bird_view.html" %}
+          {% else %}
+          <h2 color="red">No workspace selected</h2>
+          {% endif %}
+        </div>
+      </nav>
+    </div>
+    <div class="vertical-container">
+      <nav class="panel" id="search-and-filter-panel">
+        <p class="panel-heading">Search and filter</p>
+        <div class="panel-block">
+          <div class="filter-form">
+            <input id="search-input" class="input" type="text" placeholder="Search" />
+          </div>
+          <button class="button is-light">Search</button>
+        </div>
+        <div class="panel-block">
+          <span class="filter-form">
+            <input id="filter-attribute-input" class="input" type="text" placeholder="Attribute" />
             <div class="select">
-              <select id="visualizer-select" onchange="selectVisualizer(this.value)">
-                {% for visualizer in visualizers %}
-                  <option value="{{ visualizer.name }}" {% if visualizer.name == current_visualizer %}selected{% endif %}>{{ visualizer.name }}</option>
-                {% endfor %}
+              <select>
+                <option>&lt;</option>
+                <option>&gt;</option>
+                <option>&lt;=</option>
+                <option>&gt;=</option>
+                <option>==</option>
+                <option>!=</option>
               </select>
             </div>
-          </div>
-        </nav>
-        <nav class="panel" id="tree-view-panel">{% include "tree_view.html" %}</nav>
-        <nav class="panel" id="bird-view-panel">
-          <p class="panel-heading">Bird View</p>
-          <div class="panel-block">
-<!--              {% if bird_views %}-->
-<!--                  {% for bird_view in bird_views %}-->
-<!--                      <div class="main-view" id="bird-view-{{ bird_view.visualizer_id }}">-->
-<!--                          {% include "bird_view.html" with bird_view=bird_view %}-->
-<!--                      </div>-->
-<!--                  {% endfor %}-->
-<!--              {% else %}-->
-<!--                  <h2>No workspace selected</h2>-->
-<!--              {% endif %}-->
-            {% include "bird_view.html" %}
-          </div>
+            <input id="filter-value-input" class="input" type="text" placeholder="Value" />
+          </span>
+          <button class="button is-light">Filter</button>
+        </div>
+        <div class="panel-block">
+          <p>Active filters:</p>
+        </div>
       </nav>
-      </div>
-      <div class="vertical-container">
-        <nav class="panel" id="search-and-filter-panel">
-          <p class="panel-heading">Search and filter</p>
-          <div class="panel-block">
-            <div class="filter-form">
-              <input id="search-input" class="input" type="text" placeholder="Search" />
-            </div>
-            <button class="button is-light">Search</button>
-          </div>
-          <div class="panel-block">
-            <span class="filter-form">
-              <input id="filter-attribute-input" class="input" type="text" placeholder="Attribute" />
-              <div class="select">
-                <select>
-                  <option>&lt;</option>
-                  <option>&gt;</option>
-                  <option>&lt;=</option>
-                  <option>&gt;=</option>
-                  <option>==</option>
-                  <option>!=</option>
-                </select>
-              </div>
-              <input id="filter-value-input" class="input" type="text" placeholder="Value" />
-            </span>
-            <button class="button is-light">Filter</button>
-          </div>
-          <div class="panel-block">
-            <p>Active filters:</p>
-          </div>
-        </nav>
-        <nav class="panel" id="main-view-panel">
-          <p class="panel-heading">Main View</p>
-          <div style="height: 100%" id="main-view-graph">
-            {% if content %}
-              {{ content|safe }}
-            {% else %}
-              <h2 style="color: red;">No workspace selected</h2>
-            {% endif %}
-          </div>
-        </nav>
-      </div>
+      <nav class="panel" id="main-view-panel">
+        <p class="panel-heading">Main View</p>
+        <div style="height: 100%">
+          {% if content %}
+            {{ content|safe }}
+          {% else %}
+            <h2 style="color: red;">No workspace selected</h2>
+          {% endif %}
+        </div>
+      </nav>
     </div>
-  </body>
-</html>
+  </div>
+</body>
+{% endblock body %}

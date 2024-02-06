@@ -14,7 +14,9 @@ class Graph:
 
     def remove_node(self, node: Node):
         self.nodes.remove(node)
-        self.edges = [edge for edge in self.edges if edge.src != node and edge.dest != node]
+        self.edges = [
+            edge for edge in self.edges if edge.src != node and edge.dest != node
+        ]
 
     def add_node(self, node: Node):
         self.nodes.add(node)
@@ -23,8 +25,10 @@ class Graph:
         self.add_node(edge.src)
         self.add_node(edge.dest)
         self.edges.append(edge)
+        edge.src.edges.append(edge)
+        edge.dest.edges.append(edge)
 
-    def get_nodes(self) -> list[Node]:
+    def get_nodes(self) -> set[Node]:
         return self.nodes
 
     def get_edges(self) -> list[Edge]:
