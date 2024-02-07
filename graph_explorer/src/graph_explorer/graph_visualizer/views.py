@@ -69,7 +69,7 @@ def workspace(request, workspace_id):
     tree_view_data = get_tree_view_data(active_workspace.graph)
     nodes_dict = get_node_dict(active_workspace.graph)
 
-    content_module.workspaces = [vars(ws) for ws in app_config.workspaces]
+    content_module.workspaces = app_config.workspaces
     content_module.workspace_id = workspace_id
     content_module.select_data_source(
         app_config.get_workspace(workspace_id).selected_datasource
@@ -79,6 +79,7 @@ def workspace(request, workspace_id):
     context = content_module.get_context()
     context["tree_view_data"] = vars(tree_view_data)
     context["nodes_dict"] = nodes_dict
+    context["workspaces"] = [vars(ws) for ws in app_config.workspaces]
 
     return render(request, "index.html", context)
 
