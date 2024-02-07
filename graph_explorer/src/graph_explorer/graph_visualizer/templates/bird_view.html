@@ -41,8 +41,10 @@
         let viewportWidth = birdViewSvgWidth * scale;
         let viewportHeight = birdViewSvgHeight * scale;
 
-        let viewportX = -translate[0] * scaleX;
-        let viewportY = -translate[1] * scaleY;
+        console.log(viewportHeight,viewportWidth);
+
+        let viewportX = translate[0] * scaleX;
+        let viewportY = translate[1] * scaleY;
 
         d3.select("#viewport-overlay")
             .attr("width", viewportWidth)
@@ -65,7 +67,7 @@
         let birdViewSvgHeight = birdViewSvg.node().getBoundingClientRect().height;
 
         // Calculate the scale factor
-        let birdViewScaleHeight = birdViewSvgWidth / mainSvgWidth; // or birdViewSvgHeight / mainSvgHeight;
+        let birdViewScaleHeight = birdViewSvgWidth / mainSvgWidth;
         let birdViewScaleWidth = birdViewSvgHeight / mainSvgHeight;
 
         // Define the zoom behavior
@@ -73,11 +75,11 @@
             .scaleExtent([0.1, 10])
             .on("zoom", function(event) {
                 gElement.attr("transform", event.transform);
-
+                let birdViewScale = birdViewSvgWidth / mainSvgWidth;
                 // Translate the main SVG's zoom and pan for the bird's eye view
-                let adjustedScale = 1 / event.transform.k; // Inverse for overlay size
-                let adjustedTranslateX = event.transform.x * birdViewScaleWidth; // Adjust translation
-                let adjustedTranslateY = event.transform.y * birdViewScaleHeight; // Adjust translation
+                let adjustedScale =  1 / event.transform.k; // Inverse for overlay size
+                let adjustedTranslateX = event.transform.x * birdViewScale / event.transform.k;
+                let adjustedTranslateY = event.transform.y * birdViewScale / event.transform.k;
 
                 adjustViewportOverlay(adjustedScale, [adjustedTranslateX, adjustedTranslateY]);
             });
@@ -87,11 +89,12 @@
         let svgWidth = svg.node().clientWidth;
         let svgHeight = svg.node().clientHeight;
         let scale = Math.min(svgWidth / bbox.width, svgHeight / bbox.height);
-        let translate = [(svgWidth / 2) - ((bbox.x + bbox.width / 2) * scale), (svgHeight / 2) - ((bbox.y + bbox.height / 2) * scale)];
+        let scaleX = (svgWidth / bbox.width);
+        let scaleY = (svgHeight / bbox.height);
+        let translate = [(svgWidth / 2) - ((bbox.x + bbox.width / 2 + 100) * scaleX), (svgHeight / 2) - ((bbox.y + bbox.height / 2 + 100) * scaleY)];
 
         // Initialize the zoom on the SVG and apply the initial transform
-        svg.call(zoom)
-           .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
+        svg.call(zoom);
 
         adjustViewportOverlay(scale, translate);
     }
@@ -120,17 +123,10 @@
         setTimeout(function() { isLoaded = false; }, 100);
     }
 
-    function setInitialViewport() {
-        let initialScale = 1;
-        let initialTranslate = [0, 0];
-        adjustViewportOverlay(initialScale, initialTranslate);
-    }
-
     let isLoaded = false;
     window.onload = () => {
         let mainSvg = d3.select("#main-view-graph>svg");
         initializeMainSvgZoom();
-        setInitialViewport();
         const target = mainSvg.node();
         observer.observe(target, config);
     }
