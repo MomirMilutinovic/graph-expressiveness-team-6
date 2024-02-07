@@ -45,7 +45,7 @@ a .material-symbols-outlined {
     margin-left: 0.5em;
 }
 
-.panel-block button.button {
+.panel-block .button {
     margin-left: 2em;
     box-sizing: border-box;
     width: 8em;
@@ -85,3 +85,21 @@ a .material-symbols-outlined {
     background-color: #efefef;
 }
 
+.filter-form {
+    display: flex;
+    align-items: center;
+}
+
+.active-filters {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.active-filters>* {
+    display: flex;
+    align-items: center;
+    padding: 0.5em;
+    margin: 0 0.5em;
+    border-radius: 0.5em;
+}

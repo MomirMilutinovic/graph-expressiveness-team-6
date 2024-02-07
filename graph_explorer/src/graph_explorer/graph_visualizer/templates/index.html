@@ -43,10 +43,19 @@
       <nav class="panel" id="search-and-filter-panel">
         <p class="panel-heading">Search and filter</p>
         <div class="panel-block">
-          <div class="filter-form">
-            <input id="search-input" class="input" type="text" placeholder="Search" />
-          </div>
-          <button class="button is-light">Search</button>
+            {% if active_ws_id %}
+              <form class="filter-form" action="{% url 'search' %}" method="post">
+                {% csrf_token %}
+                  <input id="search-input" class="input" type="text" placeholder="Search" name="query" />
+                  <input type="submit" value="Search" class="button is-light" />
+              </form>
+            {% else %}
+              <div class="filter-form">
+                {% csrf_token %}
+                  <input id="search-input" class="input" type="text" placeholder="Search" name="query" />
+                  <input type="submit" value="Search" class="button is-light" />
+              </div>
+            {% endif %}
         </div>
         <div class="panel-block">
           <span class="filter-form">
@@ -62,11 +71,18 @@
               </select>
             </div>
             <input id="filter-value-input" class="input" type="text" placeholder="Value" />
+            <button class="button is-light">Filter</button>
           </span>
-          <button class="button is-light">Filter</button>
         </div>
         <div class="panel-block">
-          <p>Active filters:</p>
+          <div class="active-filters">
+            <span>Active filters:</span>
+            {% for filter in filters %}
+              {% if filter.type == 'SearchFilter' %}
+                <div class="filter has-background-primary has-text-white" onclick="deleteFilter({{ filter|safe }})">{{ filter.search_term }} <span class="material-symbols-outlined">remove</span></div>
+              {% endif %}
+            {% endfor %}
+          </div>
         </div>
       </nav>
       <nav class="panel" id="main-view-panel">
