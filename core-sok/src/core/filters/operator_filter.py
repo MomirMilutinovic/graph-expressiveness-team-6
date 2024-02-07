@@ -18,14 +18,15 @@ class OperatorFilter(Filter):
         "<": lambda a, b: a < b,
         ">=": lambda a, b: a >= b,
         "<=": lambda a, b: a <= b,
-        "in": lambda a, b: b in a,
-        "re": lambda a, regex: search(regex, a) is not None,
-        "⋮": lambda a, b: a % b == 0,
+        "contains": lambda a, b: b in a,
+        "matches": lambda a, regex: search(regex, a) is not None,
+        "divisible by": lambda a, b: a % b == 0,
     }
 
     def __init__(self, attribute: str, operator_name: str, value: str, operator: Callable[[Any, Any], bool]):
         """
         Initializes the operator filter.
+        The value will be converted to the type of the attribute once filter is called.
 
         :param attribute: The attribute to filter by.
         :type attribute: str
@@ -45,6 +46,7 @@ class OperatorFilter(Filter):
         """
         Initializes the operator filter.
         The operator is determined by the operator_name.
+        The value will be converted to the type of the attribute once filter is called.
 
         :param attribute: The attribute to filter by.
         :type attribute: str
@@ -81,9 +83,12 @@ class OperatorFilter(Filter):
         except ValueError:
             return False
 
-        if self.attribute == "id":
-            return self.operator(node.id, self.value)
-        return self.operator(node.data[self.attribute], self.value)
+        try:
+            if self.attribute == "id":
+                return self.operator(node.id, self.value)
+            return self.operator(node.data[self.attribute], self.value)
+        except (ValueError, TypeError):
+            return False
 
     def filter(self, graph: Graph) -> Graph:
         """

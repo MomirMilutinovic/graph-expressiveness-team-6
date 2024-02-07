@@ -56,11 +56,11 @@ a .material-symbols-outlined {
 }
 
 #filter-attribute-input, #filter-value-input {
-    width: 45%;
+    width: 42.5%;
 }
 
 .filter-form .select {
-    width: 9.2%;
+    width: 15%;
 }
 
 .filter-form .select select{
