@@ -58,29 +58,32 @@
             {% endif %}
         </div>
         <div class="panel-block">
-          <span class="filter-form">
-            <input id="filter-attribute-input" class="input" type="text" placeholder="Attribute" />
+          <form class="filter-form" method="POST" action="{% url 'add_filter' %}">
+            {% csrf_token %}
+            <input name="attribute" id="filter-attribute-input" class="input" type="text" placeholder="Attribute" />
             <div class="select">
-              <select>
-                <option>&lt;</option>
-                <option>&gt;</option>
-                <option>&lt;=</option>
-                <option>&gt;=</option>
-                <option>==</option>
-                <option>!=</option>
+              <select name="operator">
+                {% for operator in operators %}
+                  <option value="{{operator|safe}}">{{operator}}</option>
+                {% endfor %}
               </select>
             </div>
-            <input id="filter-value-input" class="input" type="text" placeholder="Value" />
-            <button class="button is-light">Filter</button>
-          </span>
+            <input name="value" id="filter-value-input" class="input" type="text" placeholder="Value" />
+            <input type="submit" value="Filter" class="button is-light" />
+          </form>
         </div>
         <div class="panel-block">
           <div class="active-filters">
             <span>Active filters:</span>
             {% for filter in filters %}
-              {% if filter.type == 'SearchFilter' %}
-                <div class="filter has-background-primary has-text-white" onclick="deleteFilter({{ filter|safe }})">{{ filter.search_term }} <span class="material-symbols-outlined">remove</span></div>
-              {% endif %}
+                <div class="filter has-background-primary has-text-white" onclick="deleteFilter({{ filter|safe }})">
+                  {% if filter.type == 'SearchFilter' %}
+                    {{ filter.search_term }}
+                  {% elif filter.type == 'OperatorFilter' %}
+                    {{ filter.attribute }} {{ filter.operator }} {{ filter.value }}
+                  {% endif %}
+                  <span class="material-symbols-outlined">remove</span>
+                </div>
             {% endfor %}
           </div>
         </div>
