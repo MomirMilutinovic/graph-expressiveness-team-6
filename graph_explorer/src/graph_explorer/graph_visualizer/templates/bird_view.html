@@ -38,8 +38,8 @@
         let scaleX = birdViewSvgWidth / mainSvgWidth;
         let scaleY = birdViewSvgHeight / mainSvgHeight;
 
-        let viewportWidth = birdViewSvgWidth / scale;
-        let viewportHeight = birdViewSvgHeight / scale;
+        let viewportWidth = birdViewSvgWidth * scale;
+        let viewportHeight = birdViewSvgHeight * scale;
 
         let viewportX = -translate[0] * scaleX;
         let viewportY = -translate[1] * scaleY;
