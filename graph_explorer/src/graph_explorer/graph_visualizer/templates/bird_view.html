@@ -27,7 +27,7 @@
 </div>
 <script>
     function adjustViewportOverlay(scale, translate) {
-        let mainSvg = d3.select("#main-svg-advanced-visualizer").empty() ? d3.select("#main-svg-simple_visualizer") : d3.select("#main-svg-advanced-visualizer");
+        let mainSvg = d3.select("#main-view-graph>svg");
 
         let mainSvgWidth = mainSvg.node().getBoundingClientRect().width;
         let mainSvgHeight = mainSvg.node().getBoundingClientRect().height;
@@ -52,7 +52,7 @@
     }
 
     function initializeMainSvgZoom() {
-        let svg = d3.select("#main-svg-advanced-visualizer").empty() ? d3.select("#main-svg-simple_visualizer") : d3.select("#main-svg-advanced-visualizer");
+        let svg = d3.select("#main-view-graph>svg");
         let gElement = svg.select('g');
 
          // Main SVG dimensions
@@ -98,7 +98,7 @@
 
     function renderBirdView(e){
         isLoaded = true;
-        let mainSvg = d3.select("#main-svg-advanced-visualizer").empty() ? d3.select("#main-svg-simple_visualizer") : d3.select("#main-svg-advanced-visualizer");
+        let mainSvg = d3.select("#main-view-graph>svg");
         let mainSvgContent = mainSvg.html();
 
         // Clear the bird view SVG and append the copied content within a <g> tag for transformation
@@ -128,7 +128,7 @@
 
     let isLoaded = false;
     window.onload = () => {
-        let mainSvg = d3.select("#main-svg-advanced-visualizer").empty() ? d3.select("#main-svg-simple_visualizer") : d3.select("#main-svg-advanced-visualizer");
+        let mainSvg = d3.select("#main-view-graph>svg");
         initializeMainSvgZoom();
         setInitialViewport();
         const target = mainSvg.node();
