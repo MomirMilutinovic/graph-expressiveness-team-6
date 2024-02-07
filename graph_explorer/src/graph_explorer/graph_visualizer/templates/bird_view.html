@@ -25,169 +25,86 @@
     </svg>
 </div>
 <script>
-    document.getElementById('bird-view-content').addEventListener('click', function(event) {
-        const birdViewRect = this.getBoundingClientRect();
-        const clickX = event.clientX - birdViewRect.left;
-        const clickY = event.clientY - birdViewRect.top;
-
-        const birdViewWidth = document.getElementById('bird-view-svg').clientWidth;
-        const birdViewHeight = document.getElementById('bird-view-svg').clientHeight;
-
-        const ratioX = clickX / birdViewRect.width;
-        const ratioY = clickY / birdViewRect.height;
-
-        scrollToMainView(ratioX * birdViewWidth, ratioY * birdViewHeight);
-    });
-
-    function scrollToMainView(x, y) {
-        let svgElement = document.getElementById('main-svg-advanced-visualizer');
-        if(!svgElement) {
-            svgElement = document.getElementById('main-svg-simple_visualizer');
+    function adjustViewportOverlay(scale, translate) {
+        let mainSvg = d3.select("#main-svg-advanced-visualizer");
+        if(mainSvg.empty()){
+            mainSvg = d3.select("#main-svg-simple_visualizer");
         }
 
-        const currentViewBox = svgElement.getAttribute('viewBox');
-        let viewWidth, viewHeight;
-        if (currentViewBox) {
-            const viewBoxValues = currentViewBox.split(' ');
-            viewWidth = viewBoxValues[2];
-            viewHeight = viewBoxValues[3];
-        } else {
-            viewWidth = 500;
-            viewHeight = 300;
-        }
+        let mainSvgWidth = mainSvg.node().getBoundingClientRect().width;
+        let mainSvgHeight = mainSvg.node().getBoundingClientRect().height;
 
-        svgElement.setAttribute('viewBox', `${x} ${y} ${viewWidth} ${viewHeight}`);
+        let birdViewSvgWidth = d3.select("#bird-view-svg").node().getBoundingClientRect().width;
+        let birdViewSvgHeight = d3.select("#bird-view-svg").node().getBoundingClientRect().height;
+
+        let scaleX = birdViewSvgWidth / mainSvgWidth;
+        let scaleY = birdViewSvgHeight / mainSvgHeight;
+
+        let viewportWidth = birdViewSvgWidth / scale;
+        let viewportHeight = birdViewSvgHeight / scale;
+
+        let viewportX = -translate[0] * scaleX;
+        let viewportY = -translate[1] * scaleY;
+
+        d3.select("#viewport-overlay")
+            .attr("width", viewportWidth)
+            .attr("height", viewportHeight)
+            .attr("x", viewportX)
+            .attr("y", viewportY);
     }
 
-    function updateViewportOverlay() {
-        const mainView = document.getElementById('main-view'); // Adjust based on your implementation
-        const birdViewSvg = document.getElementById('bird-view-svg');
+    function initializeMainSvgZoom() {
+        let svg = d3.select("#main-svg-advanced-visualizer");
+        if(svg.empty()){
+            svg = d3.select("#main-svg-simple_visualizer");
+        }
+        let gElement = svg.select('g');
+        // Calculate the bounding box of the content
+        let bbox = gElement.node().getBBox();
+        let svgWidth = svg.node().clientWidth;
+        let svgHeight = svg.node().clientHeight;
+        let scale = Math.min(svgWidth / bbox.width, svgHeight / bbox.height);
+        let translate = [(svgWidth - bbox.width * scale) / 2 - bbox.x * scale, (svgHeight - bbox.height * scale) / 2 - bbox.y * scale];
 
-        const overlay = document.getElementById('viewport-overlay');
-        const ratioX = mainView.scrollLeft / mainView.scrollWidth;
-        const ratioY = mainView.scrollTop / mainView.scrollHeight;
-        const ratioWidth = mainView.clientWidth / mainView.scrollWidth;
-        const ratioHeight = mainView.clientHeight / mainView.scrollHeight;
+        let zoom = d3.zoom()
+        .scaleExtent([0.1, 10])
+        .on("zoom", function(event) {
+            gElement.attr("transform", event.transform);
+            adjustViewportOverlay(event.transform.k, [event.transform.x, event.transform.y]);
+        });
 
-        overlay.setAttribute('x', ratioX * birdViewSvg.clientWidth);
-        overlay.setAttribute('y', ratioY * birdViewSvg.clientHeight);
-        overlay.setAttribute('width', ratioWidth * birdViewSvg.clientWidth);
-        overlay.setAttribute('height', ratioHeight * birdViewSvg.clientHeight);
+        // Apply the initial scale and translation
+        svg.call(zoom)
+           .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
+
+        // Also initialize the bird view to match this state
+        adjustViewportOverlay(scale, translate);
     }
 
-    function renderViewportOverlay() {
-        var overlay = document.getElementById('viewport-overlay');
-        var svg = document.getElementById('bird-view-svg');
-
-        // Variables to keep track of dragging state
-        var isDragging = false;
-        var startX, startY;
-
-        function startDrag(event) {
-            let rect = svg.getBoundingClientRect();
-            startX = event.clientX - rect.left - overlay.x.baseVal.value;
-            startY = event.clientY - rect.top - overlay.y.baseVal.value;
-            isDragging = true;
+    // Function to calculate initial zoom and centering
+    function getInitialZoomSettings(mainContentGroup) {
+        let bbox = mainContentGroup.select("g.content-wrapper").node().getBBox();
+        let mainSvg = d3.select("#main-svg-advanced-visualizer");
+        if(mainSvg.empty()){
+            mainSvg = d3.select("#main-svg-simple_visualizer");
         }
+        let mainSvgWidth = mainSvg.node().getBoundingClientRect().width;
+        let mainSvgHeight = mainSvg.node().getBoundingClientRect().height;
 
-        // Function to drag the overlay
-        function drag(event) {
-            if (isDragging) {
-                let rect = svg.getBoundingClientRect();
-                // Calculate the new position
-                var newX = event.clientX - rect.left - startX;
-                var newY = event.clientY - rect.top - startY;
+        // Calculate the scale needed to zoom in
+        let scale = Math.max(bbox.width / mainSvgWidth, bbox.height / mainSvgHeight);
 
-                // Update the overlay's position
-                overlay.setAttribute('x', newX);
-                overlay.setAttribute('y', newY);
+        // Calculate the center position
+        let centerX = bbox.x + bbox.width / 2;
+        let centerY = bbox.y + bbox.height / 2;
 
-                // Optionally, update the main view's viewport here
-            }
-        }
+        // Calculate translation to center the bbox
+        let translateX = mainSvgWidth / 2 - centerX * scale;
+        let translateY = mainSvgHeight / 2 - centerY * scale;
 
-        // Function to stop dragging
-        function stopDrag() {
-            isDragging = false;
-        }
-
-        // Attach event listeners
-        overlay.addEventListener('mousedown', startDrag);
-        document.addEventListener('mousemove', drag);
-        document.addEventListener('mouseup', stopDrag);
-
-        var svgRect = svg.getBoundingClientRect(); // Get the bounding rectangle of the SVG
-
-        // Function to zoom the overlay
-        function zoom(event) {
-            event.preventDefault();
-            console.log("ZOOM");
-
-            var zoomIntensity = 0.1;
-            var scaleAmount = event.deltaY > 0 ? 1 + zoomIntensity : 1 - zoomIntensity;
-
-            let rect = overlay.getBoundingClientRect();
-            let currentWidth = rect.width;
-            let currentHeight = rect.height;
-
-            let newWidth = currentWidth * scaleAmount;
-            let newHeight = currentHeight * scaleAmount;
-
-            const minWidth = 30;
-            const minHeight = 10;
-            let svgElement = document.getElementById('main-svg-advanced-visualizer');
-            if(!svgElement) {
-                svgElement = document.getElementById('main-svg-simple_visualizer');
-            }
-            const maxWidth = svgElement.clientWidth;
-            const maxHeight = svgElement.clientHeight;
-
-            // Clamp the new dimensions to be within the min and max limits
-            newWidth = Math.max(minWidth, Math.min(newWidth, maxWidth));
-            newHeight = Math.max(minHeight, Math.min(newHeight, maxHeight));
-
-            let dx = (currentWidth - newWidth) / 2;
-            let dy = (currentHeight - newHeight) / 2;
-
-            let currentX = overlay.x.baseVal.value + dx;
-            let currentY = overlay.y.baseVal.value + dy;
-
-            console.log(newWidth, newHeight, currentX, currentY);
-
-            overlay.setAttribute('width', newWidth);
-            overlay.setAttribute('height', newHeight);
-
-            overlay.setAttribute('x', currentX);
-            overlay.setAttribute('y', currentY);
-
-            if (!svgElement.hasAttribute('viewBox')) {
-                svgElement.setAttribute('viewBox', '0 0 600 400');
-            }
-
-            const viewBox = svgElement.getAttribute('viewBox').split(' ').map(Number);
-            const [x, y, width, height] = viewBox;
-
-            // Calculate the new viewBox dimensions to reflect the zoom level
-            const centerX = x + width / 2;
-            const centerY = y + height / 2;
-            const newViewBoxWidth = width * scaleAmount;
-            const newViewBoxHeight = height * scaleAmount;
-            const newX = centerX - newViewBoxWidth / 2;
-            const newY = centerY - newViewBoxHeight / 2;
-
-            console.log(newX, newY, newViewBoxWidth, newViewBoxHeight);
-
-            const clampedViewBoxWidth = Math.max(minWidth, Math.min(newViewBoxWidth, maxWidth));
-            const clampedViewBoxHeight = Math.max(minHeight, Math.min(newViewBoxHeight, maxHeight));
-
-            svgElement.setAttribute('viewBox', `${newX} ${newY} ${clampedViewBoxWidth} ${clampedViewBoxHeight}`);
-        }
-
-        svg.addEventListener('wheel', zoom);
-
-        //let mainView = document.getElementById('main-view-graph');
-        //mainView.addEventListener('scroll', updateViewportOverlay);
+        return { scale, translateX, translateY };
     }
+
     function renderBirdView(e){
         isLoaded = true;
         let mainSvg = d3.select("#main-svg-advanced-visualizer");
@@ -204,15 +121,23 @@
 
         // Calculate scale based on the bounding box of the original content
         let bbox = mainContentGroup.select("g.content-wrapper").node().getBBox();
-        let scale = Math.min(300 / bbox.width, 150 / bbox.height) * 2;
+        let scale = Math.min(300 / bbox.width, 150 / bbox.height) * 1.5;
         let x = bbox.x;
         let y = bbox.y;
-        let t = [-x * scale + 50, -y * scale + 50]; // Adjust these values as needed for positioning
+        let t = [-x * scale, -y * scale+50]; // Adjust these values as needed for positioning
 
         // Apply scale and translate to the wrapper
         gWrapper.attr("transform", "translate("+ t +") scale("+ scale +")");
 
         setTimeout(function() { isLoaded = false; }, 50);
+    }
+
+    // Call this function on initial load to match the viewport overlay with the main view
+    function setInitialViewport() {
+        // Assuming the main view starts with no zoom and no pan
+        let initialScale = 1;
+        let initialTranslate = [0, 0];
+        adjustViewportOverlay(initialScale, initialTranslate);
     }
 
     let isLoaded = false;
@@ -221,6 +146,9 @@
         if(mainSvg.empty()){
             mainSvg = d3.select("#main-svg-simple_visualizer");
         }
+        //addViewportInteraction();
+        initializeMainSvgZoom();
+        setInitialViewport();
         const target = mainSvg.node();
         observer.observe(target, config);
     }
@@ -231,5 +159,5 @@
             renderBirdView();
         }
     });
-    renderViewportOverlay()
+
 </script>
