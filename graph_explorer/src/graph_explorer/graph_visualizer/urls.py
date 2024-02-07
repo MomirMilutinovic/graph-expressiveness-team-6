@@ -30,7 +30,6 @@ urlpatterns = [
         "workspace-config/<str:datasource_name>",
         views.workspace_configuration,
     ),
-    path("", views.index, name="index"),
     path(
         "select-visualizer/<str:visualizer_name>",
         views.select_visualizer,
