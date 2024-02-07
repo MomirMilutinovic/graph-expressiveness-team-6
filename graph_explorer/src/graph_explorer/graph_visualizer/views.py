@@ -67,8 +67,8 @@ def workspace(request, workspace_id):
     active_workspace: Workspace = list(
         filter(lambda ws: ws.id == workspace_id, app_config.workspaces)
     )[0]
-    tree_view_data = get_tree_view_data(active_workspace.graph)
-    nodes_dict = get_node_dict(active_workspace.graph)
+    tree_view_data = get_tree_view_data(active_workspace.get_filtered_graph())
+    nodes_dict = get_node_dict(active_workspace.get_filtered_graph())
 
     content_module.workspaces = app_config.workspaces
     content_module.workspace_id = workspace_id

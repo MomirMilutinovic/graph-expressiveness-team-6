@@ -101,6 +101,8 @@ class OperatorFilter(Filter):
         """
         nodes = list(filter(lambda node: self.satisfiesQuery(node), graph.nodes))
         edges = list(filter(lambda edge: edge.src in nodes and edge.dest in nodes, graph.edges))
+        for node in nodes:
+            node.edges = list(filter(lambda edge: edge.src in nodes and edge.dest in nodes, node.edges))
         return Graph(edges, nodes)
 
     def to_json(self) -> dict:
