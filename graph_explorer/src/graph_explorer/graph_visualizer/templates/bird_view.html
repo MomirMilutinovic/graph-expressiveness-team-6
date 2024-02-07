@@ -9,128 +9,22 @@
         height: 100%;
         border: 1px solid #bdbdbd;
     }
-
-    .viewport-overlay {
-        fill: rgba(255, 255, 255, 0.2);
-        stroke: rgb(160, 160, 160);
-        stroke-width: 2px;
-        fill-opacity: 0.5;
-    }
 </style>
 <div id="bird-view-content">
     <svg id="bird-view-svg">
         <g id="main-content-group"></g>
         <g id="viewport-overlay-group">
-            <rect id="viewport-overlay" class="viewport-overlay" width="100" height="50"></rect>
         </g>
     </svg>
 </div>
 <script>
-    function adjustViewportOverlay(scale, translate) {
-        let mainSvg = d3.select("#main-view-graph>svg");
-
-        let mainSvgWidth = mainSvg.node().getBoundingClientRect().width;
-        let mainSvgHeight = mainSvg.node().getBoundingClientRect().height;
-
-        let birdViewSvgWidth = d3.select("#bird-view-svg").node().getBoundingClientRect().width;
-        let birdViewSvgHeight = d3.select("#bird-view-svg").node().getBoundingClientRect().height;
-
-        let scaleX = birdViewSvgWidth / mainSvgWidth;
-        let scaleY = birdViewSvgHeight / mainSvgHeight;
-
-        let viewportWidth = birdViewSvgWidth * scale;
-        let viewportHeight = birdViewSvgHeight * scale;
-
-        console.log(viewportHeight,viewportWidth);
-
-        let viewportX = -translate[0] * scaleX;
-        let viewportY = -translate[1] * scaleY;
-
-        d3.select("#viewport-overlay")
-            .attr("width", viewportWidth)
-            .attr("height", viewportHeight)
-            .attr("x", viewportX)
-            .attr("y", viewportY);
-    }
-
-    function initializeMainSvgZoom() {
-        let svg = d3.select("#main-view-graph>svg");
-        let gElement = svg.select('g');
-
-         // Main SVG dimensions
-        let mainSvgWidth = svg.node().getBoundingClientRect().width;
-        let mainSvgHeight = svg.node().getBoundingClientRect().height;
-
-        // Bird's Eye View SVG dimensions
-        let birdViewSvg = d3.select("#bird-view-svg");
-        let birdViewSvgWidth = birdViewSvg.node().getBoundingClientRect().width;
-        let birdViewSvgHeight = birdViewSvg.node().getBoundingClientRect().height;
-
-        // Calculate the scale factor
-        let birdViewScaleHeight = birdViewSvgWidth / mainSvgWidth;
-        let birdViewScaleWidth = birdViewSvgHeight / mainSvgHeight;
-
-        // Define the zoom behavior
-        let zoom = d3.zoom()
-            .scaleExtent([0.1, 10])
-            .on("zoom", function(event) {
-                gElement.attr("transform", event.transform);
-                let birdViewScale = birdViewSvgWidth / mainSvgWidth;
-                // Translate the main SVG's zoom and pan for the bird's eye view
-                let adjustedScale =  1 / event.transform.k; // Inverse for overlay size
-                let adjustedTranslateX = event.transform.x * birdViewScale / event.transform.k;
-                let adjustedTranslateY = event.transform.y * birdViewScale / event.transform.k;
-
-                adjustViewportOverlay(adjustedScale, [adjustedTranslateX, adjustedTranslateY]);
-            });
-
-        // Calculate the initial scale and translation to fit and center the content
-        let bbox = gElement.node().getBBox();
-        let svgWidth = svg.node().clientWidth;
-        let svgHeight = svg.node().clientHeight;
-        let scale = Math.min(svgWidth / bbox.width, svgHeight / bbox.height);
-        let scaleX = (svgWidth / bbox.width);
-        let scaleY = (svgHeight / bbox.height);
-        let translate = [-(svgWidth / 2) + ((bbox.x + bbox.width / 2 + 100) * scaleX), -(svgHeight / 2) + ((bbox.y + bbox.height / 2 + 100) * scaleY)];
-
-        // Initialize the zoom on the SVG and apply the initial transform
-        svg.call(zoom);
-
-        adjustViewportOverlay(scale, translate);
-    }
-
-    function renderBirdView(e){
-        isLoaded = true;
-        let mainSvg = d3.select("#main-view-graph>svg");
-        let mainSvgContent = mainSvg.html();
-
-        // Clear the bird view SVG and append the copied content within a <g> tag for transformation
-        let mainContentGroup = d3.select("#main-content-group");
-        mainContentGroup.html("");
-        let gWrapper = mainContentGroup.append("g").attr("class", "content-wrapper");
-        gWrapper.html(mainSvgContent);
-
-        // Calculate scale based on the bounding box of the original content
-        let bbox = mainContentGroup.select("g.content-wrapper").node().getBBox();
-        let scale = Math.min(300 / bbox.width, 150 / bbox.height) * 1.5;
-        let x = bbox.x;
-        let y = bbox.y;
-        let t = [-x * scale + 50, -y * scale+50]; // Adjust these values as needed for positioning
-
-        // Apply scale and translate to the wrapper
-        gWrapper.attr("transform", "translate("+ t +") scale("+ scale +")");
-
-        setTimeout(function() { isLoaded = false; }, 100);
-    }
-
-    let isLoaded = false;
     window.onload = () => {
         let mainSvg = d3.select("#main-view-graph>svg");
-        initializeMainSvgZoom();
         const target = mainSvg.node();
         observer.observe(target, config);
     }
 
+    let isLoaded = false;
     const config = { attributes: true, childList: true, subtree: true };
     const observer = new MutationObserver( () => {
         if(!isLoaded){
@@ -138,4 +32,41 @@
         }
     });
 
+    function renderBirdView(){
+        isLoaded = true;
+        let mainSvg = d3.select("#main-view-graph>svg");
+        let mainSvgContent = mainSvg.html();
+
+        mainSvg.select("#main-svg-border").remove();
+
+        let rectWidth = mainSvg.node().clientWidth;
+        let rectHeight = mainSvg.node().clientHeight;
+
+        let extensionAmount = 10;
+
+        mainSvg.append("rect")
+            .attr("x", -extensionAmount / 2)
+            .attr("y", -extensionAmount / 2)
+            .attr("width", rectWidth + extensionAmount)
+            .attr("height", rectHeight + extensionAmount)
+            .attr("id", "main-svg-border")
+            .attr("fill", "none")
+            .attr("stroke-width", 5)
+            .attr("stroke", "red");
+
+        let mainContentGroup = d3.select("#main-content-group");
+        mainContentGroup.html("");
+        let gWrapper = mainContentGroup.append("g").attr("class", "content-wrapper");
+        gWrapper.html(mainSvgContent);
+
+        let bbox = mainContentGroup.select("g.content-wrapper").node().getBBox();
+        let scale = Math.min(300 / bbox.width, 150 / bbox.height) * 1.5;
+        let x = bbox.x;
+        let y = bbox.y;
+        let t = [-x * scale + 50, -y * scale+50];
+
+        gWrapper.attr("transform", "translate("+ t +") scale("+ scale +")");
+
+        setTimeout(function() { isLoaded = false; }, 100);
+    }
 </script>
