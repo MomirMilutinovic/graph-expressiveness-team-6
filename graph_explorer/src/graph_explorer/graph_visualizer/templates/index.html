@@ -63,12 +63,9 @@
             <input name="attribute" id="filter-attribute-input" class="input" type="text" placeholder="Attribute" />
             <div class="select">
               <select name="operator">
-                <option value="<">&lt;</option>
-                <option value=">">&gt;</option>
-                <option value="<=">&lt;=</option>
-                <option value=">=">&gt;=</option>
-                <option value="==">==</option>
-                <option value="!=">!=</option>
+                {% for operator in operators %}
+                  <option value="{{operator|safe}}">{{operator}}</option>
+                {% endfor %}
               </select>
             </div>
             <input name="value" id="filter-value-input" class="input" type="text" placeholder="Value" />
