@@ -10,8 +10,8 @@
     }
 
     .viewport-overlay {
-        fill: rgba(255, 255, 255, 0.5);
-        stroke: rgb(128, 128, 128);
+        fill: rgba(255, 255, 255, 0.2);
+        stroke: rgb(160, 160, 160);
         stroke-width: 2px;
         fill-opacity: 0.5;
     }
@@ -54,55 +54,29 @@
     }
 
     function initializeMainSvgZoom() {
-        let svg = d3.select("#main-svg-advanced-visualizer");
-        if(svg.empty()){
-            svg = d3.select("#main-svg-simple_visualizer");
-        }
+        let svg = d3.select("#main-svg-advanced-visualizer").empty() ? d3.select("#main-svg-simple_visualizer") : d3.select("#main-svg-advanced-visualizer");
         let gElement = svg.select('g');
-        // Calculate the bounding box of the content
+
+        // Define the zoom behavior
+        let zoom = d3.zoom()
+            .scaleExtent([0.1, 10])
+            .on("zoom", function(event) {
+                gElement.attr("transform", event.transform);
+                adjustViewportOverlay(event.transform.k, [event.transform.x, event.transform.y]);
+            });
+
+        // Calculate the initial scale and translation to fit and center the content
         let bbox = gElement.node().getBBox();
         let svgWidth = svg.node().clientWidth;
         let svgHeight = svg.node().clientHeight;
         let scale = Math.min(svgWidth / bbox.width, svgHeight / bbox.height);
-        let translate = [(svgWidth - bbox.width * scale) / 2 - bbox.x * scale, (svgHeight - bbox.height * scale) / 2 - bbox.y * scale];
+        let translate = [(svgWidth / 2) - ((bbox.x + bbox.width / 2) * scale), (svgHeight / 2) - ((bbox.y + bbox.height / 2) * scale)];
 
-        let zoom = d3.zoom()
-        .scaleExtent([0.1, 10])
-        .on("zoom", function(event) {
-            gElement.attr("transform", event.transform);
-            adjustViewportOverlay(event.transform.k, [event.transform.x, event.transform.y]);
-        });
-
-        // Apply the initial scale and translation
+        // Initialize the zoom on the SVG and apply the initial transform
         svg.call(zoom)
            .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
 
-        // Also initialize the bird view to match this state
         adjustViewportOverlay(scale, translate);
-    }
-
-    // Function to calculate initial zoom and centering
-    function getInitialZoomSettings(mainContentGroup) {
-        let bbox = mainContentGroup.select("g.content-wrapper").node().getBBox();
-        let mainSvg = d3.select("#main-svg-advanced-visualizer");
-        if(mainSvg.empty()){
-            mainSvg = d3.select("#main-svg-simple_visualizer");
-        }
-        let mainSvgWidth = mainSvg.node().getBoundingClientRect().width;
-        let mainSvgHeight = mainSvg.node().getBoundingClientRect().height;
-
-        // Calculate the scale needed to zoom in
-        let scale = Math.max(bbox.width / mainSvgWidth, bbox.height / mainSvgHeight);
-
-        // Calculate the center position
-        let centerX = bbox.x + bbox.width / 2;
-        let centerY = bbox.y + bbox.height / 2;
-
-        // Calculate translation to center the bbox
-        let translateX = mainSvgWidth / 2 - centerX * scale;
-        let translateY = mainSvgHeight / 2 - centerY * scale;
-
-        return { scale, translateX, translateY };
     }
 
     function renderBirdView(e){
@@ -115,26 +89,24 @@
 
         // Clear the bird view SVG and append the copied content within a <g> tag for transformation
         let mainContentGroup = d3.select("#main-content-group");
-        mainContentGroup.html(""); // Clears only the content group
+        mainContentGroup.html("");
         let gWrapper = mainContentGroup.append("g").attr("class", "content-wrapper");
-        gWrapper.html(mainSvgContent); // Insert the main SVG content into the wrapper
+        gWrapper.html(mainSvgContent);
 
         // Calculate scale based on the bounding box of the original content
         let bbox = mainContentGroup.select("g.content-wrapper").node().getBBox();
         let scale = Math.min(300 / bbox.width, 150 / bbox.height) * 1.5;
         let x = bbox.x;
         let y = bbox.y;
-        let t = [-x * scale, -y * scale+50]; // Adjust these values as needed for positioning
+        let t = [-x * scale + 50, -y * scale+50]; // Adjust these values as needed for positioning
 
         // Apply scale and translate to the wrapper
         gWrapper.attr("transform", "translate("+ t +") scale("+ scale +")");
 
-        setTimeout(function() { isLoaded = false; }, 50);
+        setTimeout(function() { isLoaded = false; }, 100);
     }
 
-    // Call this function on initial load to match the viewport overlay with the main view
     function setInitialViewport() {
-        // Assuming the main view starts with no zoom and no pan
         let initialScale = 1;
         let initialTranslate = [0, 0];
         adjustViewportOverlay(initialScale, initialTranslate);
@@ -146,7 +118,6 @@
         if(mainSvg.empty()){
             mainSvg = d3.select("#main-svg-simple_visualizer");
         }
-        //addViewportInteraction();
         initializeMainSvgZoom();
         setInitialViewport();
         const target = mainSvg.node();
