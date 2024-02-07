@@ -34,11 +34,13 @@
 
   // initialization of root node
   data.children = [];
-  for (const childrenId of data.children_ids) {
-    const childClone = structuredClone(allNodes[childrenId]);
-    childClone.expanded = false;
-    childClone.children = [];
-    data.children.push(childClone);
+  if (data.children_ids) {
+    for (const childrenId of data.children_ids) {
+      const childClone = structuredClone(allNodes[childrenId]);
+      childClone.expanded = false;
+      childClone.children = [];
+      data.children.push(childClone);
+    }
   }
 
   console.log(data);
@@ -104,7 +106,7 @@
   function render() {
     emptySvg();
 
-    if (Object.keys(data).length == 0) return;
+    if (Object.keys(data).length <= 1) return;
 
     const nodeSize = 20;
     const root = d3.hierarchy(data).eachBefore(
