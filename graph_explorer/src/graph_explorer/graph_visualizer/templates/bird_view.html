@@ -54,12 +54,30 @@
         let svg = d3.select("#main-svg-advanced-visualizer").empty() ? d3.select("#main-svg-simple_visualizer") : d3.select("#main-svg-advanced-visualizer");
         let gElement = svg.select('g');
 
+         // Main SVG dimensions
+        let mainSvgWidth = svg.node().getBoundingClientRect().width;
+        let mainSvgHeight = svg.node().getBoundingClientRect().height;
+
+        // Bird's Eye View SVG dimensions
+        let birdViewSvg = d3.select("#bird-view-svg");
+        let birdViewSvgWidth = birdViewSvg.node().getBoundingClientRect().width;
+        let birdViewSvgHeight = birdViewSvg.node().getBoundingClientRect().height;
+
+        // Calculate the scale factor
+        let birdViewScale = birdViewSvgWidth / mainSvgWidth; // or birdViewSvgHeight / mainSvgHeight;
+
         // Define the zoom behavior
         let zoom = d3.zoom()
             .scaleExtent([0.1, 10])
             .on("zoom", function(event) {
                 gElement.attr("transform", event.transform);
-                adjustViewportOverlay(event.transform.k, [event.transform.x, event.transform.y]);
+
+                // Translate the main SVG's zoom and pan for the bird's eye view
+                let adjustedScale = 1 / event.transform.k; // Inverse for overlay size
+                let adjustedTranslateX = event.transform.x * birdViewScale; // Adjust translation
+                let adjustedTranslateY = event.transform.y * birdViewScale; // Adjust translation
+
+                adjustViewportOverlay(adjustedScale, [adjustedTranslateX, adjustedTranslateY]);
             });
 
         // Calculate the initial scale and translation to fit and center the content
