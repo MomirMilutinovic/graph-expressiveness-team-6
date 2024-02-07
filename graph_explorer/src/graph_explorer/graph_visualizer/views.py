@@ -22,6 +22,9 @@ content_module.workspaces = app_config.workspaces
 
 def index(request):
     context = content_module.get_context()
+    context["workspaces"] = [vars(ws) for ws in app_config.workspaces]
+    context["tree_view_data"] = {}
+    context["nodes_dict"] = {}
 
     return render(request, "index.html", context)
 
@@ -33,19 +36,19 @@ def select_visualizer(_, visualizer_name):
 
 def load_views(_):
     # TODO: Load main, bird and tree views
-    return HttpResponseRedirect(reverse('index'))
+    return HttpResponseRedirect(reverse("index"))
 
 
 def search(request):
     try:
-        query: str = request.POST['query']
+        query: str = request.POST["query"]
         current_workspace = content_module.get_current_workspace()
         search_filter: SearchFilter = SearchFilter(query)
         current_workspace.add_filter(search_filter)
     except (KeyError, ValueError):
         return
 
-    return HttpResponseRedirect(reverse('index'))
+    return HttpResponseRedirect(reverse("index"))
 
 
 def provide_data(request):
@@ -60,11 +63,23 @@ def workspace(request, workspace_id):
     if workspace_id not in list(map(lambda ws: ws.id, app_config.workspaces)):
         return HttpResponseNotFound("Workspace with given id not found.")
 
+    active_workspace: Workspace = list(
+        filter(lambda ws: ws.id == workspace_id, app_config.workspaces)
+    )[0]
+    tree_view_data = get_tree_view_data(active_workspace.graph)
+    nodes_dict = get_node_dict(active_workspace.graph)
+
+    content_module.workspaces = app_config.workspaces
     content_module.workspace_id = workspace_id
-    content_module.select_data_source(app_config.get_workspace(workspace_id).selected_datasource)
+    content_module.select_data_source(
+        app_config.get_workspace(workspace_id).selected_datasource
+    )
     content_module.set_graph(app_config.get_workspace(workspace_id).graph)
 
     context = content_module.get_context()
+    context["tree_view_data"] = vars(tree_view_data)
+    context["nodes_dict"] = nodes_dict
+    context["workspaces"] = [vars(ws) for ws in app_config.workspaces]
 
     return render(request, "index.html", context)
 
@@ -99,6 +114,7 @@ def workspace_configuration(request, datasource_name=None):
         return HttpResponseRedirect(
             reverse("workspace", kwargs={"workspace_id": new_workspace.id})
         )
+
 
 @csrf_exempt
 def delete_filter(request):
