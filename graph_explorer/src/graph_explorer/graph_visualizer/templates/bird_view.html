@@ -43,8 +43,8 @@
 
         console.log(viewportHeight,viewportWidth);
 
-        let viewportX = translate[0] * scaleX;
-        let viewportY = translate[1] * scaleY;
+        let viewportX = -translate[0] * scaleX;
+        let viewportY = -translate[1] * scaleY;
 
         d3.select("#viewport-overlay")
             .attr("width", viewportWidth)
@@ -91,7 +91,7 @@
         let scale = Math.min(svgWidth / bbox.width, svgHeight / bbox.height);
         let scaleX = (svgWidth / bbox.width);
         let scaleY = (svgHeight / bbox.height);
-        let translate = [(svgWidth / 2) - ((bbox.x + bbox.width / 2 + 100) * scaleX), (svgHeight / 2) - ((bbox.y + bbox.height / 2 + 100) * scaleY)];
+        let translate = [-(svgWidth / 2) + ((bbox.x + bbox.width / 2 + 100) * scaleX), -(svgHeight / 2) + ((bbox.y + bbox.height / 2 + 100) * scaleY)];
 
         // Initialize the zoom on the SVG and apply the initial transform
         svg.call(zoom);
