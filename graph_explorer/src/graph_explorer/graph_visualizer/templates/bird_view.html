@@ -7,6 +7,7 @@
     #bird-view-svg {
         width: 100%;
         height: 100%;
+        border: 1px solid #bdbdbd;
     }
 
     .viewport-overlay {
@@ -64,7 +65,8 @@
         let birdViewSvgHeight = birdViewSvg.node().getBoundingClientRect().height;
 
         // Calculate the scale factor
-        let birdViewScale = birdViewSvgWidth / mainSvgWidth; // or birdViewSvgHeight / mainSvgHeight;
+        let birdViewScaleHeight = birdViewSvgWidth / mainSvgWidth; // or birdViewSvgHeight / mainSvgHeight;
+        let birdViewScaleWidth = birdViewSvgHeight / mainSvgHeight;
 
         // Define the zoom behavior
         let zoom = d3.zoom()
@@ -74,8 +76,8 @@
 
                 // Translate the main SVG's zoom and pan for the bird's eye view
                 let adjustedScale = 1 / event.transform.k; // Inverse for overlay size
-                let adjustedTranslateX = event.transform.x * birdViewScale; // Adjust translation
-                let adjustedTranslateY = event.transform.y * birdViewScale; // Adjust translation
+                let adjustedTranslateX = event.transform.x * birdViewScaleWidth; // Adjust translation
+                let adjustedTranslateY = event.transform.y * birdViewScaleHeight; // Adjust translation
 
                 adjustViewportOverlay(adjustedScale, [adjustedTranslateX, adjustedTranslateY]);
             });
