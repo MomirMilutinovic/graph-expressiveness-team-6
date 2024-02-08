@@ -11,9 +11,7 @@ class Node:
         neighbours: list[Node] = []
 
         for edge in self.edges:
-            if edge.dest == self:
-                neighbours.append(edge.src)
-            else:
+            if edge.src == self:
                 neighbours.append(edge.dest)
 
         return neighbours
@@ -27,4 +25,8 @@ class Node:
         return hash(self.id)
 
     def __contains__(self, item):
-        return item in self.id or any(item in str(value) for value in self.data.values()) or any(item in str(key) for key in self.data.keys())
+        return (
+            item in self.id
+            or any(item in str(value) for value in self.data.values())
+            or any(item in str(key) for key in self.data.keys())
+        )
