@@ -41,7 +41,7 @@ a.row {
     align-items: center;
 }
 
-a .material-symbols-outlined {
+a#create-workspace .material-symbols-outlined {
     margin-left: 0.5em;
 }
 
@@ -87,4 +87,25 @@ a .material-symbols-outlined {
     padding: 0.5em;
     margin: 0 0.5em;
     border-radius: 0.5em;
+}
+
+.link-button {
+    display: inline-flex; /* Keeps the link button's internal alignment */
+    align-items: center;
+    justify-content: center;
+}
+
+.workspace-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.workspace-name {
+    flex-grow: 1;
+}
+
+.icons-container {
+    display: flex;
+    gap: 0;
 }

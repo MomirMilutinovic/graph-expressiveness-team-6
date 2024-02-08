@@ -128,3 +128,10 @@ def delete_filter(request):
         return
 
     return HttpResponse(200, content_type="application/json")
+
+
+def edit_workspace(request, id):
+    return None
+
+def delete_workspace(request, id):
+    return None
