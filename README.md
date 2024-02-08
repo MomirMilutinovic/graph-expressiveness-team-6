@@ -184,9 +184,9 @@ Bird View mirrors the Main View with the key difference that the entire graph fi
 Bird View encompass the viewport that moves in accordance with the current display on the Main View.
 The behavior of the viewport is defined as follows:
 
-- Zooming out the Main View shrinks the viewport on the Bird View.
-- Zooming in the Main View enlarges the viewport on the Bird View.
-- Panning the Main View moves the viewport on the Bird View.
+- `Zooming out` the Main View shrinks the viewport on the Bird View.
+- `Zooming in` the Main View enlarges the viewport on the Bird View.
+- `Panning` the Main View moves the viewport on the Bird View.
 - `Dragging` the nodes on the Main View affects the graph on the Bird View.
 
 All three graph views are simultaneously accessible and present the same graph in the aforementioned ways.
