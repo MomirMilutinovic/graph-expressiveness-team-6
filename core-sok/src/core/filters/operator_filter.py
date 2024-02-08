@@ -24,7 +24,7 @@ class OperatorFilter(Filter):
         "divisible by": lambda a, b: a % b == 0,
     }
 
-    def __init__(self, attribute: str, operator_name: str, value: str, operator: Callable[[Any, Any], bool]):
+    def __init__(self, attribute: str, operator_name: str, value: Any, operator: Callable[[Any, Any], bool]):
         """
         Initializes the operator filter.
         The value will be converted to the type of the attribute once filter is called.
@@ -43,7 +43,7 @@ class OperatorFilter(Filter):
         self.value = value
         self.opeartor = operator
     
-    def __init__(self, attribute: str, operator_name: str, value: str):
+    def __init__(self, attribute: str, operator_name: str, value: Any):
         """
         Initializes the operator filter.
         The operator is determined by the operator_name.
@@ -79,17 +79,9 @@ class OperatorFilter(Filter):
         if self.attribute not in node.data and self.attribute != "id":
             return False
 
-        try:
-            self.value = type(node.data[self.attribute])(self.value)
-        except ValueError:
-            return False
-
-        try:
-            if self.attribute == "id":
-                return self.operator(node.id, self.value)
-            return self.operator(node.data[self.attribute], self.value)
-        except (ValueError, TypeError):
-            return False
+        if self.attribute == "id":
+            return self.operator(node.id, self.value)
+        return self.operator(node.data[self.attribute], self.value)
 
     def filter(self, graph: Graph) -> Graph:
         """

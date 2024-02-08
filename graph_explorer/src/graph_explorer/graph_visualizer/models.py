@@ -41,3 +41,6 @@ class Workspace:
 
     def get_filter_chain(self) -> FilterChain:
         return self.filter_chain
+
+    def get_unfiltered_graph(self) -> Graph:
+        return self.graph

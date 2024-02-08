@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect, HttpResponseNotFound
@@ -140,6 +141,30 @@ def delete_filter(request):
 
     return HttpResponse(200, content_type="application/json")
 
+def coerce_filter_value(value: str, attribute: str, graph: Graph, operator: str) -> Any:
+    node_iterator = iter(graph.get_nodes())
+    first_node = next(node_iterator)
+    if attribute not in first_node.data:
+        return value
+    representative_value = first_node.data[attribute]
+    if operator != "contains":
+        return type(representative_value)(value)
+    else:
+        return coerce_value_for_contains_operator(value, attribute, graph)
+
+def coerce_value_for_contains_operator(value: str, attribute: str, graph: Graph) -> Any:
+    nodes = list(graph.get_nodes())
+    representative_value = nodes[0].data[attribute]
+
+    if type(representative_value) == str:
+        return value
+    elif type(representative_value) == list:
+        for node in nodes:
+            representative_value = node.data[attribute]
+            if len(representative_value) > 0:
+                return type(representative_value[0])(value)
+
+    return value
 
 def edit_workspace(request, id, datasource_name=None):
     data_sources = get_datasource_names()
@@ -216,7 +241,8 @@ def add_filter(request):
     try:
         attribute: str = request.POST["attribute"]
         operator: str = request.POST["operator"]
-        value: str = request.POST["value"]
+        unfiltered_graph = content_module.get_current_workspace().get_unfiltered_graph()
+        value: Any = coerce_filter_value(request.POST["value"], attribute, unfiltered_graph, operator)
         current_workspace = content_module.get_current_workspace()
         operator_filter: OperatorFilter = OperatorFilter(attribute, operator, value)
         current_workspace.add_filter(operator_filter)
