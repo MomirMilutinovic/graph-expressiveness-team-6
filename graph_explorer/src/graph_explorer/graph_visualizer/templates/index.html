@@ -65,7 +65,7 @@
             {% endif %}
         </div>
         <div class="panel-block">
-          <form class="filter-form" method="POST" action="{% url 'add_filter' %}">
+          <form id="filter-form" class="filter-form" method="POST" action="{% url 'add_filter' %}">
             {% csrf_token %}
             <input name="attribute" id="filter-attribute-input" class="input" type="text" placeholder="Attribute" />
             <div class="select">
@@ -107,5 +107,14 @@
       </nav>
     </div>
   </div>
+  <article id="error" class="message is-normal is-danger is-hidden">
+    <div class="message-header">
+      <p>Invalid filter</p>
+    </div>
+    <div class="message-body">
+      <p>Invalid filter (most likely due to type mismatch)</p>
+      <p>Error: <span id="error-message"></span> </p>
+    </div>
+  </article>
 </body>
 {% endblock body %}

@@ -29,9 +29,15 @@ class Workspace:
         self.graph = app_config.data_source_plugins_dict[selected_datasource].provide(
             **datasource_config
         )
+        self.filtered_graph = self.graph
     
     def add_filter(self, filter: Filter):
         self.filter_chain.add_filter(filter)
+        try:
+            self.filtered_graph = self.filter_chain.filter(self.graph)
+        except Exception as e:
+            self.filter_chain.remove_filter(filter)
+            raise e
 
     def get_filtered_graph(self) -> Graph:
         return self.filter_chain.filter(self.graph)

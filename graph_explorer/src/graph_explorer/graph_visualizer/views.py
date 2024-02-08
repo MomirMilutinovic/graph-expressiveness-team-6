@@ -246,7 +246,7 @@ def add_filter(request):
         current_workspace = content_module.get_current_workspace()
         operator_filter: OperatorFilter = OperatorFilter(attribute, operator, value)
         current_workspace.add_filter(operator_filter)
-    except (KeyError, ValueError):
-        return
+    except (KeyError, ValueError, TypeError) as e:
+        return HttpResponse(str(e), content_type="text/plain", status=400)
 
     return HttpResponseRedirect(reverse("index"))

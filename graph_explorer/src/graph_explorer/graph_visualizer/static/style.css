@@ -132,3 +132,30 @@ a#create-workspace .material-symbols-outlined {
 #main-view-panel > div {
     flex-grow: 1;
 }
+#error {
+    position: fixed;
+    left: 50%;
+    bottom: 1em;
+    -webkit-animation: fadein 0.5s, fadeout 0.5s 4.5s;
+    animation: fadein 0.5s, fadeout 0.5s 4.5s;
+}
+
+@-webkit-keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 1em; opacity: 1;}
+}
+
+@keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 1em; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+    from {bottom: 1em; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+    from {bottom: 1em; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+}
