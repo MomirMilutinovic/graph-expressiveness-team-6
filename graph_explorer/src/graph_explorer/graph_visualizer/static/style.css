@@ -67,9 +67,24 @@ a .material-symbols-outlined {
     width: 100%;
 }
 
+#bird-view-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+#bird-view-panel .panel-heading {
+    flex: 0;
+}
+
+#bird-view-panel .panel-block {
+    flex: 1;
+    margin-bottom: 0;
+}
+
 .highlight {
     background-color: #efefef;
 }
+
 .filter-form {
     display: flex;
     align-items: center;

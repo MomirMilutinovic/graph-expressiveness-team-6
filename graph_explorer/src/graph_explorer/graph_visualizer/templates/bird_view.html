@@ -1,0 +1,72 @@
+<style>
+    #bird-view-content {
+        width: 100%;
+        height: 100%;
+    }
+
+    #bird-view-svg {
+        width: 100%;
+        height: 100%;
+        border: 1px solid #bdbdbd;
+    }
+</style>
+<div id="bird-view-content">
+    <svg id="bird-view-svg">
+        <g id="main-content-group"></g>
+        <g id="viewport-overlay-group">
+        </g>
+    </svg>
+</div>
+<script>
+    window.onload = () => {
+        let mainSvg = d3.select("#main-view-graph>svg");
+        const target = mainSvg.node();
+        observer.observe(target, config);
+    }
+
+    let isLoaded = false;
+    const config = { attributes: true, childList: true, subtree: true };
+    const observer = new MutationObserver( () => {
+        if(!isLoaded){
+            renderBirdView();
+        }
+    });
+
+    function renderBirdView(){
+        isLoaded = true;
+        let mainSvg = d3.select("#main-view-graph>svg");
+        let mainSvgContent = mainSvg.html();
+
+        mainSvg.select("#main-svg-border").remove();
+
+        let rectWidth = mainSvg.node().clientWidth;
+        let rectHeight = mainSvg.node().clientHeight;
+
+        let extensionAmount = 10;
+
+        mainSvg.append("rect")
+            .attr("x", -extensionAmount / 2)
+            .attr("y", -extensionAmount / 2)
+            .attr("width", rectWidth + extensionAmount)
+            .attr("height", rectHeight + extensionAmount)
+            .attr("id", "main-svg-border")
+            .attr("fill", "none")
+            .attr("stroke-width", 5)
+            .attr("stroke", "red");
+
+        let mainContentGroup = d3.select("#main-content-group");
+        mainContentGroup.html("");
+        let gWrapper = mainContentGroup.append("g").attr("class", "content-wrapper");
+        gWrapper.html(mainSvgContent);
+
+        let bbox = mainContentGroup.select("g.content-wrapper").node().getBBox();
+        let scale = Math.min(300 / bbox.width, 150 / bbox.height) * 1.5;
+        let x = bbox.x;
+        let y = bbox.y;
+        let t = [-x * scale + 50, -y * scale+50];
+
+        gWrapper.attr("transform", "translate("+ t +") scale("+ scale +")");
+
+        setTimeout(function() { isLoaded = false; }, 100);
+    }
+</script>

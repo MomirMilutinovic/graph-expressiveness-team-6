@@ -31,9 +31,9 @@
       <nav class="panel" id="bird-view-panel">
         <p class="panel-heading">Bird View</p>
         <div class="panel-block">
-          {%if bird_views %} {% for bird_view in bird_views %}
-          <div class="main-view is-hidden" id="bird-view-{{ bird_view.visualizer_id }}">{{ bird_view.html|safe }}</div>
-          {% endfor %} {% else %}
+          {%if content %}
+            {% include "bird_view.html" %}
+          {% else %}
           <h2 color="red">No workspace selected</h2>
           {% endif %}
         </div>
@@ -90,7 +90,7 @@
       </nav>
       <nav class="panel" id="main-view-panel">
         <p class="panel-heading">Main View</p>
-        <div style="height: 100%">
+        <div style="height: 100% ; width: 100%" id="main-view-graph">
           {% if content %}
             {{ content|safe }}
           {% else %}
