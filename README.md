@@ -189,7 +189,7 @@ The behavior of the viewport is defined as follows:
 - Panning the Main View moves the viewport on the Bird View.
 - `Dragging` the nodes on the Main View affects the graph on the Bird View.
 
-All three graph views are simultaneously accessible and present the same graph in described ways.
+All three graph views are simultaneously accessible and present the same graph in the aforementioned ways.
 
 ### Graph View Interactions
 
