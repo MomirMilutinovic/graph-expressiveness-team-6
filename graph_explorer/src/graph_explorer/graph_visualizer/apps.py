@@ -24,3 +24,9 @@ class GraphVisualizerConfig(AppConfig):
 
     def get_workspace(self, id_) -> Workspace:
         return next((ws for ws in self.workspaces if ws.id == id_), None)
+
+    def delete_workspace(self, id_):
+        self.workspaces = [ws for ws in self.workspaces if ws.id != id_]
+
+    def get_number_of_workspaces(self):
+        return len(self.workspaces)

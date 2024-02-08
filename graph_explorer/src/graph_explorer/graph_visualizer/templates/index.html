@@ -4,11 +4,18 @@
     <aside class="menu" id="workspace-bar">
       <p class="menu-label">Workspaces</p>
       <ul class="menu-list">
-        {% for workspace in workspaces %} {% if workspace.id == active_ws_id %}
-        <li class="highlight"><a href="{%url 'workspace' workspace.id %}">{{ workspace.name }}</a></li>
+        {% for workspace in workspaces %} 
+        {% if workspace.id == active_ws_id %}
+        <li class="highlight workspace-row"><a href="{%url 'workspace' workspace.id %}" class="workspace-name">{{ workspace.name }}</a>
         {% else %}
-        <li><a href="{%url 'workspace' workspace.id %}">{{ workspace.name }}</a></li>
-        {% endif %} {% endfor %}
+        <li class="workspace-row"><a href="{%url 'workspace' workspace.id %}" class="workspace-name">{{ workspace.name }}</a>
+        {% endif %}
+        <div class="icons-container">
+          <a href="{% url 'edit_workspace' workspace.id %}" class="link-button"><span class="material-symbols-outlined">settings</span></a>
+          <a href="{% url 'delete_workspace' workspace.id %}" class="link-button"><span class="material-symbols-outlined">close</span></a>
+        </div>
+        </li>
+        {% endfor %}
         <li>
           <a href="/workspace-config" id="create-workspace" class="row">Create a new workspace <span class="material-symbols-outlined">add_circle</span></a>
         </li>

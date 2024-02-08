@@ -1,15 +1,15 @@
-from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponseNotFound
-from django.urls import reverse
-from django.apps.registry import apps
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
 import json
 
-from .services import *
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect, HttpResponseNotFound
+from django.shortcuts import render
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+
+from core.filters.search_filter import SearchFilter
 from .models import Workspace
 from .module.content import ContentModule
-from core.filters.search_filter import SearchFilter
+from .services import *
 from core.filters.operator_filter import OperatorFilter
 
 content_module = ContentModule(
@@ -95,7 +95,7 @@ def workspace_configuration(request, datasource_name=None):
     if datasource_name is None:
         datasource_name = data_sources[0]
     datasource_config_params = get_datasource_configuration(datasource_name)
-
+    print(datasource_config_params)
     if request.method == "GET":
         return render(
             request,
@@ -141,6 +141,77 @@ def delete_filter(request):
     return HttpResponse(200, content_type="application/json")
 
 
+def edit_workspace(request, id, datasource_name=None):
+    data_sources = get_datasource_names()
+    ws: Workspace = app_config.get_workspace(id)
+    if ws is None:
+        return HttpResponseNotFound("Workspace with given id not found.")
+    datasource_name = ws.selected_datasource if datasource_name is None else datasource_name
+
+    datasource_config_params = get_datasource_configuration(datasource_name)
+    ds_config_params = datasource_config_params.items()
+    ds_config_params_with_values = []
+    for key, key_type in ds_config_params:
+        value = ""
+        if datasource_name == ws.selected_datasource:
+            value = ws.datasource_config[key]
+        ds_config_params_with_values.append((key, key_type, value))
+
+    if request.method == "GET":
+        return render(
+            request,
+            "workspace_edit.html",
+            {
+                "parameters": ds_config_params_with_values,
+                "data_sources": data_sources,
+                "selected_ds": datasource_name,
+                "workspace": ws,
+            },
+        )
+    elif request.method == "POST":
+        form_data = request.POST.dict()
+        workspace_name = form_data.get("workspace-name")
+        del form_data["workspace-name"]
+        del form_data["csrfmiddlewaretoken"]
+
+        new_workspace = Workspace(
+            workspace_name, datasource_name, form_data, app_config
+        )
+
+        ws.name = new_workspace.name
+        ws.selected_datasource = new_workspace.selected_datasource
+        ws.datasource_config = new_workspace.datasource_config
+        ws.graph = new_workspace.graph
+        return HttpResponseRedirect(
+            reverse("workspace", kwargs={"workspace_id": content_module.workspace_id})
+        )
+    else:
+        return HttpResponse(404, content_type="application/json")
+
+
+def delete_workspace(request, id):
+    global content_module
+    try:
+        is_active_workspace = content_module.get_current_workspace().id == id
+
+        app_config.delete_workspace(id)
+        if app_config.get_number_of_workspaces() == 0:
+            content_module = ContentModule(
+                apps.get_app_config("graph_visualizer").data_source_plugins,
+                apps.get_app_config("graph_visualizer").visualizer_plugins,
+            )
+            return HttpResponseRedirect(reverse("index"))
+        elif is_active_workspace:
+            return HttpResponseRedirect(
+                reverse("workspace", kwargs={"workspace_id": app_config.workspaces[0].id})
+            )
+        else:
+            referer_url = request.META.get('HTTP_REFERER', reverse("index"))
+            return HttpResponseRedirect(referer_url)
+    except Exception:
+        return HttpResponse("An error occurred during workspace deletion.", status=500)
+      
+      
 def add_filter(request):
     try:
         attribute: str = request.POST["attribute"]

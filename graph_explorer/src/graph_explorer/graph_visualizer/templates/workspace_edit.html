@@ -1,0 +1,14 @@
+{% extends "workspace_config.html" %}
+{% block script %}
+<script>
+  selectEl = document.getElementById("data-source-select");
+
+  selectEl.addEventListener("change", (event) => {
+    const url = window.location.href;
+    const uuidLength = 32;
+    const indexToSlice = url.indexOf("workspace-edit") + "workspace-edit".length + "/".length + uuidLength;
+    const baseUrl = `${url.slice(0, indexToSlice)}/${encodeURIComponent(event.target.value.trim())}`;
+    window.location.replace(baseUrl);
+  });
+</script>
+{% endblock %}

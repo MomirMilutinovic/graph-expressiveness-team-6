@@ -30,7 +30,7 @@
     <h1>Workspace Configuration</h1>
     <form method="POST">
       {% csrf_token %}
-      <input name="workspace-name" class="input" type="text" placeholder="Workspace Name" />
+      <input name="workspace-name" class="input" type="text" placeholder="Workspace Name" {% if workspace is not None %}value="{{workspace.name}}"{% endif %}  />
       <div class="select">
         <select id="data-source-select">
           {% for data_source in data_sources %} {% if selected_ds is None and forloop.first or selected_ds == data_source %}
@@ -41,16 +41,17 @@
         </select>
       </div>
       {% for param in parameters %} {% if param.1 == "str" %}
-      <input name="{{ param.0 }}" class="input" type="text" placeholder="{{ param.0 }}" />
+      <input name="{{ param.0 }}" class="input" type="text" placeholder="{{ param.0 }}" value="{{ param.2 }}" />
       {% endif %} {% if param.1 == "int" %}
-      <input name="{{ param.0 }}" class="input" type="number" min="1" placeholder="{{ param.0 }}" />
+      <input name="{{ param.0 }}" class="input" type="number" min="1" placeholder="{{ param.0 }}" value="{{ param.2 }}" />
       {% endif %} {% if param.1 == "date" %}
-      <input name="{{ param.0 }}" class="input" type="date" placeholder="{{ param.0 }}" />
+      <input name="{{ param.0 }}" class="input" type="date" placeholder="{{ param.0 }}" value="{{ param.2 }}" />
       {% endif %} {% endfor %}
       <input class="button" type="submit" value="Confirm" />
     </form>
   </div>
 </body>
+{% block script %}
 <script>
   selectEl = document.getElementById("data-source-select");
 
@@ -61,4 +62,5 @@
     window.location.replace(baseUrl);
   });
 </script>
+{% endblock script %}
 {% endblock body %}
