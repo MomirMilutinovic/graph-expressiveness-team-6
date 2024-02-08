@@ -191,7 +191,7 @@ The behavior of the viewport is defined as follows:
 
 All three graph views are simultaneously accessible and present the same graph in the aforementioned ways.
 
-### Graph View Interactions
+### Graph View Features
 
 - **Main View:**
   - Pan: Allows dragging the graph to view different parts.
