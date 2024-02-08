@@ -51,6 +51,7 @@
     </form>
   </div>
 </body>
+{% block script %}
 <script>
   selectEl = document.getElementById("data-source-select");
 
@@ -61,4 +62,5 @@
     window.location.replace(baseUrl);
   });
 </script>
+{% endblock script %}
 {% endblock body %}

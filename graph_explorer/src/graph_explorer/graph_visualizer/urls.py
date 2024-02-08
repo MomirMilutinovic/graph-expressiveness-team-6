@@ -27,11 +27,6 @@ urlpatterns = [
         name="workspace_config",
     ),
     path(
-        "workspace-config/<str:id_>",
-        views.workspace_configuration,
-        name="workspace_edit",
-    ),
-    path(
         "workspace-config/<str:datasource_name>",
         views.workspace_configuration,
     ),
@@ -46,6 +41,7 @@ urlpatterns = [
     path("search", views.search, name="search"),
     path("delete-filter", views.delete_filter, name="delete_filter"),
     path('workspace-edit/<str:id>/', views.edit_workspace, name='edit_workspace'),
+    path('workspace-edit/<str:id>/<str:datasource_name>', views.edit_workspace, name='edit_workspace'),
     path('workspace-delete/<str:id>/', views.delete_workspace, name='delete_workspace'),
     path("add-filter", views.add_filter, name="add_filter"),
 ]

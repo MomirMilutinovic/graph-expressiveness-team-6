@@ -85,32 +85,23 @@ def workspace(request, workspace_id):
     return render(request, "index.html", context)
 
 
-def workspace_configuration(request, datasource_name=None, id_=None):
+def workspace_configuration(request, datasource_name=None):
     data_sources = get_datasource_names()
     if datasource_name is None:
         datasource_name = data_sources[0]
     datasource_config_params = get_datasource_configuration(datasource_name)
-    ws: Workspace = None if id_ is None else app_config.get_workspace(id_)
-    datasource_name = datasource_name if ws is None else ws.selected_datasource
-    ds_config_params = datasource_config_params.items()
-    ds_config_params_with_values = []
-    for key, key_type in ds_config_params:
-        value = ""
-        if ws is not None and key in ws.datasource_config:
-            value = ws.datasource_config[key]
-        ds_config_params_with_values.append((key, key_type, value))
+    print(datasource_config_params)
     if request.method == "GET":
         return render(
             request,
             "workspace_config.html",
             {
-                "parameters": ds_config_params_with_values,
+                "parameters": datasource_config_params.items(),
                 "data_sources": data_sources,
                 "selected_ds": datasource_name,
-                "workspace": ws,
             },
         )
-    elif request.method == "POST" and ws is None:
+    elif request.method == "POST":
         form_data = request.POST.dict()
         workspace_name = form_data.get("workspace-name")
         del form_data["workspace-name"]
@@ -123,23 +114,6 @@ def workspace_configuration(request, datasource_name=None, id_=None):
 
         return HttpResponseRedirect(
             reverse("workspace", kwargs={"workspace_id": new_workspace.id})
-        )
-    elif request.method == "POST" and ws is not None:
-        form_data = request.POST.dict()
-        workspace_name = form_data.get("workspace-name")
-        del form_data["workspace-name"]
-        del form_data["csrfmiddlewaretoken"]
-
-        new_workspace = Workspace(
-            workspace_name, datasource_name, form_data, app_config
-        )
-
-        ws.name = new_workspace.name
-        ws.selected_datasource = new_workspace.selected_datasource
-        ws.datasource_config = new_workspace.datasource_config
-        ws.graph = new_workspace.graph
-        return HttpResponseRedirect(
-            reverse("workspace", kwargs={"workspace_id": content_module.workspace_id})
         )
 
 
@@ -160,8 +134,52 @@ def delete_filter(request):
     return HttpResponse(200, content_type="application/json")
 
 
-def edit_workspace(_, id):
-    return HttpResponseRedirect(reverse("workspace_edit", kwargs={"id_": id}))
+def edit_workspace(request, id, datasource_name=None):
+    data_sources = get_datasource_names()
+    ws: Workspace = app_config.get_workspace(id)
+    if ws is None:
+        return HttpResponseNotFound("Workspace with given id not found.")
+    datasource_name = ws.selected_datasource if datasource_name is None else datasource_name
+
+    datasource_config_params = get_datasource_configuration(datasource_name)
+    ds_config_params = datasource_config_params.items()
+    ds_config_params_with_values = []
+    for key, key_type in ds_config_params:
+        value = ""
+        if ws is not None and key in ws.datasource_config:
+            value = ws.datasource_config[key]
+        ds_config_params_with_values.append((key, key_type, value))
+
+    if request.method == "GET":
+        return render(
+            request,
+            "workspace_edit.html",
+            {
+                "parameters": ds_config_params_with_values,
+                "data_sources": data_sources,
+                "selected_ds": datasource_name,
+                "workspace": ws,
+            },
+        )
+    elif request.method == "POST":
+        form_data = request.POST.dict()
+        workspace_name = form_data.get("workspace-name")
+        del form_data["workspace-name"]
+        del form_data["csrfmiddlewaretoken"]
+
+        new_workspace = Workspace(
+            workspace_name, datasource_name, form_data, app_config
+        )
+
+        ws.name = new_workspace.name
+        ws.selected_datasource = new_workspace.selected_datasource
+        ws.datasource_config = new_workspace.datasource_config
+        ws.graph = new_workspace.graph
+        return HttpResponseRedirect(
+            reverse("workspace", kwargs={"workspace_id": content_module.workspace_id})
+        )
+    else:
+        return HttpResponse(404, content_type="application/json")
 
 
 def delete_workspace(request, id):
