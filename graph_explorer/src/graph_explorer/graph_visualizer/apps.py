@@ -30,6 +30,3 @@ class GraphVisualizerConfig(AppConfig):
 
     def get_number_of_workspaces(self):
         return len(self.workspaces)
-
-    def is_workspace_id_valid(self, id_) -> bool:
-        return id_ in [ws.id for ws in self.workspaces]
