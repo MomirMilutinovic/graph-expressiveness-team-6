@@ -1,15 +1,15 @@
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect, HttpResponseNotFound
-from django.urls import reverse
-from django.apps.registry import apps
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
 import json
 
-from .services import *
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect, HttpResponseNotFound
+from django.shortcuts import render
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+
+from core.filters.search_filter import SearchFilter
 from .models import Workspace
 from .module.content import ContentModule
-from core.filters.search_filter import SearchFilter
+from .services import *
 
 content_module = ContentModule(
     apps.get_app_config("graph_visualizer").data_source_plugins,
@@ -91,18 +91,25 @@ def workspace_configuration(request, datasource_name=None, id_=None):
     datasource_config_params = get_datasource_configuration(datasource_name)
     ws: Workspace = None if id_ is None else app_config.get_workspace(id_)
     datasource_name = datasource_name if ws is None else ws.selected_datasource
+    ds_config_params = datasource_config_params.items()
+    ds_config_params_with_values = []
+    for key, key_type in ds_config_params:
+        value = ""
+        if ws is not None and key in ws.datasource_config:
+            value = ws.datasource_config[key]
+        ds_config_params_with_values.append((key, key_type, value))
     if request.method == "GET":
         return render(
             request,
             "workspace_config.html",
             {
-                "parameters": datasource_config_params.items(),
+                "parameters": ds_config_params_with_values,
                 "data_sources": data_sources,
                 "selected_ds": datasource_name,
                 "workspace": ws,
             },
         )
-    elif request.method == "POST":
+    elif request.method == "POST" and ws is None:
         form_data = request.POST.dict()
         workspace_name = form_data.get("workspace-name")
         del form_data["workspace-name"]
@@ -115,6 +122,23 @@ def workspace_configuration(request, datasource_name=None, id_=None):
 
         return HttpResponseRedirect(
             reverse("workspace", kwargs={"workspace_id": new_workspace.id})
+        )
+    elif request.method == "POST" and ws is not None:
+        form_data = request.POST.dict()
+        workspace_name = form_data.get("workspace-name")
+        del form_data["workspace-name"]
+        del form_data["csrfmiddlewaretoken"]
+
+        new_workspace = Workspace(
+            workspace_name, datasource_name, form_data, app_config
+        )
+
+        ws.name = new_workspace.name
+        ws.selected_datasource = new_workspace.selected_datasource
+        ws.datasource_config = new_workspace.datasource_config
+        ws.graph = new_workspace.graph
+        return HttpResponseRedirect(
+            reverse("workspace", kwargs={"workspace_id": content_module.workspace_id})
         )
 
 
@@ -155,5 +179,5 @@ def delete_workspace(request, id):
         else:
             referer_url = request.META.get('HTTP_REFERER', reverse("index"))
             return HttpResponseRedirect(referer_url)
-    except Exception as e:
+    except Exception:
         return HttpResponse("An error occurred during workspace deletion.", status=500)

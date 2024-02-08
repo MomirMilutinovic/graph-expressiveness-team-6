@@ -28,7 +28,7 @@
 <body>
   <div class="main-form">
     <h1>Workspace Configuration</h1>
-    <form {% if workspace is None %}method="POST"{% else %}method="PUT"{% endif %}>
+    <form method="POST">
       {% csrf_token %}
       <input name="workspace-name" class="input" type="text" placeholder="Workspace Name" {% if workspace is not None %}value="{{workspace.name}}"{% endif %}  />
       <div class="select">
@@ -41,11 +41,11 @@
         </select>
       </div>
       {% for param in parameters %} {% if param.1 == "str" %}
-      <input name="{{ param.0 }}" class="input" type="text" placeholder="{{ param.0 }}" />
+      <input name="{{ param.0 }}" class="input" type="text" placeholder="{{ param.0 }}" value="{{ param.2 }}" />
       {% endif %} {% if param.1 == "int" %}
-      <input name="{{ param.0 }}" class="input" type="number" min="1" placeholder="{{ param.0 }}" />
+      <input name="{{ param.0 }}" class="input" type="number" min="1" placeholder="{{ param.0 }}" value="{{ param.2 }}" />
       {% endif %} {% if param.1 == "date" %}
-      <input name="{{ param.0 }}" class="input" type="date" placeholder="{{ param.0 }}" />
+      <input name="{{ param.0 }}" class="input" type="date" placeholder="{{ param.0 }}" value="{{ param.2 }}" />
       {% endif %} {% endfor %}
       <input class="button" type="submit" value="Confirm" />
     </form>
