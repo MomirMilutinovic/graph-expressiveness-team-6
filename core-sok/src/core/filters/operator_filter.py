@@ -24,7 +24,7 @@ class OperatorFilter(Filter):
         "divisible by": lambda a, b: a % b == 0,
     }
 
-    def __init__(self, attribute: str, operator_name: str, value: Any, operator: Callable[[Any, Any], bool]):
+    def __init__(self, attribute: str, operator_name: str, value: Any, operator: Callable[[Any, Any], bool]=None):
         """
         Initializes the operator filter.
         The value will be converted to the type of the attribute once filter is called.
@@ -41,29 +41,10 @@ class OperatorFilter(Filter):
         self.attribute = attribute
         self.operator_name = operator_name
         self.value = value
-        self.opeartor = operator
-    
-    def __init__(self, attribute: str, operator_name: str, value: Any):
-        """
-        Initializes the operator filter.
-        The operator is determined by the operator_name.
-        The value will be converted to the type of the attribute once filter is called.
-
-        :param attribute: The attribute to filter by.
-        :type attribute: str
-        :param operator_name: The name of the operator.
-        :type operator_name: str
-        :param value: The value to compare to.
-        :type value: str
-        """
-        if operator_name not in OperatorFilter.operators:
+        if operator_name not in OperatorFilter.operators and operator is None:
             raise ValueError("Invalid operator")
-
-        self.attribute = attribute
-        self.operator_name = operator_name
-        self.value = value
-        self.operator = OperatorFilter.operators[operator_name]
-
+        self.operator = OperatorFilter.operators[operator_name] if operator is None else operator
+    
     def __eq__(self, __value: object) -> bool:
         if not isinstance(__value, OperatorFilter):
             return False
