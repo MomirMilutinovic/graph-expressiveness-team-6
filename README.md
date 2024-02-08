@@ -187,7 +187,7 @@ The behavior of the viewport is defined as follows:
 - The `zoom-out` on the Main View reducing the viewport on the Bird View.
 - The `zoom-in` on the Main View enlarging the viewport on the Bird View.
 - The `pan` operation on the Main View moving the viewport on the Bird View.
-- `Dragging` the nodes on the Main View affecting the graph on the Bird View.
+- `Dragging` the nodes on the Main View affects the graph on the Bird View.
 
 All three graph views are simultaneously accessible and present the same graph in described ways.
 
