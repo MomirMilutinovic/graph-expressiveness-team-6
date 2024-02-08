@@ -11,8 +11,13 @@ def get_graph(
     recursion_depth: int = 2,
 ) -> Graph:
     artist = get_artist_by_name(auth_token, artist_name)
+<<<<<<< HEAD
     graph = Graph()
     procesed_artist_ids = set()
+=======
+    graph = Graph(directed=False)
+    processed_artist_ids = set()
+>>>>>>> 36d2793 (#22 feat: add support for newly created graph api)
 
     process_artists_recursively(
         auth_token, artist, max_neighbours, recursion_depth, graph, procesed_artist_ids
