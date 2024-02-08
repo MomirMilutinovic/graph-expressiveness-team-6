@@ -1,4 +1,4 @@
-pip install ./api
+pip install ./api-sok
 pip install ./core-sok
 pip install ./html_datasource
 pip install ./spotify_datasource
