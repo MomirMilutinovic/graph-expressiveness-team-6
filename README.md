@@ -1,6 +1,6 @@
 # Graph Expressiveness
 ## Team 6
-## Team members
+### Team members
 * Popov Vladimir SV29/2021
 * Bulatović Balša SV37/2021
 * Milutinović Momir SV39/2021
