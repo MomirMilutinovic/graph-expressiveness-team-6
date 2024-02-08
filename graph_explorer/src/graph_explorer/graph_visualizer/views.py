@@ -27,11 +27,6 @@ def index(request):
     context["tree_view_data"] = {}
     context["nodes_dict"] = {}
 
-    if content_module.workspace_id != content_module.INVALID_WORKSPACE_ID:
-        return HttpResponseRedirect(
-            reverse("workspace", kwargs={"workspace_id": content_module.workspace_id})
-        )
-
     return render(request, "index.html", context)
 
 
