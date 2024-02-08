@@ -146,7 +146,7 @@ def edit_workspace(request, id, datasource_name=None):
     ds_config_params_with_values = []
     for key, key_type in ds_config_params:
         value = ""
-        if ws is not None and key in ws.datasource_config:
+        if datasource_name == ws.selected_datasource:
             value = ws.datasource_config[key]
         ds_config_params_with_values.append((key, key_type, value))
 
