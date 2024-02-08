@@ -28,9 +28,9 @@
 <body>
   <div class="main-form">
     <h1>Workspace Configuration</h1>
-    <form method="POST">
+    <form {% if workspace is None %}method="POST"{% else %}method="PUT"{% endif %}>
       {% csrf_token %}
-      <input name="workspace-name" class="input" type="text" placeholder="Workspace Name" />
+      <input name="workspace-name" class="input" type="text" placeholder="Workspace Name" {% if workspace is not None %}value="{{workspace.name}}"{% endif %}  />
       <div class="select">
         <select id="data-source-select">
           {% for data_source in data_sources %} {% if selected_ds is None and forloop.first or selected_ds == data_source %}

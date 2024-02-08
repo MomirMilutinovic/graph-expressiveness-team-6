@@ -27,6 +27,11 @@ urlpatterns = [
         name="workspace_config",
     ),
     path(
+        "workspace-config/<str:id_>",
+        views.workspace_configuration,
+        name="workspace_edit",
+    ),
+    path(
         "workspace-config/<str:datasource_name>",
         views.workspace_configuration,
     ),

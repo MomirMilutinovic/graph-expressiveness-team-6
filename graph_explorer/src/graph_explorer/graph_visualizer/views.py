@@ -84,12 +84,13 @@ def workspace(request, workspace_id):
     return render(request, "index.html", context)
 
 
-def workspace_configuration(request, datasource_name=None):
+def workspace_configuration(request, datasource_name=None, id_=None):
     data_sources = get_datasource_names()
     if datasource_name is None:
         datasource_name = data_sources[0]
     datasource_config_params = get_datasource_configuration(datasource_name)
-
+    ws: Workspace = None if id_ is None else app_config.get_workspace(id_)
+    datasource_name = datasource_name if ws is None else ws.selected_datasource
     if request.method == "GET":
         return render(
             request,
@@ -98,6 +99,7 @@ def workspace_configuration(request, datasource_name=None):
                 "parameters": datasource_config_params.items(),
                 "data_sources": data_sources,
                 "selected_ds": datasource_name,
+                "workspace": ws,
             },
         )
     elif request.method == "POST":
@@ -130,14 +132,14 @@ def delete_filter(request):
     return HttpResponse(200, content_type="application/json")
 
 
-def edit_workspace(request, id):
-    return None
+def edit_workspace(_, id):
+    return HttpResponseRedirect(reverse("workspace_edit", kwargs={"id_": id}))
 
 
 def delete_workspace(request, id):
     global content_module
     try:
-        is_active_workspace = content_module.get_current_workspace() == id
+        is_active_workspace = content_module.get_current_workspace().id == id
 
         app_config.delete_workspace(id)
         if app_config.get_number_of_workspaces() == 0:
