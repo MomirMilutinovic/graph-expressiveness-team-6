@@ -104,7 +104,7 @@ The API defines two abstract classes:
 These abstract classes provide a foundation for creating plugins by specifying required methods and properties.
 
 ## Plugin Development
-In order to create a new plugin, you need to implement the interface similar as API package abstraction and provide an entry point for the plugin.
+In order to create a new plugin, you need to implement the interface for the kind of plugin you are writing and provide an entry point for the plugin.
 Note that it is not necessary to use the API package, but it is recommended to use it in order to have a consistent interface for all plugins.
 
 
