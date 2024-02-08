@@ -10,6 +10,7 @@ class OperatorFilter(Filter):
     """
     OperatorFilter filters the graph so only nodes that contain a specific
     attribute for which the given comparison returns true remain in the graph.
+    The filtering is done in-place.
     """
     operators = {
         "==": lambda a, b: a == b,
@@ -23,7 +24,7 @@ class OperatorFilter(Filter):
         "divisible by": lambda a, b: a % b == 0,
     }
 
-    def __init__(self, attribute: str, operator_name: str, value: str, operator: Callable[[Any, Any], bool]):
+    def __init__(self, attribute: str, operator_name: str, value: Any, operator: Callable[[Any, Any], bool]=None):
         """
         Initializes the operator filter.
         The value will be converted to the type of the attribute once filter is called.
@@ -40,29 +41,10 @@ class OperatorFilter(Filter):
         self.attribute = attribute
         self.operator_name = operator_name
         self.value = value
-        self.opeartor = operator
-    
-    def __init__(self, attribute: str, operator_name: str, value: str):
-        """
-        Initializes the operator filter.
-        The operator is determined by the operator_name.
-        The value will be converted to the type of the attribute once filter is called.
-
-        :param attribute: The attribute to filter by.
-        :type attribute: str
-        :param operator_name: The name of the operator.
-        :type operator_name: str
-        :param value: The value to compare to.
-        :type value: str
-        """
-        if operator_name not in OperatorFilter.operators:
+        if operator_name not in OperatorFilter.operators and operator is None:
             raise ValueError("Invalid operator")
-
-        self.attribute = attribute
-        self.operator_name = operator_name
-        self.value = value
-        self.operator = OperatorFilter.operators[operator_name]
-
+        self.operator = OperatorFilter.operators[operator_name] if operator is None else operator
+    
     def __eq__(self, __value: object) -> bool:
         if not isinstance(__value, OperatorFilter):
             return False
@@ -78,17 +60,9 @@ class OperatorFilter(Filter):
         if self.attribute not in node.data and self.attribute != "id":
             return False
 
-        try:
-            self.value = type(node.data[self.attribute])(self.value)
-        except ValueError:
-            return False
-
-        try:
-            if self.attribute == "id":
-                return self.operator(node.id, self.value)
-            return self.operator(node.data[self.attribute], self.value)
-        except (ValueError, TypeError):
-            return False
+        if self.attribute == "id":
+            return self.operator(node.id, self.value)
+        return self.operator(node.data[self.attribute], self.value)
 
     def filter(self, graph: Graph) -> Graph:
         """
@@ -99,11 +73,11 @@ class OperatorFilter(Filter):
         :return: The filtered graph.
         :rtype: Graph
         """
-        nodes = list(filter(lambda node: self.satisfiesQuery(node), graph.nodes))
-        edges = list(filter(lambda edge: edge.src in nodes and edge.dest in nodes, graph.edges))
-        for node in nodes:
-            node.edges = list(filter(lambda edge: edge.src in nodes and edge.dest in nodes, node.edges))
-        return Graph(edges, nodes)
+        for node in list(graph.nodes):
+            if not self.satisfiesQuery(node):
+                graph.remove_node(node)
+
+        return graph
 
     def to_json(self) -> dict:
         return {

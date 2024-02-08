@@ -18,6 +18,8 @@ class Graph:
         self.edges = [
             edge for edge in self.edges if edge.src != node and edge.dest != node
         ]
+        for node in self.nodes:
+            node.edges = list(filter(lambda edge: edge.src in self.nodes and edge.dest in self.nodes, node.edges))
 
     def add_node(self, node: Node):
         self.nodes.add(node)

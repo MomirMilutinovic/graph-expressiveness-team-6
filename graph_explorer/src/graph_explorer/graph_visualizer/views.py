@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect, HttpResponseNotFound
@@ -129,12 +130,12 @@ def delete_filter(request):
         filter_json = json.loads(request.body)
         if filter_json["type"] == "SearchFilter":
             search_filter = SearchFilter(filter_json["search_term"])
-            current_workspace.get_filter_chain().remove_filter(search_filter)
+            current_workspace.remove_filter(search_filter)
         elif filter_json["type"] == "OperatorFilter":
             operator_filter = OperatorFilter(
                 filter_json["attribute"], filter_json["operator"], filter_json["value"]
             )
-            current_workspace.get_filter_chain().remove_filter(operator_filter)
+            current_workspace.remove_filter(operator_filter)
     except KeyError:
         return
 
@@ -174,14 +175,8 @@ def edit_workspace(request, id, datasource_name=None):
         del form_data["workspace-name"]
         del form_data["csrfmiddlewaretoken"]
 
-        new_workspace = Workspace(
-            workspace_name, datasource_name, form_data, app_config
-        )
-
-        ws.name = new_workspace.name
-        ws.selected_datasource = new_workspace.selected_datasource
-        ws.datasource_config = new_workspace.datasource_config
-        ws.graph = new_workspace.graph
+        ws.name = workspace_name
+        ws.set_data_source(datasource_name, form_data, app_config)
         return HttpResponseRedirect(
             reverse("workspace", kwargs={"workspace_id": content_module.workspace_id})
         )
@@ -216,11 +211,12 @@ def add_filter(request):
     try:
         attribute: str = request.POST["attribute"]
         operator: str = request.POST["operator"]
-        value: str = request.POST["value"]
+        unfiltered_graph = content_module.get_current_workspace().get_unfiltered_graph()
+        value: Any = coerce_filter_value(request.POST["value"], attribute, unfiltered_graph, operator)
         current_workspace = content_module.get_current_workspace()
         operator_filter: OperatorFilter = OperatorFilter(attribute, operator, value)
         current_workspace.add_filter(operator_filter)
-    except (KeyError, ValueError):
-        return
+    except (KeyError, ValueError, TypeError) as e:
+        return HttpResponse(str(e), content_type="text/plain", status=400)
 
-    return HttpResponseRedirect(reverse("index"))
+    return HttpResponseRedirect(reverse("workspace", kwargs={"workspace_id": current_workspace.id}))

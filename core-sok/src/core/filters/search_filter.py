@@ -6,6 +6,7 @@ class SearchFilter(Filter):
     """
     SearchFilter filters the graph so only nodes where the search query occurs
     remain in the graph.
+    The filtering is done in-place.
     """
 
     def __init__(self, search_term: str):
@@ -31,11 +32,11 @@ class SearchFilter(Filter):
         :return: The filtered graph.
         :rtype: Graph
         """
-        nodes = list(filter(lambda node: self.search_term in node, graph.nodes))
-        edges = list(filter(lambda edge: edge.src in nodes and edge.dest in nodes, graph.edges))
-        for node in nodes:
-            node.edges = list(filter(lambda edge: edge.src in nodes and edge.dest in nodes, node.edges))
-        return Graph(edges, nodes)
+        for node in list(graph.nodes):
+            if self.search_term not in node:
+                graph.remove_node(node)
+            
+        return graph
 
     def to_json(self) -> dict:
         """

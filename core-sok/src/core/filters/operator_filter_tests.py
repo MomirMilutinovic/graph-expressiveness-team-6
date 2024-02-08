@@ -17,7 +17,6 @@ class OperatorFilterTests(unittest.TestCase):
         filtered_graph = search_filter.filter(graph)
         self.assertEqual(filtered_graph.get_nodes(), [node1, node2, node3])
         self.assertEqual(filtered_graph.get_edges(), [edge1, edge2])
-        self.assertNotEqual(filtered_graph, graph)
 
     def test_no_node_passes(self):
         node1 = Node("1", {"name": "node1"})
@@ -30,7 +29,6 @@ class OperatorFilterTests(unittest.TestCase):
         filtered_graph = search_filter.filter(graph)
         self.assertEqual(filtered_graph.get_nodes(), [])
         self.assertEqual(filtered_graph.get_edges(), [])
-        self.assertNotEqual(filtered_graph, graph)
 
     def test_string_comparison(self):
         node1 = Node("1", {"name": "node1"})
@@ -43,7 +41,6 @@ class OperatorFilterTests(unittest.TestCase):
         filtered_graph = search_filter.filter(graph)
         self.assertEqual(filtered_graph.get_nodes(), [node1, node2])
         self.assertEqual(filtered_graph.get_edges(), [edge1])
-        self.assertNotEqual(filtered_graph, graph)
     
     def test_no_attribute(self):
         node1 = Node("1", {"name": "node1"})
@@ -56,7 +53,6 @@ class OperatorFilterTests(unittest.TestCase):
         filtered_graph = search_filter.filter(graph)
         self.assertEqual(filtered_graph.get_nodes(), [])
         self.assertEqual(filtered_graph.get_edges(), [])
-        self.assertNotEqual(filtered_graph, graph)
 
 if __name__ == '__main__':
     unittest.main()

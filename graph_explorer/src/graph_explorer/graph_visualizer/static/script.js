@@ -33,3 +33,30 @@ function deleteFilter(filter) {
         }
     };
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("filter-form").addEventListener("submit", function(e) {
+        e.preventDefault();
+        request = new XMLHttpRequest();
+        request.open("POST", "/add-filter", true);
+        request.send(new FormData(this));
+        request.onload = function () {
+            if (request.status === 200) {
+                location.reload();
+            }
+            else {
+                showErrorMessage(request.responseText);
+            }
+        };
+    }, true);
+}, true);
+
+function showErrorMessage(message) {
+    let errorToast = document.getElementById("error");
+    let errorMessage = document.getElementById("error-message");
+    errorMessage.innerText = message;
+    errorToast.classList.remove("is-hidden");
+    setTimeout(function() {
+        errorToast.classList.add("is-hidden");
+    }, 5000);
+}

@@ -2,7 +2,7 @@ from typing import List
 from django.db import models
 import uuid
 
-from core.filters.filter_chain import FilterChain
+from core.filters.filter_pipeline import FilterPipeline
 from core.filters.base_filter import Filter
 from api.models.graph import Graph
 
@@ -25,19 +25,40 @@ class Workspace:
         self.name = name
         self.selected_datasource = selected_datasource
         self.datasource_config = datasource_config
-        self.filter_chain = FilterChain()
+        self.filter_pipeline = FilterPipeline()
         self.graph = app_config.data_source_plugins_dict[selected_datasource].provide(
             **datasource_config
         )
+        self.filtered_graph = self.graph
     
     def add_filter(self, filter: Filter):
-        self.filter_chain.add_filter(filter)
+        self.filter_pipeline.add_filter(filter)
+        try:
+            self.filtered_graph = self.filter_pipeline.filter(self.graph)
+        except Exception as e:
+            self.filter_pipeline.remove_filter(filter)
+            raise e
 
     def get_filtered_graph(self) -> Graph:
-        return self.filter_chain.filter(self.graph)
+        return self.filtered_graph
 
     def get_filters(self) -> List[Filter]:
-        return self.filter_chain.get_filters()
+        return self.filter_pipeline.get_filters()
 
-    def get_filter_chain(self) -> FilterChain:
-        return self.filter_chain
+    def get_filter_pipeline(self) -> FilterPipeline:
+        return self.filter_pipeline
+
+    def get_unfiltered_graph(self) -> Graph:
+        return self.graph
+
+    def remove_filter(self, filter: Filter):
+        self.filter_pipeline.remove_filter(filter)
+        self.filtered_graph = self.filter_pipeline.filter(self.graph)
+
+    def set_data_source(self, datasource_name: str, datasource_config: dict, app_config):
+        self.selected_datasource = datasource_name
+        self.datasource_config = datasource_config
+        self.graph = app_config.data_source_plugins_dict[datasource_name].provide(
+            **datasource_config
+        )
+        self.filtered_graph = self.filter_pipeline.filter(self.graph)
