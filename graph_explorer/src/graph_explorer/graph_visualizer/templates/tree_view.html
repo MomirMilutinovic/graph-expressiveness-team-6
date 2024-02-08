@@ -34,34 +34,25 @@
 
   // initialization of root node
   data.children = [];
-  for (const childrenId of data.children_ids) {
-    const childClone = structuredClone(allNodes[childrenId]);
-    childClone.expanded = false;
-    childClone.children = [];
-    data.children.push(childClone);
+  if (data.children_ids) {
+    for (const childrenId of data.children_ids) {
+      const childClone = structuredClone(allNodes[childrenId]);
+      childClone.expanded = false;
+      childClone.children = [];
+      data.children.push(childClone);
+    }
   }
-
-  console.log(data);
 
   function emptySvg() {
     d3.select("#tree-view-svg").selectAll("*").remove();
   }
 
   function getYOffset(node) {
-    if (node.parent == null) return 0;
-
-    const siblings = node.parent.children;
-    const nodeChildIndex = siblings.indexOf(node);
-
-    if (nodeChildIndex == 0) {
-      return Object.keys(node.parent.data.data).length + 1;
+    try {
+      return node.data.expanded ? Object.keys(node.data.data).length + 1 : 1;
+    } catch (error) {
+      return 1;
     }
-
-    const prevSibling = siblings[nodeChildIndex - 1];
-
-    if (!prevSibling.data.expanded) return 1;
-
-    return Object.keys(siblings[nodeChildIndex - 1].data.data).length + 1;
   }
 
   function calculateSvgHeight(nodes, nodeSize) {
@@ -104,17 +95,18 @@
   function render() {
     emptySvg();
 
-    if (Object.keys(data).length == 0) return;
+    if (Object.keys(data).length <= 1) return;
 
     const nodeSize = 20;
     const root = d3.hierarchy(data).eachBefore(
-      ((i) => (d) => {
+      ((i, beforeOffset) => (d) => {
         if (d.index == undefined) {
-          i += getYOffset(d);
+          i += beforeOffset;
+          beforeOffset = getYOffset(d);
           return (d.index = i);
         }
         return;
-      })(0)
+      })(0, 0)
     );
     const nodes = root.descendants();
     let width = calculateSvgWidth(nodes, nodeSize) + 50;
@@ -176,6 +168,7 @@
     node
       .append("text")
       .attr("dy", "0.32em")
+      .attr("cursor", "pointer")
       .attr("x", (d) => d.depth * nodeSize + 20)
       .text((d) => d.data.name);
 

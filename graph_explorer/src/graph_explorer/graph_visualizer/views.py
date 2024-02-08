@@ -10,6 +10,7 @@ from core.filters.search_filter import SearchFilter
 from .models import Workspace
 from .module.content import ContentModule
 from .services import *
+from core.filters.operator_filter import OperatorFilter
 
 content_module = ContentModule(
     apps.get_app_config("graph_visualizer").data_source_plugins,
@@ -66,8 +67,8 @@ def workspace(request, workspace_id):
     active_workspace: Workspace = list(
         filter(lambda ws: ws.id == workspace_id, app_config.workspaces)
     )[0]
-    tree_view_data = get_tree_view_data(active_workspace.graph)
-    nodes_dict = get_node_dict(active_workspace.graph)
+    tree_view_data = get_tree_view_data(active_workspace.get_filtered_graph())
+    nodes_dict = get_node_dict(active_workspace.get_filtered_graph())
 
     content_module.workspaces = app_config.workspaces
     content_module.workspace_id = workspace_id
@@ -150,6 +151,9 @@ def delete_filter(request):
         if filter_json["type"] == "SearchFilter":
             search_filter = SearchFilter(filter_json["search_term"])
             current_workspace.get_filter_chain().remove_filter(search_filter)
+        elif filter_json["type"] == "OperatorFilter":
+            operator_filter = OperatorFilter(filter_json["attribute"], filter_json["operator"], filter_json["value"])
+            current_workspace.get_filter_chain().remove_filter(operator_filter)
     except KeyError:
         return
 
@@ -181,3 +185,17 @@ def delete_workspace(request, id):
             return HttpResponseRedirect(referer_url)
     except Exception:
         return HttpResponse("An error occurred during workspace deletion.", status=500)
+      
+      
+def add_filter(request):
+    try:
+        attribute: str = request.POST["attribute"]
+        operator: str = request.POST["operator"]
+        value: str = request.POST["value"]
+        current_workspace = content_module.get_current_workspace()
+        operator_filter: OperatorFilter = OperatorFilter(attribute, operator, value)
+        current_workspace.add_filter(operator_filter)
+    except (KeyError, ValueError):
+        return
+
+    return HttpResponseRedirect(reverse('index'))

@@ -2,6 +2,7 @@ from api.components.data_source import DataSource
 from api.components.visualizer import Visualizer
 from api.models.graph import Graph
 from ..models import Workspace
+from core.filters.operator_filter import OperatorFilter
 
 
 class ContentModule:
@@ -39,7 +40,8 @@ class ContentModule:
             "content": self.current_visualizer.display(self.get_filtered_graph()) if self.current_visualizer else None,
             "workspaces": [vars(ws) for ws in self.workspaces],
             "active_ws_id": self.workspace_id,
-            "filters": list(map(lambda filter: filter.to_json(), self.get_current_workspace().get_filters())) if self.workspace_id != ContentModule.INVALID_WORKSPACE_ID else []
+            "filters": list(map(lambda filter: filter.to_json(), self.get_current_workspace().get_filters())) if self.workspace_id != ContentModule.INVALID_WORKSPACE_ID else [],
+            "operators": list(OperatorFilter.operators.keys())
         }
         return content
 

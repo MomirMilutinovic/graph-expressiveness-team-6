@@ -56,20 +56,35 @@ a#create-workspace .material-symbols-outlined {
 }
 
 #filter-attribute-input, #filter-value-input {
-    width: 45%;
+    width: 42.5%;
 }
 
 .filter-form .select {
-    width: 9.2%;
+    width: 15%;
 }
 
 .filter-form .select select{
     width: 100%;
 }
 
+#bird-view-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+#bird-view-panel .panel-heading {
+    flex: 0;
+}
+
+#bird-view-panel .panel-block {
+    flex: 1;
+    margin-bottom: 0;
+}
+
 .highlight {
     background-color: #efefef;
 }
+
 .filter-form {
     display: flex;
     align-items: center;
