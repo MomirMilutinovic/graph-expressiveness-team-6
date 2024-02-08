@@ -10,6 +10,7 @@ class OperatorFilter(Filter):
     """
     OperatorFilter filters the graph so only nodes that contain a specific
     attribute for which the given comparison returns true remain in the graph.
+    The filtering is done in-place.
     """
     operators = {
         "==": lambda a, b: a == b,
@@ -99,11 +100,11 @@ class OperatorFilter(Filter):
         :return: The filtered graph.
         :rtype: Graph
         """
-        nodes = list(filter(lambda node: self.satisfiesQuery(node), graph.nodes))
-        edges = list(filter(lambda edge: edge.src in nodes and edge.dest in nodes, graph.edges))
-        for node in nodes:
-            node.edges = list(filter(lambda edge: edge.src in nodes and edge.dest in nodes, node.edges))
-        return Graph(edges, nodes)
+        for node in graph.nodes[:]:
+            if not self.satisfiesQuery(node):
+                graph.remove_node(node)
+
+        return graph
 
     def to_json(self) -> dict:
         return {

@@ -16,7 +16,6 @@ class SearchFilterTests(unittest.TestCase):
         filtered_graph = search_filter.filter(graph)
         self.assertEqual(filtered_graph.get_nodes(), [node2])
         self.assertEqual(filtered_graph.get_edges(), [])
-        self.assertNotEqual(filtered_graph, graph)
 
     def test_filter_all_nodes_pass_attribute_value(self):
         node1 = Node("1", {"name": "node1"})
@@ -29,7 +28,6 @@ class SearchFilterTests(unittest.TestCase):
         filtered_graph = search_filter.filter(graph)
         self.assertEqual(filtered_graph.get_nodes(), [node1, node2, node3])
         self.assertEqual(filtered_graph.get_edges(), [edge1, edge2])
-        self.assertNotEqual(filtered_graph, graph)
 
     def test_filter_all_nodes_pass_attribute_key(self):
         node1 = Node("1", {"name": "node1"})
@@ -42,7 +40,6 @@ class SearchFilterTests(unittest.TestCase):
         filtered_graph = search_filter.filter(graph)
         self.assertEqual(filtered_graph.get_nodes(), [node1, node2, node3])
         self.assertEqual(filtered_graph.get_edges(), [edge1, edge2])
-        self.assertNotEqual(filtered_graph, graph)
 
     def test_filter_id(self):
         node1 = Node("1", {"name": "node1"})
@@ -55,7 +52,6 @@ class SearchFilterTests(unittest.TestCase):
         filtered_graph = search_filter.filter(graph)
         self.assertEqual(filtered_graph.get_nodes(), [node2])
         self.assertEqual(filtered_graph.get_edges(), [])
-        self.assertNotEqual(filtered_graph, graph)
 
     def test_filter_preserves_edge(self):
         node1 = Node("1", {"name": "node1pass"})
@@ -68,7 +64,6 @@ class SearchFilterTests(unittest.TestCase):
         filtered_graph = search_filter.filter(graph)
         self.assertEqual(filtered_graph.get_nodes(), [node1, node2])
         self.assertEqual(filtered_graph.get_edges(), [edge1])
-        self.assertNotEqual(filtered_graph, graph)
 
 
 if __name__ == '__main__':
