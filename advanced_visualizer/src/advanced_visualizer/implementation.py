@@ -27,20 +27,22 @@ class AdvancedVisualizer(Visualizer):
         except Exception as e:
             return f"<html><body><h2>Error: Invalid graph data.</h2><p>Details: {e}</p></body></html>"
 
-        return self.template.render(nodes=graph.get_nodes(), edges=graph.get_edges(), name=self.get_name())
+        return self.template.render(nodes=graph.get_nodes(), edges=graph.get_edges(), name=self.get_name(),
+                                    directed=graph.directed)
 
 
 class MockGraph(Graph):
     def get_nodes(self):
         # Create mock nodes with IDs and labels
-        return [Node(id=str(i), data={"label": f"Node {i}", "extraInfo": f"Info {i}", "info2": f"Info {i}"}) for i in range(1, 21)]
+        return [Node(id=str(i), data={"label": f"Node {i}", "extraInfo": f"Info {i}", "info2": f"Info {i}"}) for i in
+                range(1, 21)]
 
     def get_edges(self):
         # Create mock edges between nodes with some data
         edges = []
         for i in range(1, 10):  # Creating edges from each node to the next
             edges.append(Edge(src=Node(id=str(i), data={"label": f"Node {i}"}),
-                              dest=Node(id=str(i+1), data={"label": f"Node {i+1}"}),
+                              dest=Node(id=str(i + 1), data={"label": f"Node {i + 1}"}),
                               data={"weight": i}))
 
         edges.append(Edge(src=Node(id=str(1), data={"label": "Node 1"}),
@@ -49,6 +51,12 @@ class MockGraph(Graph):
         edges.append(Edge(src=Node(id=str(20), data={"label": "Node 20"}),
                           dest=Node(id=str(1), data={"label": "Node 1"}),
                           data={"weight": 10}))
+        edges.append(Edge(src=Node(id=str(1), data={"label": "Node 1"}),
+                          dest=Node(id=str(10), data={"label": "Node 10"}),
+                          data={"weight": 5}))
+        edges.append(Edge(src=Node(id=str(10), data={"label": "Node 10"}),
+                          dest=Node(id=str(1), data={"label": "Node 1"}),
+                          data={"weight": 2}))
         return edges
 
 
@@ -57,4 +65,3 @@ if __name__ == "__main__":
     mock_graph = MockGraph()
     html_output = visualizer.display(mock_graph)
     print(html_output)
-
