@@ -61,4 +61,4 @@ class Workspace:
         self.graph = app_config.data_source_plugins_dict[datasource_name].provide(
             **datasource_config
         )
-        self.filtered_graph = self.graph
+        self.filtered_graph = self.filter_pipeline.filter(self.graph)
