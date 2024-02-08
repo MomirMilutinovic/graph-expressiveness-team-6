@@ -13,7 +13,6 @@
 <div id="bird-view-content">
     <svg id="bird-view-svg">
         <g id="main-content-group"></g>
-        <g id="viewport-overlay-group">
         </g>
     </svg>
 </div>
@@ -59,13 +58,21 @@
         let gWrapper = mainContentGroup.append("g").attr("class", "content-wrapper");
         gWrapper.html(mainSvgContent);
 
-        let bbox = mainContentGroup.select("g.content-wrapper").node().getBBox();
-        let scale = Math.min(300 / bbox.width, 150 / bbox.height) * 1.5;
-        let x = bbox.x;
-        let y = bbox.y;
-        let t = [-x * scale + 50, -y * scale+50];
+        let birdViewSvg = d3.select("#bird-view-svg");
+        let birdViewHeight = birdViewSvg.node().clientHeight;
+        let birdViewWidth = birdViewSvg.node().clientWidth;
 
-        gWrapper.attr("transform", "translate("+ t +") scale("+ scale +")");
+        let bbox = gWrapper.node().getBBox();
+        let scaleX = birdViewWidth / bbox.width;
+        let scaleY = birdViewHeight / bbox.height;
+
+        let scale = Math.min(scaleX, scaleY);
+
+        let x = bbox.x * scale;
+        let y = bbox.y * scale;
+        let t = [(birdViewWidth / 2) - (bbox.width * scale / 2) - x, (birdViewHeight / 2) - (bbox.height * scale / 2) - y];
+
+        gWrapper.attr("transform", `translate(${t}) scale(${scale})`);
 
         setTimeout(function() { isLoaded = false; }, 100);
     }

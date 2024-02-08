@@ -124,3 +124,11 @@ a#create-workspace .material-symbols-outlined {
     display: flex;
     gap: 0;
 }
+#main-view-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+#main-view-panel > div {
+    flex-grow: 1;
+}
