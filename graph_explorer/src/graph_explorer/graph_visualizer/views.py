@@ -27,6 +27,11 @@ def index(request):
     context["tree_view_data"] = {}
     context["nodes_dict"] = {}
 
+    if content_module.workspace_id != content_module.INVALID_WORKSPACE_ID:
+        return HttpResponseRedirect(
+            reverse("workspace", kwargs={"workspace_id": content_module.workspace_id})
+        )
+
     return render(request, "index.html", context)
 
 
@@ -78,7 +83,7 @@ def workspace(request, workspace_id):
     content_module.set_graph(app_config.get_workspace(workspace_id).graph)
 
     context = content_module.get_context()
-    context["tree_view_data"] = vars(tree_view_data)
+    context["tree_view_data"] = tree_view_data
     context["nodes_dict"] = nodes_dict
     context["workspaces"] = [vars(ws) for ws in app_config.workspaces]
 
@@ -126,7 +131,9 @@ def delete_filter(request):
             search_filter = SearchFilter(filter_json["search_term"])
             current_workspace.get_filter_chain().remove_filter(search_filter)
         elif filter_json["type"] == "OperatorFilter":
-            operator_filter = OperatorFilter(filter_json["attribute"], filter_json["operator"], filter_json["value"])
+            operator_filter = OperatorFilter(
+                filter_json["attribute"], filter_json["operator"], filter_json["value"]
+            )
             current_workspace.get_filter_chain().remove_filter(operator_filter)
     except KeyError:
         return
@@ -216,4 +223,4 @@ def add_filter(request):
     except (KeyError, ValueError):
         return
 
-    return HttpResponseRedirect(reverse('index'))
+    return HttpResponseRedirect(reverse("index"))

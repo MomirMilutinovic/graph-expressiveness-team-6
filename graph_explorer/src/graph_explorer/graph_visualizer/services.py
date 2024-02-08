@@ -6,12 +6,16 @@ import random
 from .models import TreeViewNode
 
 
-def get_tree_view_data(graph: Graph) -> TreeViewNode:
+def get_tree_view_data(graph: Graph) -> dict:
+
+    if len(graph.get_nodes()) == 0:
+        return {}
+
     graph_root = random.choice(list(graph.get_nodes()))
 
     tree_view_root = process_node(graph_root)
 
-    return tree_view_root
+    return vars(tree_view_root)
 
 
 def get_node_dict(graph: Graph) -> dict:
