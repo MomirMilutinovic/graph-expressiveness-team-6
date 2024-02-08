@@ -4,13 +4,14 @@ from .node import Node
 
 class Graph:
 
-    def __init__(self, edges=None, nodes=None):
+    def __init__(self, edges=None, nodes=None, directed=True):
         if nodes is None:
             nodes = set()
         if edges is None:
-            edges = []
+            edges = set()
         self.edges = edges
         self.nodes = nodes
+        self.directed = directed
 
     def remove_node(self, node: Node):
         self.nodes.remove(node)
@@ -24,16 +25,22 @@ class Graph:
     def add_edge(self, edge: Edge):
         self.add_node(edge.src)
         self.add_node(edge.dest)
-        self.edges.append(edge)
 
-        for node in self.nodes:
-            if node == edge.src:
-                node.edges.append(edge)
-            if node == edge.dest:
-                node.edges.append(edge)
+        if edge not in self.edges:
+            self.edges.add(edge)
+
+            if not self.directed:
+                inverted_edge = Edge(edge.data, edge.dest, edge.src)
+                self.edges.add(inverted_edge)
+
+            for node in self.nodes:
+                if node == edge.src:
+                    node.edges.append(edge)
+                if not self.directed and node == edge.dest:
+                    node.edges.append(inverted_edge)
 
     def get_nodes(self) -> set[Node]:
         return self.nodes
 
     def get_edges(self) -> list[Edge]:
-        return self.edges
+        return list(self.edges)
