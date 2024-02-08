@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.urls import reverse
 from django.apps.registry import apps
@@ -133,5 +133,25 @@ def delete_filter(request):
 def edit_workspace(request, id):
     return None
 
+
 def delete_workspace(request, id):
-    return None
+    global content_module
+    try:
+        is_active_workspace = content_module.get_current_workspace() == id
+
+        app_config.delete_workspace(id)
+        if app_config.get_number_of_workspaces() == 0:
+            content_module = ContentModule(
+                apps.get_app_config("graph_visualizer").data_source_plugins,
+                apps.get_app_config("graph_visualizer").visualizer_plugins,
+            )
+            return HttpResponseRedirect(reverse("index"))
+        elif is_active_workspace:
+            return HttpResponseRedirect(
+                reverse("workspace", kwargs={"workspace_id": app_config.workspaces[0].id})
+            )
+        else:
+            referer_url = request.META.get('HTTP_REFERER', reverse("index"))
+            return HttpResponseRedirect(referer_url)
+    except Exception as e:
+        return HttpResponse("An error occurred during workspace deletion.", status=500)
