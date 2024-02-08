@@ -195,7 +195,7 @@ All three graph views are simultaneously accessible and present the same graph i
 
 - **Main View:**
   - Pan: Allows dragging the graph to view different parts of it.
-  - Zoom In/Out: Enables zooming in and out of the graph.
+  - Zoom In/Out: The graph can be zoomed in or out.
   - Drag and Drop: Allows moving nodes within the Main View.
 
 - **Tree View:**
