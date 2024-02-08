@@ -249,4 +249,4 @@ def add_filter(request):
     except (KeyError, ValueError, TypeError) as e:
         return HttpResponse(str(e), content_type="text/plain", status=400)
 
-    return HttpResponseRedirect(reverse('workspace', kwargs={'workspace_id': current_workspace.id}))
+    return HttpResponseRedirect(reverse("workspace", kwargs={"workspace_id": current_workspace.id}))
