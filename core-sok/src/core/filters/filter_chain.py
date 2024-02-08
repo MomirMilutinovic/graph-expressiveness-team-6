@@ -1,12 +1,14 @@
 from api.models.graph import Graph
 from .base_filter import Filter
 from typing import List
+import copy
 
 class FilterChain(Filter):
     """
     FilterChain is a filter that chains multiple filters together.
     The output of this filters is the result of applying all the filters in the chain.
     The filters are applied in the order they were added.
+    The filter makes a deep copy of the graph before applying the filters.
     """
     def __init__(self) -> None:
         super().__init__()
@@ -36,6 +38,7 @@ class FilterChain(Filter):
         :return: The filtered graph.
         :rtype: Graph
         """
+        graph = copy.deepcopy(graph)
         for filter in self.filters:
             graph = filter.filter(graph)
         return graph
