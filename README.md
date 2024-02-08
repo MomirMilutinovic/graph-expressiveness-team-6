@@ -185,7 +185,7 @@ Bird View encompass the viewport that moves in accordance with the current displ
 The behavior of the viewport is defined as follows:
 
 - Zooming out the Main View shrinks the viewport on the Bird View.
-- The `zoom-in` on the Main View enlarging the viewport on the Bird View.
+- Zooming in the Main View enlarges the viewport on the Bird View.
 - The `pan` operation on the Main View moving the viewport on the Bird View.
 - `Dragging` the nodes on the Main View affects the graph on the Bird View.
 
