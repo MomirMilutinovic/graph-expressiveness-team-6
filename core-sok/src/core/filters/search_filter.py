@@ -32,7 +32,7 @@ class SearchFilter(Filter):
         :return: The filtered graph.
         :rtype: Graph
         """
-        for node in graph.nodes[:]:
+        for node in list(graph.nodes):
             if self.search_term not in node:
                 graph.remove_node(node)
             

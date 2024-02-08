@@ -100,7 +100,7 @@ class OperatorFilter(Filter):
         :return: The filtered graph.
         :rtype: Graph
         """
-        for node in graph.nodes[:]:
+        for node in list(graph.nodes):
             if not self.satisfiesQuery(node):
                 graph.remove_node(node)
 
