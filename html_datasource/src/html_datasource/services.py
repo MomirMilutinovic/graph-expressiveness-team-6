@@ -7,11 +7,11 @@ from api.models.graph import Graph
 
 
 def get_graph(url):
-    g = Graph([], set())
+    g = Graph(set(), set())
     driver = driver_setup(url)
     html_content = driver.page_source
     driver.quit()
-    soup = BeautifulSoup(html_content, 'html.parser')
+    soup = BeautifulSoup(html_content, "html.parser")
     root = soup.html
     recursive_html_traversal(g, root)
     handle_self_pointing_hrefs(g)
