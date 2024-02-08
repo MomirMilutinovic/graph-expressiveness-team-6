@@ -130,12 +130,12 @@ def delete_filter(request):
         filter_json = json.loads(request.body)
         if filter_json["type"] == "SearchFilter":
             search_filter = SearchFilter(filter_json["search_term"])
-            current_workspace.get_filter_chain().remove_filter(search_filter)
+            current_workspace.remove_filter(search_filter)
         elif filter_json["type"] == "OperatorFilter":
             operator_filter = OperatorFilter(
                 filter_json["attribute"], filter_json["operator"], filter_json["value"]
             )
-            current_workspace.get_filter_chain().remove_filter(operator_filter)
+            current_workspace.remove_filter(operator_filter)
     except KeyError:
         return
 

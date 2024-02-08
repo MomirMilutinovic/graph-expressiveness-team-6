@@ -40,7 +40,7 @@ class Workspace:
             raise e
 
     def get_filtered_graph(self) -> Graph:
-        return self.filter_chain.filter(self.graph)
+        return self.filtered_graph
 
     def get_filters(self) -> List[Filter]:
         return self.filter_chain.get_filters()
@@ -50,3 +50,7 @@ class Workspace:
 
     def get_unfiltered_graph(self) -> Graph:
         return self.graph
+
+    def remove_filter(self, filter: Filter):
+        self.filter_chain.remove_filter(filter)
+        self.filtered_graph = self.filter_chain.filter(self.graph)
