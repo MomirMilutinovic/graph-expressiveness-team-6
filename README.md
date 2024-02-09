@@ -136,8 +136,8 @@ We have developed two distinct Data Source plugins, each serving a specific purp
 1. **HTML Data Source:**
    - Description: This plugin is designed to retrieve data from HTML documents and represent it as a graph.
    - Source Code: [HTML Data Source Plugin](./html_datasource)
-   - The circularity within HTML is established by leveraging the `<a>` tags and their associated `href` attributes. 
-     - These attributes serve to link to specific sections of the page, identified by either an `id` or the `<html>` if `href="#"`
+   - In addition to parent-child relationships in the HTML document, the graph also includes links between `<a>` elements and the elements referenced by their `href` attributes if the referenced elements are within the document.
+   - Graphs produced by this data source may be cyclic due to the inclusion of intradocument links.
    - Here is the example of the HTML document, and it's graph representation:
    ```html
     <html lang="en">
