@@ -11,7 +11,7 @@ def get_graph(
     recursion_depth: int = 2,
 ) -> Graph:
     artist = get_artist_by_name(auth_token, artist_name)
-    graph = Graph(directed=False)
+    graph = Graph(directed=False, root_id=artist.id)
     processed_artist_ids = set()
 
     process_artists_recursively(
