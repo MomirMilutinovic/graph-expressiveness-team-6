@@ -115,21 +115,32 @@
     }
   }
 
-  function expand(nodeId) {
-    const node = d3.selectAll(".tree-view-node").filter((d) => d.data.name === nodeId && !d.data.expanded).dispatch("expand");
+  function expandOneInstance(nodeId) {
+    if (d3.selectAll(".tree-view-node").filter((d) => d.data.name === nodeId && d.data.expanded).size() > 0) return;
+    let expanded = false;
+    const node = d3.selectAll(".tree-view-node")
+    .select(function(d, i){ return d.data.name === nodeId && !d.data.expanded ? this : null })
+    .each(function(d, i) {
+      if (!expanded){
+        d3.select(this).dispatch("expand");
+        expanded = true;
+      }
+    });
   }
 
   function handleNodeFocus(nodeId) {
     d3.selectAll("text").classed("focused", false);
-    const ancestors = getAncestors(nodeId);
-    console.log("Ancestors", ancestors)
-    for (const ancestor of ancestors) {
-      expand(ancestor.name);
+    let node = d3.selectAll(".tree-view-node").filter((d) => d.data.name === nodeId);
+    if (node.size() == 0) {
+      const ancestors = getAncestors(nodeId);
+      ancestors.pop();
+      console.log("Ancestors", ancestors);
+      for (const ancestor of ancestors) {
+        expandOneInstance(ancestor.name);
+      }
     }
-    const node = d3.selectAll(".tree-view-node").filter((d) => d.data.name === nodeId);
-    if (node) {
-      node.select("text").classed("focused", true);
-    }
+    node = d3.selectAll(".tree-view-node").filter((d) => d.data.name === nodeId);
+    node.select("text").classed("focused", true);
   }
 
   function render() {
@@ -176,7 +187,7 @@
       `
       );
 
-    const expand = (event, d) => {
+    const toggleExpand = (event, d) => {
       d.data.expanded = !d.data.expanded;
       if (d.data.expanded) populateNodeChildren(d);
       else d.data.children = [];
@@ -191,11 +202,11 @@
       .classed("tree-view-node", true)
       .attr("transform", (d) => `translate(0,${d.index * nodeSize + nodeSize})`)
       .on("click", (ev, d) => {
-        expand(ev, d);
+        toggleExpand(ev, d);
         dispatchNodeFocusEvent(d.data.name);
       })
       .on("expand", (ev, d) => {
-        expand(ev, d);
+        toggleExpand(ev, d);
       });
 
     node
