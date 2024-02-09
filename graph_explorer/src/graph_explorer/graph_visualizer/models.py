@@ -59,9 +59,9 @@ class Workspace:
     def set_data_source(
         self, datasource_name: str, datasource_config: dict, app_config
     ):
-        self.selected_datasource = datasource_name
-        self.datasource_config = datasource_config
         self.graph = app_config.data_source_plugins_dict[datasource_name].provide(
             **datasource_config
         )
+        self.selected_datasource = datasource_name
+        self.datasource_config = datasource_config
         self.filtered_graph = self.filter_pipeline.filter(self.graph)
