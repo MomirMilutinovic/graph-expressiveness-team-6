@@ -1,6 +1,7 @@
 from django.apps import AppConfig
+
 from core.infrastructure import DataSource, Visualizer, get_plugins
-from .models import Workspace
+from core.models import Workspace
 
 
 class GraphVisualizerConfig(AppConfig):

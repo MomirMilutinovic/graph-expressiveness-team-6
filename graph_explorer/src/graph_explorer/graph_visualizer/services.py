@@ -1,10 +1,11 @@
 from django.apps import apps
+from typing import Any
+import random
+
 from api.components.data_source import DataSource
 from api.models.node import Node
 from api.models.graph import Graph
-import random
-from typing import Any
-from .models import TreeViewNode
+from core.models import TreeViewNode
 
 
 def get_tree_view_data(graph: Graph) -> dict:

@@ -7,10 +7,11 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from core.filters.search_filter import SearchFilter
-from .models import Workspace
+from core.models import Workspace
+from core.filters.operator_filter import OperatorFilter
+
 from .module.content import ContentModule
 from .services import *
-from core.filters.operator_filter import OperatorFilter
 
 content_module = ContentModule(
     apps.get_app_config("graph_visualizer").data_source_plugins,
@@ -150,7 +151,9 @@ def edit_workspace(request, id, datasource_name=None):
     ws: Workspace = app_config.get_workspace(id)
     if ws is None:
         return HttpResponseNotFound("Workspace with given id not found.")
-    datasource_name = ws.selected_datasource if datasource_name is None else datasource_name
+    datasource_name = (
+        ws.selected_datasource if datasource_name is None else datasource_name
+    )
 
     datasource_config_params = get_datasource_configuration(datasource_name)
     ds_config_params = datasource_config_params.items()
@@ -204,25 +207,31 @@ def delete_workspace(request, id):
             return HttpResponseRedirect(reverse("index"))
         elif is_active_workspace:
             return HttpResponseRedirect(
-                reverse("workspace", kwargs={"workspace_id": app_config.workspaces[0].id})
+                reverse(
+                    "workspace", kwargs={"workspace_id": app_config.workspaces[0].id}
+                )
             )
         else:
-            referer_url = request.META.get('HTTP_REFERER', reverse("index"))
+            referer_url = request.META.get("HTTP_REFERER", reverse("index"))
             return HttpResponseRedirect(referer_url)
     except Exception:
         return HttpResponse("An error occurred during workspace deletion.", status=500)
-      
-      
+
+
 def add_filter(request):
     try:
         attribute: str = request.POST["attribute"]
         operator: str = request.POST["operator"]
         unfiltered_graph = content_module.get_current_workspace().get_unfiltered_graph()
-        value: Any = coerce_filter_value(request.POST["value"], attribute, unfiltered_graph, operator)
+        value: Any = coerce_filter_value(
+            request.POST["value"], attribute, unfiltered_graph, operator
+        )
         current_workspace = content_module.get_current_workspace()
         operator_filter: OperatorFilter = OperatorFilter(attribute, operator, value)
         current_workspace.add_filter(operator_filter)
     except (KeyError, ValueError, TypeError) as e:
         return HttpResponse(str(e), content_type="text/plain", status=400)
 
-    return HttpResponseRedirect(reverse("workspace", kwargs={"workspace_id": current_workspace.id}))
+    return HttpResponseRedirect(
+        reverse("workspace", kwargs={"workspace_id": current_workspace.id})
+    )
