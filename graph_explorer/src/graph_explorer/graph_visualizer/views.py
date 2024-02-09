@@ -1,5 +1,4 @@
 import json
-from typing import Any
 
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect, HttpResponseNotFound
@@ -113,9 +112,13 @@ def workspace_configuration(request, datasource_name=None):
         del form_data["workspace-name"]
         del form_data["csrfmiddlewaretoken"]
 
-        new_workspace = Workspace(
-            workspace_name, datasource_name, form_data, app_config
-        )
+        try:
+            new_workspace = Workspace(
+                workspace_name, datasource_name, form_data, app_config
+            )
+        except Exception as e:
+            return HttpResponse(f"Error: {str(e)}", status=400)
+
         app_config.add_workspace(new_workspace)
 
         return HttpResponseRedirect(
@@ -175,8 +178,11 @@ def edit_workspace(request, id, datasource_name=None):
         del form_data["workspace-name"]
         del form_data["csrfmiddlewaretoken"]
 
+        try:
+            ws.set_data_source(datasource_name, form_data, app_config)
+        except Exception as e:
+            return HttpResponse(f"Error: {str(e)}", status=400)
         ws.name = workspace_name
-        ws.set_data_source(datasource_name, form_data, app_config)
         return HttpResponseRedirect(
             reverse("workspace", kwargs={"workspace_id": content_module.workspace_id})
         )
