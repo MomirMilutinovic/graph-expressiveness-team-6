@@ -202,7 +202,6 @@ def delete_workspace(request, id):
             referer_url = request.META.get("HTTP_REFERER", reverse("index"))
             return HttpResponseRedirect(referer_url)
     except Exception as e:
-        print(e)
         return HttpResponse("An error occurred during workspace deletion.", status=500)
 
 
