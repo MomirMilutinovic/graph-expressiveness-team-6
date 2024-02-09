@@ -93,11 +93,6 @@ class ContentModule:
         }
         return content
 
-    def provide_data(self, kwargs: dict):
-        if self.current_data_source is None:
-            return
-        self.graph = self.current_data_source.provide(**kwargs)
-
     def get_filtered_graph(self):
         return (
             self.get_current_workspace().get_filtered_graph()

@@ -22,7 +22,6 @@ content_module: ContentModule = apps.get_app_config(
 
 def index(request):
     context = content_module.get_context()
-    context["workspaces"] = [vars(ws) for ws in content_module.workspaces]
     context["tree_view_data"] = {}
     context["nodes_dict"] = {}
 
@@ -39,11 +38,6 @@ def select_visualizer(_, visualizer_name):
     return HttpResponseRedirect(reverse("index"))
 
 
-def load_views(_):
-    # TODO: Load main, bird and tree views
-    return HttpResponseRedirect(reverse("index"))
-
-
 def search(request):
     try:
         query: str = request.POST["query"]
@@ -53,14 +47,6 @@ def search(request):
     except (KeyError, ValueError):
         return
 
-    return HttpResponseRedirect(reverse("index"))
-
-
-def provide_data(request):
-    if request.method != "POST":
-        return
-    kwargs = request.body.decode("utf-8")
-    content_module.provide_data(kwargs)
     return HttpResponseRedirect(reverse("index"))
 
 
