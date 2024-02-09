@@ -1,9 +1,8 @@
-from typing import List
-from django.db import models
 import uuid
+from typing import List
 
-from core.filters.filter_pipeline import FilterPipeline
-from core.filters.base_filter import Filter
+from .filters.filter_pipeline import FilterPipeline
+from .filters.base_filter import Filter
 from api.models.graph import Graph
 
 
