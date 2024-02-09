@@ -12,7 +12,16 @@ def get_tree_view_data(graph: Graph) -> dict:
     if len(graph.get_nodes()) == 0:
         return {}
 
-    graph_root = random.choice(list(graph.get_nodes()))
+    if graph.root_id is None:
+        graph_root = random.choice(list(graph.get_nodes()))
+    else:
+        root_node_list = list(
+            filter(lambda n: n.id == graph.root_id, graph.get_nodes())
+        )
+        if len(root_node_list) < 1:
+            graph_root = random.choice(list(graph.get_nodes()))
+        else:
+            graph_root = root_node_list[0]
 
     tree_view_root = process_node(graph_root)
 

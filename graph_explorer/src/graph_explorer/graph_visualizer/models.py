@@ -6,6 +6,7 @@ from core.filters.filter_pipeline import FilterPipeline
 from core.filters.base_filter import Filter
 from api.models.graph import Graph
 
+
 class TreeViewNode:
     def __init__(
         self, name: str, expanded: bool, children: list, data: dict, children_ids
@@ -30,7 +31,7 @@ class Workspace:
             **datasource_config
         )
         self.filtered_graph = self.graph
-    
+
     def add_filter(self, filter: Filter):
         self.filter_pipeline.add_filter(filter)
         try:
@@ -55,7 +56,9 @@ class Workspace:
         self.filter_pipeline.remove_filter(filter)
         self.filtered_graph = self.filter_pipeline.filter(self.graph)
 
-    def set_data_source(self, datasource_name: str, datasource_config: dict, app_config):
+    def set_data_source(
+        self, datasource_name: str, datasource_config: dict, app_config
+    ):
         self.selected_datasource = datasource_name
         self.datasource_config = datasource_config
         self.graph = app_config.data_source_plugins_dict[datasource_name].provide(
