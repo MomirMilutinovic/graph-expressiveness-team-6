@@ -63,6 +63,19 @@
         const handleZoom = (e) => g.attr('transform', e.transform);
         const zoom = d3.zoom().on('zoom', handleZoom);
 
+        d3.select('#main-svg-{{name}}').append('defs')
+            .append('marker')
+            .attr("id", "arrowhead")
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 43)
+            .attr("refY", 0)
+            .attr("markerWidth", 8)
+            .attr("markerHeight", 8)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("fill", "#9ecae1")
+            .attr("d", 'M0,-5L10,0L0,5');
+
         var g = d3.select('#main-svg-{{name}}').call(zoom).append('g');
 
         const simulation = d3.forceSimulation(nodes)
@@ -76,6 +89,9 @@
         const link = g.selectAll(".link")
             .data(links).enter()
             .append("line")
+            {% if directed %}
+            .attr("marker-end", 'url(#arrowhead)')
+            {% endif %}
             .attr("class" , "link");
     
         const node = g.selectAll(".node")
