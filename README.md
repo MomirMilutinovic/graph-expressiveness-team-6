@@ -67,6 +67,8 @@ The `Node` model represents a node in the graph, encapsulating node-specific pro
 The `Edge` model represents an edge between two nodes in the graph.
 Edges, like nodes, encapsulate edge-specific properties and data.
 
+![Graph Model](./assets/class_diagram.jpg)
+
 #### 4. Plugin Abstractions
 
 Application supports two types of plugins: `data source plugins` and `visualizer plugins`.
@@ -102,6 +104,8 @@ The API defines two abstract classes:
   ```
 
 These abstract classes provide a foundation for creating plugins by specifying required methods and properties.
+
+![Plugin Abstractions](./assets/component_diagram.jpg)
 
 ## Plugin Development
 In order to create a new plugin, you need to implement the interface for the kind of plugin you are writing and provide an entry point for the plugin.
