@@ -235,6 +235,40 @@ All three graph views are simultaneously accessible and present the same graph i
   - Scaling: Adjusts the view according to operations on the Main View.
   - Synchronization: Mirrors the movement and changes in the Main View.
 
+## Workspaces
+
+The platform is designed to seamlessly detect all installed Data Source plugins, offering users the flexibility to choose from various data sources for graph visualization. The application supports loading multiple graphs from different (or the same) data sources simultaneously.
+
+### Workspace Definition
+
+A **workspace** is a unique environment within the application that encapsulates a single data source, along with any active filters and search queries applied to the graph visualization. This design allows users to work on multiple analyses concurrently, each with its own set of parameters and visualizations.
+
+### Workspace Features
+
+- **Data Source Integration**: Users can select the desired data source for each workspace from the available Data Source plugins.
+
+- **Multiple Concurrent Workspaces**: The platform supports the creation and management of multiple workspaces, enabling users to switch between different graphs or projects without losing their progress. Each workspace operates independently, ensuring that actions in one workspace do not affect others.
+
+- **Custom Filters and Searches**: In each workspace, users can use custom filters and search functions to refine their graph visualizations. This makes it easier to analyze data and discover insights.
+
+### Workspace Management Component
+
+This component is integrated into the primary interface of the application and offers a seamless user experience for managing workspaces. It allows for the selection, editing, deletion, or creation of new workspaces with ease.
+
+![Workspace Management Component](./assets/workspace_component.jpg)
+
+### Workspace Configuration Page
+
+When users click the 'Create' or 'Edit' button in the Workspace Management Component, they are navigated to the Workspace Configuration Page. On this page, users can assign a name to their workspace and choose a data source from a dropdown menu. Additionally, users can input the necessary parameters for the selected data source.
+
+![Workspace Configuration Page](./assets/create_edit_workspace_form.jpg)
+
+### Implementing Workspaces
+
+Implementing workspaces involves creating a user interface component that allows for the creation, deletion, and switching of workspaces. This UI component works with the application's backend to dynamically load data sources and apply user-defined filters or searches for each selected workspace. Unlike traditional approaches that persist workspace states in a database, our implementation temporarily stores this information in memory for the duration of a user session.
+
+By incorporating workspaces into the application, we aim to enhance the user experience by providing a flexible and efficient environment for graph visualization and analysis. This feature supports our goal of making complex data more accessible and actionable for our users.
+
 
 ## Installation
 
