@@ -23,22 +23,35 @@
 
 </style>
 <script>
-    function nodeClick(el){
-        d3.selectAll(".active-node").select("circle").style("fill","white");
-        d3.selectAll(".active-node").classed("active-node", false);
-        d3.select(el).classed("active-node",true);
-        d3.select(el).select("circle").style("fill","red");
-    }
 </script>
 <svg id="main-svg-{{name}}">
 
 </svg>
 <script>
     function renderSimpleVisualization() {
+        function getIdFromName(name){
+            return name.split("_")[1];
+        }
+        function getNameFromId(id){
+            return "node_"+id;
+        }
+        function handleNodeFocus(nodeId){
+            d3.selectAll(".active-node").select("circle").style("fill","white");
+            d3.selectAll(".active-node").classed("active-node", false);
+            const focusedNode = g.selectAll(".node")
+                .filter(d => d.name === getNameFromId(nodeId));
+            focusedNode.classed("active-node",true);
+            focusedNode.select("circle").style("fill","red");
+        }
+
+        document.addEventListener("node-focus", function(event){
+            handleNodeFocus(event.detail);
+        });
+
         var nodes = [
             {% for n in nodes %}
             {
-                name: "node_{{n.id}}",
+                name: getNameFromId("{{ n.id }}"),
                 data: {{ n.data | tojson }},
             },
             {% endfor %}
@@ -47,8 +60,8 @@
         var links = [
             {% for e in edges %}
             {
-                source: "node_{{e.src.id}}",
-                target: "node_{{e.dest.id}}",
+                source: getNameFromId("{{ e.src.id }}"),
+                target: getNameFromId("{{ e.dest.id }}"),
                 data: {{ e.data | tojson }},
             },
             {% endfor %}
@@ -84,8 +97,8 @@
             .append("g")
             .attr("class", "node")
             .attr("id", d => d.name)
-            .on('click',function(){
-                nodeClick(this);
+            .on('click',function(event, d){
+                dispatchNodeFocusEvent(getIdFromName(d.name));
             })
             .call(drag(simulation));
         
