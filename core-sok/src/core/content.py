@@ -119,3 +119,9 @@ class ContentModule:
         return self.data_source_plugins_dict[
             datasource_name
         ].get_configuration_parameters()
+
+    def get_active_workspace_id(self) -> str:
+        return self.workspace_id
+
+    def set_active_workspace_id(self, _workspace_id: str):
+        self.workspace_id = _workspace_id
