@@ -9,22 +9,19 @@ from django.views.decorators.csrf import csrf_exempt
 from core.filters.search_filter import SearchFilter
 from core.models import Workspace
 from core.filters.operator_filter import OperatorFilter
+from core.content import ContentModule
+from core.services import coerce_filter_value
 
-from .module.content import ContentModule
 from .services import *
 
-content_module = ContentModule(
-    apps.get_app_config("graph_visualizer").data_source_plugins,
-    apps.get_app_config("graph_visualizer").visualizer_plugins,
-)
-
-app_config = apps.get_app_config("graph_visualizer")
-content_module.workspaces = app_config.workspaces
+content_module: ContentModule = apps.get_app_config(
+    "graph_visualizer"
+).get_content_module()
 
 
 def index(request):
     context = content_module.get_context()
-    context["workspaces"] = [vars(ws) for ws in app_config.workspaces]
+    context["workspaces"] = [vars(ws) for ws in content_module.workspaces]
     context["tree_view_data"] = {}
     context["nodes_dict"] = {}
 
@@ -67,26 +64,26 @@ def provide_data(request):
 
 
 def workspace(request, workspace_id):
-    if workspace_id not in list(map(lambda ws: ws.id, app_config.workspaces)):
+    if workspace_id not in list(map(lambda ws: ws.id, content_module.workspaces)):
         return HttpResponseNotFound("Workspace with given id not found.")
 
     active_workspace: Workspace = list(
-        filter(lambda ws: ws.id == workspace_id, app_config.workspaces)
+        filter(lambda ws: ws.id == workspace_id, content_module.workspaces)
     )[0]
     tree_view_data = get_tree_view_data(active_workspace.get_filtered_graph())
     nodes_dict = get_node_dict(active_workspace.get_filtered_graph())
 
-    content_module.workspaces = app_config.workspaces
+    content_module.workspaces = content_module.workspaces
     content_module.workspace_id = workspace_id
     content_module.select_data_source(
-        app_config.get_workspace(workspace_id).selected_datasource
+        content_module.get_workspace(workspace_id).selected_datasource
     )
-    content_module.set_graph(app_config.get_workspace(workspace_id).graph)
+    content_module.set_graph(content_module.get_workspace(workspace_id).graph)
 
     context = content_module.get_context()
     context["tree_view_data"] = tree_view_data
     context["nodes_dict"] = nodes_dict
-    context["workspaces"] = [vars(ws) for ws in app_config.workspaces]
+    context["workspaces"] = [vars(ws) for ws in content_module.workspaces]
 
     return render(request, "index.html", context)
 
@@ -95,7 +92,9 @@ def workspace_configuration(request, datasource_name=None):
     data_sources = get_datasource_names()
     if datasource_name is None:
         datasource_name = data_sources[0]
-    datasource_config_params = get_datasource_configuration(datasource_name)
+    datasource_config_params = content_module.get_datasource_configuration(
+        datasource_name
+    )
     print(datasource_config_params)
     if request.method == "GET":
         return render(
@@ -115,12 +114,12 @@ def workspace_configuration(request, datasource_name=None):
 
         try:
             new_workspace = Workspace(
-                workspace_name, datasource_name, form_data, app_config
+                workspace_name, datasource_name, form_data, content_module
             )
         except Exception as e:
             return HttpResponse(f"Error: {str(e)}", status=400)
 
-        app_config.add_workspace(new_workspace)
+        content_module.add_workspace(new_workspace)
 
         return HttpResponseRedirect(
             reverse("workspace", kwargs={"workspace_id": new_workspace.id})
@@ -148,14 +147,16 @@ def delete_filter(request):
 
 def edit_workspace(request, id, datasource_name=None):
     data_sources = get_datasource_names()
-    ws: Workspace = app_config.get_workspace(id)
+    ws: Workspace = content_module.get_workspace(id)
     if ws is None:
         return HttpResponseNotFound("Workspace with given id not found.")
     datasource_name = (
         ws.selected_datasource if datasource_name is None else datasource_name
     )
 
-    datasource_config_params = get_datasource_configuration(datasource_name)
+    datasource_config_params = content_module.get_datasource_configuration(
+        datasource_name
+    )
     ds_config_params = datasource_config_params.items()
     ds_config_params_with_values = []
     for key, key_type in ds_config_params:
@@ -182,7 +183,7 @@ def edit_workspace(request, id, datasource_name=None):
         del form_data["csrfmiddlewaretoken"]
 
         try:
-            ws.set_data_source(datasource_name, form_data, app_config)
+            ws.set_data_source(datasource_name, form_data, content_module)
         except Exception as e:
             return HttpResponse(f"Error: {str(e)}", status=400)
         ws.name = workspace_name
@@ -198,8 +199,8 @@ def delete_workspace(request, id):
     try:
         is_active_workspace = content_module.get_current_workspace().id == id
 
-        app_config.delete_workspace(id)
-        if app_config.get_number_of_workspaces() == 0:
+        content_module.delete_workspace(id)
+        if content_module.get_number_of_workspaces() == 0:
             content_module = ContentModule(
                 apps.get_app_config("graph_visualizer").data_source_plugins,
                 apps.get_app_config("graph_visualizer").visualizer_plugins,
@@ -208,7 +209,8 @@ def delete_workspace(request, id):
         elif is_active_workspace:
             return HttpResponseRedirect(
                 reverse(
-                    "workspace", kwargs={"workspace_id": app_config.workspaces[0].id}
+                    "workspace",
+                    kwargs={"workspace_id": content_module.workspaces[0].id},
                 )
             )
         else:
