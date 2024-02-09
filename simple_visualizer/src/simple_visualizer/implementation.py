@@ -15,4 +15,4 @@ class SimpleVisualizer(Visualizer):
         return "simple_visualizer"
 
     def display(self, graph: Graph) -> str:
-        return self.template.render(nodes=graph.get_nodes(), edges=graph.get_edges(), name=self.get_name())
+        return self.template.render(nodes=graph.get_nodes(), edges=graph.get_edges(), name=self.get_name(), directed=graph.directed)
