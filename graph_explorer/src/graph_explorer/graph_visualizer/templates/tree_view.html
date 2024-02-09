@@ -96,6 +96,14 @@
     }
   }
 
+  function handleNodeFocus(nodeId) {
+    d3.selectAll("text").classed("focused", false);
+    const node = d3.selectAll(".tree-view-node").filter((d) => d.data.name === nodeId);
+    if (node) {
+      node.select("text").classed("focused", true);
+    }
+  }
+
   function render() {
     emptySvg();
 
@@ -193,17 +201,11 @@
       });
 
     console.log(nodes);
-    function handleNodeFocus(nodeId) {
-      d3.selectAll("text").classed("focused", false);
-      const node = d3.selectAll(".tree-view-node").filter((d) => d.data.name === nodeId);
-      if (node) {
-        node.select("text").classed("focused", true);
-      }
-    }
-    document.addEventListener("node-focus", function(event){
-        handleNodeFocus(event.detail);
-    });
   }
+
+  document.addEventListener("node-focus", function (event) {
+    handleNodeFocus(event.detail);
+  });
 
   render();
 </script>
