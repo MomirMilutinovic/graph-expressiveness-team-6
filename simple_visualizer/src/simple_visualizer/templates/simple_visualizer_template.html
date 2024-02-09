@@ -97,9 +97,7 @@
             .append("g")
             .attr("class", "node")
             .attr("id", d => d.name)
-            .on('click',function(event, d){
-                dispatchNodeFocusEvent(getIdFromName(d.name));
-            })
+            .attr('onclick', d => `dispatchNodeFocusEvent("${getIdFromName(d.name)}");`)
             .call(drag(simulation));
         
         const radius=25;
