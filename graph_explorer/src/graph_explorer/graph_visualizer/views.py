@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
+from typing import Any
 
 from core.filters.search_filter import SearchFilter
 from core.models import Workspace
