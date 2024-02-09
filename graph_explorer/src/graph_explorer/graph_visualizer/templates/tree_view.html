@@ -17,6 +17,10 @@
   #svg-container {
     overflow: scroll;
   }
+
+  text.focused {
+    font-weight: bold;
+  }
 </style>
 <script>
   function nodeClick(el) {
@@ -141,6 +145,7 @@
       .selectAll()
       .data(nodes)
       .join("g")
+      .classed("tree-view-node", true)
       .attr("transform", (d) => `translate(0,${d.index * nodeSize + nodeSize})`)
       .on("click", (ev, d) => {
         d.data.expanded = !d.data.expanded;
@@ -188,6 +193,16 @@
       });
 
     console.log(nodes);
+    function handleNodeFocus(nodeId) {
+      d3.selectAll("text").classed("focused", false);
+      const node = d3.selectAll(".tree-view-node").filter((d) => d.data.name === nodeId);
+      if (node) {
+        node.select("text").classed("focused", true);
+      }
+    }
+    document.addEventListener("node-focus", function(event){
+        handleNodeFocus(event.detail);
+    });
   }
 
   render();
