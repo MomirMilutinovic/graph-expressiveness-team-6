@@ -65,19 +65,35 @@
             {% endif %}
         </div>
         <div class="panel-block">
-          <form id="filter-form" class="filter-form" method="POST" action="{% url 'add_filter' %}">
-            {% csrf_token %}
-            <input name="attribute" id="filter-attribute-input" class="input" type="text" placeholder="Attribute" />
-            <div class="select">
-              <select name="operator">
-                {% for operator in operators %}
-                  <option value="{{operator|safe}}">{{operator}}</option>
-                {% endfor %}
-              </select>
+          {% if active_ws_id != -1 %}
+            <form id="filter-form" class="filter-form" method="POST" action="{% url 'add_filter' %}">
+              {% csrf_token %}
+              <input name="attribute" id="filter-attribute-input" class="input" type="text" placeholder="Attribute" />
+              <div class="select">
+                <select name="operator">
+                  {% for operator in operators %}
+                    <option value="{{operator|safe}}">{{operator}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <input name="value" id="filter-value-input" class="input" type="text" placeholder="Value" />
+              <input type="submit" value="Filter" class="button is-light" />
+            </form>
+          {% else %}
+            <div id="filter-form" class="filter-form" method="POST" action="{% url 'add_filter' %}">
+              {% csrf_token %}
+              <input name="attribute" id="filter-attribute-input" class="input" type="text" placeholder="Attribute" />
+              <div class="select">
+                <select name="operator">
+                  {% for operator in operators %}
+                    <option value="{{operator|safe}}">{{operator}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <input name="value" id="filter-value-input" class="input" type="text" placeholder="Value" />
+              <input type="submit" value="Filter" class="button is-light" />
             </div>
-            <input name="value" id="filter-value-input" class="input" type="text" placeholder="Value" />
-            <input type="submit" value="Filter" class="button is-light" />
-          </form>
+           {% endif %} 
         </div>
         <div class="panel-block">
           <div class="active-filters">
