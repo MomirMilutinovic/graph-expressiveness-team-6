@@ -3,6 +3,7 @@ from typing import List
 
 from .filters.filter_pipeline import FilterPipeline
 from .filters.base_filter import Filter
+from .content import ContentModule
 from api.models.graph import Graph
 
 
@@ -19,16 +20,20 @@ class TreeViewNode:
 
 class Workspace:
     def __init__(
-        self, name: str, selected_datasource: str, datasource_config: dict, app_config
+        self,
+        name: str,
+        selected_datasource: str,
+        datasource_config: dict,
+        content_module: ContentModule,
     ) -> None:
         self.id = uuid.uuid4().hex
         self.name = name
         self.selected_datasource = selected_datasource
         self.datasource_config = datasource_config
         self.filter_pipeline = FilterPipeline()
-        self.graph = app_config.data_source_plugins_dict[selected_datasource].provide(
-            **datasource_config
-        )
+        self.graph = content_module.data_source_plugins_dict[
+            selected_datasource
+        ].provide(**datasource_config)
         self.filtered_graph = self.graph
 
     def add_filter(self, filter: Filter):
@@ -56,9 +61,12 @@ class Workspace:
         self.filtered_graph = self.filter_pipeline.filter(self.graph)
 
     def set_data_source(
-        self, datasource_name: str, datasource_config: dict, app_config
+        self,
+        datasource_name: str,
+        datasource_config: dict,
+        content_module: ContentModule,
     ):
-        self.graph = app_config.data_source_plugins_dict[datasource_name].provide(
+        self.graph = content_module.data_source_plugins_dict[datasource_name].provide(
             **datasource_config
         )
         self.selected_datasource = datasource_name
