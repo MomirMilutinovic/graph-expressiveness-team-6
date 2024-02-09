@@ -25,9 +25,10 @@ def index(request):
     context["tree_view_data"] = {}
     context["nodes_dict"] = {}
 
-    if content_module.workspace_id != content_module.INVALID_WORKSPACE_ID:
+    active_workspace_id = content_module.get_active_workspace_id()
+    if active_workspace_id != content_module.INVALID_WORKSPACE_ID:
         return HttpResponseRedirect(
-            reverse("workspace", kwargs={"workspace_id": content_module.workspace_id})
+            reverse("workspace", kwargs={"workspace_id": active_workspace_id})
         )
 
     return render(request, "index.html", context)
@@ -54,14 +55,12 @@ def workspace(request, workspace_id):
     if workspace_id not in list(map(lambda ws: ws.id, content_module.workspaces)):
         return HttpResponseNotFound("Workspace with given id not found.")
 
-    active_workspace: Workspace = list(
-        filter(lambda ws: ws.id == workspace_id, content_module.workspaces)
-    )[0]
+    active_workspace: Workspace = content_module.get_workspace(workspace_id)
+
     tree_view_data = get_tree_view_data(active_workspace.get_filtered_graph())
     nodes_dict = get_node_dict(active_workspace.get_filtered_graph())
 
-    content_module.workspaces = content_module.workspaces
-    content_module.workspace_id = workspace_id
+    content_module.set_active_workspace_id(workspace_id)
     content_module.select_data_source(
         content_module.get_workspace(workspace_id).selected_datasource
     )
@@ -70,7 +69,6 @@ def workspace(request, workspace_id):
     context = content_module.get_context()
     context["tree_view_data"] = tree_view_data
     context["nodes_dict"] = nodes_dict
-    context["workspaces"] = [vars(ws) for ws in content_module.workspaces]
 
     return render(request, "index.html", context)
 
@@ -79,10 +77,11 @@ def workspace_configuration(request, datasource_name=None):
     data_sources = get_datasource_names()
     if datasource_name is None:
         datasource_name = data_sources[0]
+
     datasource_config_params = content_module.get_datasource_configuration(
         datasource_name
     )
-    print(datasource_config_params)
+
     if request.method == "GET":
         return render(
             request,
@@ -184,14 +183,13 @@ def edit_workspace(request, id, datasource_name=None):
 def delete_workspace(request, id):
     global content_module
     try:
-        is_active_workspace = content_module.get_current_workspace().id == id
+        is_active_workspace = content_module.get_active_workspace_id() == id
 
         content_module.delete_workspace(id)
         if content_module.get_number_of_workspaces() == 0:
-            content_module = ContentModule(
-                apps.get_app_config("graph_visualizer").data_source_plugins,
-                apps.get_app_config("graph_visualizer").visualizer_plugins,
-            )
+            content_module = apps.get_app_config(
+                "graph_visualizer"
+            ).get_content_module()
             return HttpResponseRedirect(reverse("index"))
         elif is_active_workspace:
             return HttpResponseRedirect(
@@ -203,7 +201,8 @@ def delete_workspace(request, id):
         else:
             referer_url = request.META.get("HTTP_REFERER", reverse("index"))
             return HttpResponseRedirect(referer_url)
-    except Exception:
+    except Exception as e:
+        print(e)
         return HttpResponse("An error occurred during workspace deletion.", status=500)
 
 
