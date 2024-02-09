@@ -36,7 +36,7 @@ html, body, #container {
     flex-grow: 1;
 }
 
-a.row {
+a.row, div.row {
     display: flex;
     align-items: center;
 }
@@ -132,12 +132,21 @@ a#create-workspace .material-symbols-outlined {
 #main-view-panel > div {
     flex-grow: 1;
 }
-#error {
+#error-container {
     position: fixed;
-    left: 50%;
+    left: 0;
     bottom: 1em;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+#error {
     -webkit-animation: fadein 0.5s, fadeout 0.5s 4.5s;
     animation: fadein 0.5s, fadeout 0.5s 4.5s;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 50%;
 }
 
 @-webkit-keyframes fadein {

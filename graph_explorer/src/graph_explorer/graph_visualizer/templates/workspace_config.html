@@ -50,14 +50,16 @@
       <input class="button" type="submit" value="Confirm" />
     </form>
   </div>
-  <article id="error" class="message is-normal is-danger is-hidden">
-    <div class="message-header">
-      <p span id="error-title">Invalid filter</p>
-    </div>
-    <div class="message-body">
-      <p><span id="error-message"></span></p>
-    </div>
-  </article>
+  <div id="error-container">
+    <article id="error" class="message is-normal is-danger is-hidden">
+      <div class="message-header">
+        <p span id="error-title">Invalid filter</p>
+      </div>
+      <div class="message-body">
+        <p><span id="error-message"></span></p>
+      </div>
+    </article>
+  </div>
 </body>
 <script>
   document.querySelector(".main-form form").addEventListener("submit", function(e) {
