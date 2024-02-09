@@ -1,5 +1,4 @@
 from django.apps import apps
-from typing import Any
 import random
 
 from api.components.data_source import DataSource
@@ -70,14 +69,6 @@ def process_node(node: Node, level: int = 0) -> TreeViewNode:
         node.data,
         list(map(lambda node: node.id, node.get_neighbours())),
     )
-
-
-def get_datasource_configuration(datasource_name) -> dict:
-    data_sources: list[DataSource] = apps.get_app_config(
-        "graph_visualizer"
-    ).data_source_plugins_dict
-
-    return data_sources[datasource_name].get_configuration_parameters()
 
 
 def get_datasource_names() -> list:
