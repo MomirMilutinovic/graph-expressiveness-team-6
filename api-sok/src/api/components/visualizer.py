@@ -21,7 +21,7 @@ class Visualizer(ABC):
         """Provides an HTML representation of the Graph that is ready to be presented to the end user.
 
         Args:
-            Graph: Graph that is to be displayed
+            graph (Graph): Graph that is to be displayed
 
         Returns:
             str: HTML representation of the graph
