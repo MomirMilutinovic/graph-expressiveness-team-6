@@ -4,7 +4,7 @@ from .node import Node
 
 class Graph:
 
-    def __init__(self, edges=None, nodes=None, directed=True):
+    def __init__(self, edges=None, nodes=None, directed=True, root_id=None):
         if nodes is None:
             nodes = set()
         if edges is None:
@@ -12,6 +12,7 @@ class Graph:
         self.edges = edges
         self.nodes = nodes
         self.directed = directed
+        self.root_id = root_id
 
     def remove_node(self, node: Node):
         self.nodes.remove(node)
@@ -19,7 +20,12 @@ class Graph:
             edge for edge in self.edges if edge.src != node and edge.dest != node
         ]
         for node in self.nodes:
-            node.edges = list(filter(lambda edge: edge.src in self.nodes and edge.dest in self.nodes, node.edges))
+            node.edges = list(
+                filter(
+                    lambda edge: edge.src in self.nodes and edge.dest in self.nodes,
+                    node.edges,
+                )
+            )
 
     def add_node(self, node: Node):
         self.nodes.add(node)
