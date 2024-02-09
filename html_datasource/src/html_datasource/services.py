@@ -15,6 +15,7 @@ def get_graph(url):
     root = soup.html
     recursive_html_traversal(g, root)
     handle_self_pointing_hrefs(g)
+    g.root_id = _find_node_by_id(g, "html").id if _find_node_by_id(g, "html") else None
     return g
 
 
