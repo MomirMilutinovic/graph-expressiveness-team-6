@@ -65,3 +65,8 @@ function showErrorMessage(title, message) {
         errorToast.classList.add("is-hidden");
     }, 5000);
 }
+
+function dispatchNodeFocusEvent(nodeId) {
+    let event = new CustomEvent("node-focus", {detail: nodeId});
+    document.dispatchEvent(event);
+}

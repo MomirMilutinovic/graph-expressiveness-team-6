@@ -17,6 +17,10 @@
   #svg-container {
     overflow: scroll;
   }
+
+  text.focused {
+    font-weight: bold;
+  }
 </style>
 <script>
   function nodeClick(el) {
@@ -40,6 +44,25 @@
       childClone.expanded = false;
       childClone.children = [];
       data.children.push(childClone);
+    }
+  }
+
+  function getAncestors(nodeId, currentNode, visitedNodes) {
+    let queue = [];
+    let visited = new Set();
+    queue.push([data]);
+    while(queue.length > 0) {
+        let path = queue.shift()
+        let node = path[path.length - 1]
+        if (node.name == nodeId)
+            return path
+        for (const childId of node.children_ids) {
+          if (visited.has(childId)) continue;
+          visited.add(childId);
+          let newPath = path.slice(0);
+          newPath.push(allNodes[childId]);
+          queue.push(newPath);
+        }
     }
   }
 
@@ -92,6 +115,34 @@
     }
   }
 
+  function expandOneInstance(nodeId) {
+    if (d3.selectAll(".tree-view-node").filter((d) => d.data.name === nodeId && d.data.expanded).size() > 0) return;
+    let expanded = false;
+    const node = d3.selectAll(".tree-view-node")
+    .select(function(d, i){ return d.data.name === nodeId && !d.data.expanded ? this : null })
+    .each(function(d, i) {
+      if (!expanded){
+        d3.select(this).dispatch("expand");
+        expanded = true;
+      }
+    });
+  }
+
+  function handleNodeFocus(nodeId) {
+    d3.selectAll("text").classed("focused", false);
+    let node = d3.selectAll(".tree-view-node").filter((d) => d.data.name === nodeId);
+    if (node.size() == 0) {
+      const ancestors = getAncestors(nodeId);
+      ancestors.pop();
+      console.log("Ancestors", ancestors);
+      for (const ancestor of ancestors) {
+        expandOneInstance(ancestor.name);
+      }
+    }
+    node = d3.selectAll(".tree-view-node").filter((d) => d.data.name === nodeId);
+    node.select("text").classed("focused", true);
+  }
+
   function render() {
     emptySvg();
 
@@ -136,17 +187,26 @@
       `
       );
 
+    const toggleExpand = (event, d) => {
+      d.data.expanded = !d.data.expanded;
+      if (d.data.expanded) populateNodeChildren(d);
+      else d.data.children = [];
+      render();
+    };
+
     const node = svg
       .append("g")
       .selectAll()
       .data(nodes)
       .join("g")
+      .classed("tree-view-node", true)
       .attr("transform", (d) => `translate(0,${d.index * nodeSize + nodeSize})`)
       .on("click", (ev, d) => {
-        d.data.expanded = !d.data.expanded;
-        if (d.data.expanded) populateNodeChildren(d);
-        else d.data.children = [];
-        render();
+        toggleExpand(ev, d);
+        dispatchNodeFocusEvent(d.data.name);
+      })
+      .on("expand", (ev, d) => {
+        toggleExpand(ev, d);
       });
 
     node
@@ -189,6 +249,10 @@
 
     console.log(nodes);
   }
+
+  document.addEventListener("node-focus", function (event) {
+    handleNodeFocus(event.detail);
+  });
 
   render();
 </script>
