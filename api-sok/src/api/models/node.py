@@ -7,7 +7,7 @@ class Node:
         self.data = data
         self.edges = edges
 
-    def get_neighbours(self):
+    def get_neighbours(self) -> list['Node']:
         neighbours: list[Node] = []
 
         for edge in self.edges:

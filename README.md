@@ -67,6 +67,8 @@ The `Node` model represents a node in the graph, encapsulating node-specific pro
 The `Edge` model represents an edge between two nodes in the graph.
 Edges, like nodes, encapsulate edge-specific properties and data.
 
+![Graph Model](./assets/class_diagram.jpg)
+
 #### 4. Plugin Abstractions
 
 Application supports two types of plugins: `data source plugins` and `visualizer plugins`.
@@ -103,6 +105,8 @@ The API defines two abstract classes:
 
 These abstract classes provide a foundation for creating plugins by specifying required methods and properties.
 
+![Plugin Abstractions](./assets/component_diagram.jpg)
+
 ## Plugin Development
 In order to create a new plugin, you need to implement the interface for the kind of plugin you are writing and provide an entry point for the plugin.
 Note that it is not necessary to use the API package, but it is recommended to use it in order to have a consistent interface for all plugins.
@@ -134,8 +138,34 @@ Here is an example of how to provide entry point for each plugin type:
 We have developed two distinct Data Source plugins, each serving a specific purpose:
 
 1. **HTML Data Source:**
-   - Description: This plugin is designed to retrieve data from HTML documents.
+   - Description: This plugin is designed to retrieve data from HTML documents and represent it as a graph.
    - Source Code: [HTML Data Source Plugin](./html_datasource)
+   - In addition to parent-child relationships in the HTML document, the graph also includes links between `<a>` elements and the elements referenced by their `href` attributes if the referenced elements are within the document.
+   - Graphs produced by this data source may be cyclic due to the inclusion of intradocument links.
+   - Here is the example of the HTML document, and it's graph representation:
+   ```html
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Circular HTML Example</title>
+    </head>
+    <body>
+        <a href="somewebsite.com">Some Website</a>
+    
+        <div id="div-with-id" style="background-color: red;">
+            <p style="color: rebeccapurple;">Hello Everyone</p>
+        </div>
+        
+        <input type="text" value="Balsa"/>
+        <a href="#">Href to the page root</a>
+        <a href="#div-with-id">Href to the div with id</a>
+    </body>
+    </html>
+    ```
+    ![HTML Graph](./assets/html_graph.jpg)
+   
+
 
 2. **Spotify Data Source:**
    - Description: The Spotify Data Source plugin allows fetching data from the Spotify API.
@@ -167,6 +197,7 @@ Provides operations such as `pan`, `zoom`, `drag` and `drop`
 - Nodes are draggable and can be moved around the canvas. 
 - The canvas can be panned and zoomed in and out using the mouse or touchpad.
 
+![Main View](./assets/main_view.gif)
 
 ### Tree View
 `The Tree View` (graph representation as a tree) allows dynamic expanding and collapsing of nodes,
@@ -175,6 +206,7 @@ similar to the package explorer in IDEs.
 - `plus` sign next to an object indicates that it can be expanded
 - `minus` sign means that the object can be collapsed.
 
+![Tree View](./assets/tree_view.gif)
 
 ## Bird View
 
@@ -188,6 +220,8 @@ The behavior of the viewport is defined as follows:
 - `Zooming in` the Main View enlarges the viewport on the Bird View.
 - `Panning` the Main View moves the viewport on the Bird View.
 - `Dragging` the nodes on the Main View affects the graph on the Bird View.
+
+![Bird View](./assets/bird_view.gif)
 
 All three graph views are simultaneously accessible and present the same graph in the aforementioned ways.
 
@@ -204,6 +238,79 @@ All three graph views are simultaneously accessible and present the same graph i
 - **Bird View:**
   - Scaling: Adjusts the view according to operations on the Main View.
   - Synchronization: Mirrors the movement and changes in the Main View.
+
+## Search and Filter Functionality
+
+Our application's search and filter features are designed to enhance the user experience by providing precise control over the visualization of graph data. Users can search across node attributes and apply filters to isolate graph elements that meet specific criteria.
+
+### Search Functionality
+
+#### Text-Based Search
+
+- Users can input arbitrary text into a search field to query the graph.
+- A subgraph is generated, displaying only the nodes that contain an attribute name or value matching the search term.
+- This is particularly useful for navigating large graphs, allowing for quick location of relevant nodes.
+
+### Filter Functionality
+
+#### Applying Filters
+
+- Filters are applied through a dedicated text input field using the following format:
+    ```
+    <attribute_name> <comparator> <attribute_value>
+    ```
+  
+- Available `<comparator>` options include: `==`, `>`, `>=`, `<`, `<=`, `!=`, `contains`, `matches`, `divisible by`.
+- Applying a filter creates a subgraph from the current graph with nodes that have attributes satisfying the filter criteria.
+
+### Successive Application of Search and Filters
+
+- Our platform supports the sequential application of searches and filters.
+- Users can layer these operations to incrementally refine the graph.
+- The visualization updates in real-time to reflect the current active criteria, maintaining clarity and precision.
+
+### User Interface for Search and Filters
+
+- The UI elements for search and filter operations are designed for intuitive use, with input fields and visual updates on the graph.
+- A control panel allows users to easily manage their search and filter parameters within the visualization interface.
+
+![Search and Filter Functionality](./assets/search_filter_component.jpg)
+
+With these features, users can easily analyze complex graphs and focus on the most relevant data for their needs.
+
+## Workspaces
+
+The platform is designed to seamlessly detect all installed Data Source plugins, offering users the flexibility to choose from various data sources for graph visualization. The application supports loading multiple graphs from different (or the same) data sources simultaneously.
+
+### Workspace Definition
+
+A **workspace** is a unique environment within the application that encapsulates a single data source, along with any active filters and search queries applied to the graph visualization. This design allows users to work on multiple analyses concurrently, each with its own set of parameters and visualizations.
+
+### Workspace Features
+
+- **Data Source Integration**: Users can select the desired data source for each workspace from the available Data Source plugins.
+
+- **Multiple Concurrent Workspaces**: The platform supports the creation and management of multiple workspaces, enabling users to switch between different graphs or projects without losing their progress. Each workspace operates independently, ensuring that actions in one workspace do not affect others.
+
+- **Custom Filters and Searches**: In each workspace, users can use custom filters and search functions to refine their graph visualizations. This makes it easier to analyze data and discover insights.
+
+### Workspace Management Component
+
+This component is integrated into the primary interface of the application and offers a seamless user experience for managing workspaces. It allows for the selection, editing, deletion, or creation of new workspaces with ease.
+
+![Workspace Management Component](./assets/workspace_component.jpg)
+
+### Workspace Configuration Page
+
+When users click the 'Create' or 'Edit' button in the Workspace Management Component, they are navigated to the Workspace Configuration Page. On this page, users can assign a name to their workspace and choose a data source from a dropdown menu. Additionally, users can input the necessary parameters for the selected data source.
+
+![Workspace Configuration Page](./assets/create_edit_workspace_form.jpg)
+
+### Implementing Workspaces
+
+Implementing workspaces involves creating a user interface component that allows for the creation, deletion, and switching of workspaces. This UI component works with the application's backend to dynamically load data sources and apply user-defined filters or searches for each selected workspace. Unlike traditional approaches that persist workspace states in a database, our implementation temporarily stores this information in memory for the duration of a user session.
+
+By incorporating workspaces into the application, we aim to enhance the user experience by providing a flexible and efficient environment for graph visualization and analysis. This feature supports our goal of making complex data more accessible and actionable for our users.
 
 
 ## Installation
