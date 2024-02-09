@@ -50,7 +50,31 @@
       <input class="button" type="submit" value="Confirm" />
     </form>
   </div>
+  <article id="error" class="message is-normal is-danger is-hidden">
+    <div class="message-header">
+      <p span id="error-title">Invalid filter</p>
+    </div>
+    <div class="message-body">
+      <p><span id="error-message"></span></p>
+    </div>
+  </article>
 </body>
+<script>
+  document.querySelector(".main-form form").addEventListener("submit", function(e) {
+        e.preventDefault();
+        request = new XMLHttpRequest();
+        request.open("POST", window.location.href, true);
+        request.send(new FormData(this));
+        request.onload = function () {
+            if(request.status === 200) {
+                window.location = request.responseURL;
+            }
+            else if (request.status === 400) {
+                showErrorMessage("Data source error", "Could not fetch graph. <br/>" + request.responseText);
+            }
+        };
+    }, true);
+</script>
 {% block script %}
 <script>
   selectEl = document.getElementById("data-source-select");

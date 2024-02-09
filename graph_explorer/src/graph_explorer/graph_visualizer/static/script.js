@@ -35,6 +35,9 @@ function deleteFilter(filter) {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
+    if (!document.getElementById("filter-form")) {
+        return;
+    }
     document.getElementById("filter-form").addEventListener("submit", function(e) {
         e.preventDefault();
         request = new XMLHttpRequest();
@@ -45,16 +48,18 @@ document.addEventListener("DOMContentLoaded", function() {
                 location.reload();
             }
             else {
-                showErrorMessage(request.responseText);
+                showErrorMessage("Invalid filter", "Error while adding filter (most likely due to type mismatch). <br/> Message: " + request.responseText);
             }
         };
     }, true);
 }, true);
 
-function showErrorMessage(message) {
+function showErrorMessage(title, message) {
     let errorToast = document.getElementById("error");
     let errorMessage = document.getElementById("error-message");
-    errorMessage.innerText = message;
+    let errorTitle = document.getElementById("error-title");
+    errorTitle.innerHTML = title;
+    errorMessage.innerHTML = message;
     errorToast.classList.remove("is-hidden");
     setTimeout(function() {
         errorToast.classList.add("is-hidden");
