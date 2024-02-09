@@ -47,6 +47,22 @@
     }
   }
 
+  function getAncestors(nodeId, currentNode, visitedNodes) {
+    if (!currentNode) {
+      return getAncestors(nodeId, data, new Set());
+    }
+    visitedNodes.add(currentNode.name);
+    if (currentNode.name === nodeId) return [currentNode];
+    if (currentNode.children_ids) {
+      for (const childId of currentNode.children_ids) {
+        if (visitedNodes.has(childId)) continue;
+        const result = getAncestors(nodeId, allNodes[childId], visitedNodes);
+        if (result) return [currentNode, ...result];
+      }
+    }
+    return null;
+  }
+
   function emptySvg() {
     d3.select("#tree-view-svg").selectAll("*").remove();
   }
