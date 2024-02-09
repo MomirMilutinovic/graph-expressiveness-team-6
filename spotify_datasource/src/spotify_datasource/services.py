@@ -38,6 +38,8 @@ def process_artists_recursively(
     rel_artists = get_related_artists(auth_token, artist.id, max_neighbours)
     processed_artist_ids.add(artist.id)
 
+    rel_artists = list(filter(lambda a: a.id not in processed_artist_ids, rel_artists))
+
     for i, rel_artist in enumerate(rel_artists):
         if i > max_neighbours - 1:
             break
