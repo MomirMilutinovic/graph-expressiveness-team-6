@@ -134,8 +134,34 @@ Here is an example of how to provide entry point for each plugin type:
 We have developed two distinct Data Source plugins, each serving a specific purpose:
 
 1. **HTML Data Source:**
-   - Description: This plugin is designed to retrieve data from HTML documents.
+   - Description: This plugin is designed to retrieve data from HTML documents and represent it as a cyclic and acyclic graph.
    - Source Code: [HTML Data Source Plugin](./html_datasource)
+   - The circularity within HTML is established by leveraging the `<a>` tags and their associated `href` attributes. 
+     - These attributes serve to link to specific sections of the page, identified by either an `id` or the `<html>` if `href="#"`
+   - Here is the example of the HTML document, and it's graph representation:
+   ```html
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Circular HTML Example</title>
+    </head>
+    <body>
+        <a href="somewebsite.com">Some Website</a>
+    
+        <div id="div-with-id" style="background-color: red;">
+            <p style="color: rebeccapurple;">Hello Everyone</p>
+        </div>
+        
+        <input type="text" value="Balsa"/>
+        <a href="#">Href to the page root</a>
+        <a href="#div-with-id">Href to the div with id</a>
+    </body>
+    </html>
+    ```
+    ![HTML Graph](./assets/html_graph.jpg)
+   
+
 
 2. **Spotify Data Source:**
    - Description: The Spotify Data Source plugin allows fetching data from the Spotify API.
@@ -167,6 +193,7 @@ Provides operations such as `pan`, `zoom`, `drag` and `drop`
 - Nodes are draggable and can be moved around the canvas. 
 - The canvas can be panned and zoomed in and out using the mouse or touchpad.
 
+![Main View](./assets/main_view.gif)
 
 ### Tree View
 `The Tree View` (graph representation as a tree) allows dynamic expanding and collapsing of nodes,
@@ -175,6 +202,7 @@ similar to the package explorer in IDEs.
 - `plus` sign next to an object indicates that it can be expanded
 - `minus` sign means that the object can be collapsed.
 
+![Tree View](./assets/tree_view.gif)
 
 ## Bird View
 
@@ -188,6 +216,8 @@ The behavior of the viewport is defined as follows:
 - `Zooming in` the Main View enlarges the viewport on the Bird View.
 - `Panning` the Main View moves the viewport on the Bird View.
 - `Dragging` the nodes on the Main View affects the graph on the Bird View.
+
+![Bird View](./assets/bird_view.gif)
 
 All three graph views are simultaneously accessible and present the same graph in the aforementioned ways.
 
