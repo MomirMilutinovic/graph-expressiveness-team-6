@@ -160,6 +160,7 @@
         if (d.data.expanded) populateNodeChildren(d);
         else d.data.children = [];
         render();
+        dispatchNodeFocusEvent(d.data.name);
       });
 
     node
