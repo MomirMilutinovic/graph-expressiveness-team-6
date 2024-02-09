@@ -134,7 +134,7 @@ Here is an example of how to provide entry point for each plugin type:
 We have developed two distinct Data Source plugins, each serving a specific purpose:
 
 1. **HTML Data Source:**
-   - Description: This plugin is designed to retrieve data from HTML documents and represent it as a cyclic and acyclic graph.
+   - Description: This plugin is designed to retrieve data from HTML documents and represent it as a graph.
    - Source Code: [HTML Data Source Plugin](./html_datasource)
    - The circularity within HTML is established by leveraging the `<a>` tags and their associated `href` attributes. 
      - These attributes serve to link to specific sections of the page, identified by either an `id` or the `<html>` if `href="#"`
