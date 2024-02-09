@@ -235,6 +235,45 @@ All three graph views are simultaneously accessible and present the same graph i
   - Scaling: Adjusts the view according to operations on the Main View.
   - Synchronization: Mirrors the movement and changes in the Main View.
 
+## Search and Filter Functionality
+
+Our application's search and filter features are designed to enhance the user experience by providing precise control over the visualization of graph data. Users can search across node attributes and apply filters to isolate graph elements that meet specific criteria.
+
+### Search Functionality
+
+#### Text-Based Search
+
+- Users can input arbitrary text into a search field to query the graph.
+- A subgraph is generated, displaying only the nodes that contain an attribute name or value matching the search term.
+- This is particularly useful for navigating large graphs, allowing for quick location of relevant nodes.
+
+### Filter Functionality
+
+#### Applying Filters
+
+- Filters are applied through a dedicated text input field using the following format:
+    ```
+    <attribute_name> <comparator> <attribute_value>
+    ```
+  
+- Available `<comparator>` options include: `==`, `>`, `>=`, `<`, `<=`, `!=`, `contains`, `matches`, `divisible by`.
+- Applying a filter creates a subgraph from the current graph with nodes that have attributes satisfying the filter criteria.
+
+### Successive Application of Search and Filters
+
+- Our platform supports the sequential application of searches and filters.
+- Users can layer these operations to incrementally refine the graph.
+- The visualization updates in real-time to reflect the current active criteria, maintaining clarity and precision.
+
+### User Interface for Search and Filters
+
+- The UI elements for search and filter operations are designed for intuitive use, with input fields and visual updates on the graph.
+- A control panel allows users to easily manage their search and filter parameters within the visualization interface.
+
+![Search and Filter Functionality](./assets/search_filter_component.jpg)
+
+With these features, users can easily analyze complex graphs and focus on the most relevant data for their needs.
+
 ## Workspaces
 
 The platform is designed to seamlessly detect all installed Data Source plugins, offering users the flexibility to choose from various data sources for graph visualization. The application supports loading multiple graphs from different (or the same) data sources simultaneously.
