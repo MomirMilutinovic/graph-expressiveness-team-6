@@ -24,8 +24,8 @@
 </style>
 <script>
     function nodeClick(el){
-        d3.select(".active-node").select("circle").style("fill","white");
-        d3.select(".active-node").classed("active-node",false);
+        d3.selectAll(".active-node").select("circle").style("fill","white");
+        d3.selectAll(".active-node").classed("active-node", false);
         d3.select(el).classed("active-node",true);
         d3.select(el).select("circle").style("fill","red");
     }
