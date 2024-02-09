@@ -50,7 +50,7 @@
       <nav class="panel" id="search-and-filter-panel">
         <p class="panel-heading">Search and filter</p>
         <div class="panel-block">
-            {% if active_ws_id %}
+            {% if active_ws_id != -1 %}
               <form class="filter-form" action="{% url 'search' %}" method="post">
                 {% csrf_token %}
                   <input id="search-input" class="input" type="text" placeholder="Search" name="query" />
