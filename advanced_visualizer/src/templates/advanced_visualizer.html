@@ -95,10 +95,6 @@
 
         svg.call(zoom);
 
-        console.log(nodes);
-        console.log(links);
-        console.log(directed);
-
         var addedLinks = new Map();
 
         var linksFiltered = links.filter(function(link) {
@@ -107,7 +103,6 @@
 
             if (!directed) {
                 if (addedLinks.has(linkKey) || addedLinks.has(reverseLinkKey)) {
-                    console.log("Duplicate link found: ", linkKey);
                     return false;
                 }
             }
@@ -132,8 +127,6 @@
             linkCounts[key]++;
             link.index = linkCounts[key];
         });
-        console.log(linkCounts);
-        console.log(linksFiltered);
 
         var simulation = d3.forceSimulation(nodes)
         .force("link", d3.forceLink(linksFiltered).id(function(d) { return d.id; }).distance(300))
