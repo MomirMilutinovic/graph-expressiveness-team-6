@@ -143,33 +143,33 @@ We have developed two distinct Data Source plugins, each serving a specific purp
    - In addition to parent-child relationships in the HTML document, the graph also includes links between `<a>` elements and the elements referenced by their `href` attributes if the referenced elements are within the document.
    - Graphs produced by this data source may be cyclic due to the inclusion of intradocument links.
    - Here is the example of the HTML document, and it's graph representation:
-   ```html
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Circular HTML Example</title>
-    </head>
-    <body>
-        <a href="somewebsite.com">Some Website</a>
-    
-        <div id="div-with-id" style="background-color: red;">
-            <p style="color: rebeccapurple;">Hello Everyone</p>
-        </div>
+       ```html
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Circular HTML Example</title>
+        </head>
+        <body>
+            <a href="somewebsite.com">Some Website</a>
         
-        <input type="text" value="Balsa"/>
-        <a href="#">Href to the page root</a>
-        <a href="#div-with-id">Href to the div with id</a>
-    </body>
-    </html>
-    ```
-    ![HTML Graph](./assets/html_graph.jpg)
+            <div id="div-with-id" style="background-color: red;">
+                <p style="color: rebeccapurple;">Hello Everyone</p>
+            </div>
+            
+            <input type="text" value="Balsa"/>
+            <a href="#">Href to the page root</a>
+            <a href="#div-with-id">Href to the div with id</a>
+        </body>
+        </html>
+        ```
+        ![HTML Graph](./assets/html_graph.jpg)
    
-
 
 2. **Spotify Data Source:**
    - Description: The Spotify Data Source plugin allows fetching data from the Spotify API.
    - Source Code: [Spotify Data Source Plugin](./spotify_datasource)
+   ![Spotify Data Source](./assets/spotify_datasource.jpg)
 
 ### Visualizer Plugins
 
@@ -178,10 +178,12 @@ In addition to Data Source plugins, we've created two Visualizer plugins to enha
 1. **Simple Visualizer:**
    - Description: The Simple Visualizer offers straightforward visualization capabilities for basic graph structures.
    - Source Code: [Simple Visualizer Plugin](./simple_visualizer)
+   ![Simple Visualizer](./assets/simple_visualizer.jpg)
 
 2. **Advanced Visualizer:**
    - Description: For more complex graph visualization needs, the Advanced Visualizer provides enhanced features and functionalities.
    - Source Code: [Advanced Visualizer Plugin](./advanced_visualizer)
+    ![Advanced Visualizer](./assets/html_graph.jpg)
 
 ### Software Components
 
