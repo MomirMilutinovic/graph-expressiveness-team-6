@@ -167,7 +167,7 @@ We have developed two distinct Data Source plugins, each serving a specific purp
    
 
 2. **Spotify Data Source:**
-   - Description: The Spotify Data Source plugin allows fetching data from the Spotify API.
+   - Description: The Spotify Data Source plugin allows fetching data from the Spotify API (artist's related artists).
    - Source Code: [Spotify Data Source Plugin](./spotify_datasource)
    
 ![Spotify Data Source](./assets/spotify_datasource.jpg)
