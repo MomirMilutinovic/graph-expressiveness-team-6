@@ -45,18 +45,17 @@
     let queue = [];
     let visited = new Set();
     queue.push([data]);
-    while(queue.length > 0) {
-        let path = queue.shift()
-        let node = path[path.length - 1]
-        if (node.name == nodeId)
-            return path
-        for (const childId of node.children_ids) {
-          if (visited.has(childId)) continue;
-          visited.add(childId);
-          let newPath = path.slice(0);
-          newPath.push(allNodes[childId]);
-          queue.push(newPath);
-        }
+    while (queue.length > 0) {
+      let path = queue.shift();
+      let node = path[path.length - 1];
+      if (node.name == nodeId) return path;
+      for (const childId of node.children_ids) {
+        if (visited.has(childId)) continue;
+        visited.add(childId);
+        let newPath = path.slice(0);
+        newPath.push(allNodes[childId]);
+        queue.push(newPath);
+      }
     }
   }
 
@@ -110,16 +109,25 @@
   }
 
   function expandOneInstance(nodeId) {
-    if (d3.selectAll(".tree-view-node").filter((d) => d.data.name === nodeId && d.data.expanded).size() > 0) return;
+    if (
+      d3
+        .selectAll(".tree-view-node")
+        .filter((d) => d.data.name === nodeId && d.data.expanded)
+        .size() > 0
+    )
+      return;
     let expanded = false;
-    const node = d3.selectAll(".tree-view-node")
-    .select(function(d, i){ return d.data.name === nodeId && !d.data.expanded ? this : null })
-    .each(function(d, i) {
-      if (!expanded){
-        d3.select(this).dispatch("expand");
-        expanded = true;
-      }
-    });
+    const node = d3
+      .selectAll(".tree-view-node")
+      .select(function (d, i) {
+        return d.data.name === nodeId && !d.data.expanded ? this : null;
+      })
+      .each(function (d, i) {
+        if (!expanded) {
+          d3.select(this).dispatch("expand");
+          expanded = true;
+        }
+      });
   }
 
   function handleNodeFocus(nodeId) {
@@ -127,8 +135,8 @@
     let node = d3.selectAll(".tree-view-node").filter((d) => d.data.name === nodeId);
     if (node.size() == 0) {
       const ancestors = getAncestors(nodeId);
+      if (ancestors == undefined) return;
       ancestors.pop();
-      console.log("Ancestors", ancestors);
       for (const ancestor of ancestors) {
         expandOneInstance(ancestor.name);
       }
