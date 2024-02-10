@@ -169,7 +169,8 @@ We have developed two distinct Data Source plugins, each serving a specific purp
 2. **Spotify Data Source:**
    - Description: The Spotify Data Source plugin allows fetching data from the Spotify API.
    - Source Code: [Spotify Data Source Plugin](./spotify_datasource)
-   ![Spotify Data Source](./assets/spotify_datasource.jpg)
+   
+![Spotify Data Source](./assets/spotify_datasource.jpg)
 
 ### Visualizer Plugins
 
@@ -178,12 +179,14 @@ In addition to Data Source plugins, we've created two Visualizer plugins to enha
 1. **Simple Visualizer:**
    - Description: The Simple Visualizer offers straightforward visualization capabilities for basic graph structures.
    - Source Code: [Simple Visualizer Plugin](./simple_visualizer)
-   ![Simple Visualizer](./assets/simple_visualizer.jpg)
+   
+![Simple Visualizer](./assets/simple_visualizer.jpg)
 
 2. **Advanced Visualizer:**
    - Description: For more complex graph visualization needs, the Advanced Visualizer provides enhanced features and functionalities.
    - Source Code: [Advanced Visualizer Plugin](./advanced_visualizer)
-    ![Advanced Visualizer](./assets/html_graph.jpg)
+    
+![Advanced Visualizer](./assets/html_graph.jpg)
 
 ### Software Components
 
