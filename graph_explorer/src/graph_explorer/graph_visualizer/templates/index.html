@@ -1,0 +1,137 @@
+{% extends "base.html" %} {% block title %}Graph Expressiveness{% endblock title %} {% block body %}
+<body onload="changeVisualizer()">
+  <div id="container">
+    <aside class="menu" id="workspace-bar">
+      <p class="menu-label">Workspaces</p>
+      <ul class="menu-list">
+        {% for workspace in workspaces %} 
+        {% if workspace.id == active_ws_id %}
+        <li class="highlight workspace-row"><a href="{%url 'workspace' workspace.id %}" class="workspace-name">{{ workspace.name }}</a>
+        {% else %}
+        <li class="workspace-row"><a href="{%url 'workspace' workspace.id %}" class="workspace-name">{{ workspace.name }}</a>
+        {% endif %}
+        <div class="icons-container">
+          <a href="{% url 'edit_workspace' workspace.id %}" class="link-button"><span class="material-symbols-outlined">settings</span></a>
+          <a href="{% url 'delete_workspace' workspace.id %}" class="link-button"><span class="material-symbols-outlined">close</span></a>
+        </div>
+        </li>
+        {% endfor %}
+        <li>
+          <a href="/workspace-config" id="create-workspace" class="row">Create a new workspace <span class="material-symbols-outlined">add_circle</span></a>
+        </li>
+      </ul>
+    </aside>
+    <div class="vertical-container" id="left-panel">
+      <nav class="panel" id="visualizer-select-panel">
+        <p class="panel-heading">Visualizer</p>
+        <div class="panel-block">
+          <div class="select">
+            <select id="visualizer-select" onchange="selectVisualizer(this.value)">
+              {% for visualizer in visualizers %}
+                <option value="{{ visualizer.name }}" {% if visualizer.name == current_visualizer %}selected{% endif %}>{{ visualizer.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </nav>
+      <nav class="panel" id="bird-view-panel">
+        <p class="panel-heading">Bird View</p>
+        <div class="panel-block">
+          {%if content %}
+            {% include "bird_view.html" %}
+          {% else %}
+          <h2 color="red">No workspace selected</h2>
+          {% endif %}
+        </div>
+      </nav>
+      <nav class="panel" id="tree-view-panel">{% include "tree_view.html" %}</nav>
+    </div>
+    <div class="vertical-container">
+      <nav class="panel" id="search-and-filter-panel">
+        <p class="panel-heading">Search and filter</p>
+        <div class="panel-block">
+            {% if active_ws_id != -1 %}
+              <form class="filter-form" action="{% url 'search' %}" method="post">
+                {% csrf_token %}
+                  <input id="search-input" class="input" type="text" placeholder="Search" name="query" />
+                  <input type="submit" value="Search" class="button is-light" />
+              </form>
+            {% else %}
+              <div class="filter-form">
+                {% csrf_token %}
+                  <input id="search-input" class="input" type="text" placeholder="Search" name="query" />
+                  <input type="submit" value="Search" class="button is-light" />
+              </div>
+            {% endif %}
+        </div>
+        <div class="panel-block">
+          {% if active_ws_id != -1 %}
+            <form id="filter-form" class="filter-form" method="POST" action="{% url 'add_filter' %}">
+              {% csrf_token %}
+              <input name="attribute" id="filter-attribute-input" class="input" type="text" placeholder="Attribute" />
+              <div class="select">
+                <select name="operator">
+                  {% for operator in operators %}
+                    <option value="{{operator|safe}}">{{operator}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <input name="value" id="filter-value-input" class="input" type="text" placeholder="Value" />
+              <input type="submit" value="Filter" class="button is-light" />
+            </form>
+          {% else %}
+            <div id="filter-form" class="filter-form" method="POST" action="{% url 'add_filter' %}">
+              {% csrf_token %}
+              <input name="attribute" id="filter-attribute-input" class="input" type="text" placeholder="Attribute" />
+              <div class="select">
+                <select name="operator">
+                  {% for operator in operators %}
+                    <option value="{{operator|safe}}">{{operator}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <input name="value" id="filter-value-input" class="input" type="text" placeholder="Value" />
+              <input type="submit" value="Filter" class="button is-light" />
+            </div>
+           {% endif %} 
+        </div>
+        <div class="panel-block">
+          <div class="active-filters">
+            <span>Active filters:</span>
+            {% for filter in filters %}
+                <div class="filter has-background-primary has-text-white" onclick="deleteFilter({{ filter|safe }})">
+                  {% if filter.type == 'SearchFilter' %}
+                    {{ filter.search_term }}
+                  {% elif filter.type == 'OperatorFilter' %}
+                    {{ filter.attribute }} {{ filter.operator }} {{ filter.value }}
+                  {% endif %}
+                  <span class="material-symbols-outlined">remove</span>
+                </div>
+            {% endfor %}
+          </div>
+        </div>
+      </nav>
+      <nav class="panel" id="main-view-panel">
+        <p class="panel-heading">Main View</p>
+        <div style="height: 100% ; width: 100%" id="main-view-graph">
+          {% if content %}
+            {{ content|safe }}
+          {% else %}
+            <h2 style="color: red;">No workspace selected</h2>
+          {% endif %}
+        </div>
+      </nav>
+    </div>
+  </div>
+  <div id ="error-container">
+    <article id="error" class="message is-normal is-danger is-hidden">
+      <div class="message-header">
+        <p span id="error-title">Invalid filter</p>
+      </div>
+      <div class="message-body">
+        <p><span id="error-message"></span></p>
+      </div>
+    </article>
+  </div>
+</body>
+{% endblock body %}

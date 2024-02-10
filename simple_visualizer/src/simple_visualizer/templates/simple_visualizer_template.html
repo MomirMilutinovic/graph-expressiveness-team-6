@@ -1,0 +1,172 @@
+<style>
+.node {
+  cursor: pointer;
+  color: #3182bd;
+
+}
+
+.link {
+  fill: none;
+  stroke: #9ecae1;
+  stroke-width: 1.5px;
+}
+
+#main-svg-{{name}} {
+    width: 100%;
+    height: 100%;
+}
+
+.active-node {
+    stroke-width: 2px;
+}
+
+</style>
+<script>
+</script>
+<svg id="main-svg-{{name}}">
+
+</svg>
+<script>
+    function renderSimpleVisualization() {
+        function getIdFromName(name){
+            return name.split("_")[1];
+        }
+        function getNameFromId(id){
+            return "node_"+id;
+        }
+        function handleNodeFocus(nodeId){
+            d3.selectAll(".active-node").select("circle").style("fill","white");
+            d3.selectAll(".active-node").classed("active-node", false);
+            const focusedNode = g.selectAll(".node")
+                .filter(d => d.name === getNameFromId(nodeId));
+            focusedNode.classed("active-node",true);
+            focusedNode.select("circle").style("fill","red");
+        }
+
+        document.addEventListener("node-focus", function(event){
+            handleNodeFocus(event.detail);
+        });
+
+        var nodes = [
+            {% for n in nodes %}
+            {
+                name: getNameFromId("{{ n.id }}"),
+                data: {{ n.data | tojson }},
+            },
+            {% endfor %}
+        ];
+
+        var links = [
+            {% for e in edges %}
+            {
+                source: getNameFromId("{{ e.src.id }}"),
+                target: getNameFromId("{{ e.dest.id }}"),
+                data: {{ e.data | tojson }},
+            },
+            {% endfor %}
+        ];
+
+        links = links.map(link => ({
+            ...link,
+            source: nodes.find(n => n.name === link.source),
+            target: nodes.find(n => n.name === link.target),
+        }));
+
+        const handleZoom = (e) => g.attr('transform', e.transform);
+        const zoom = d3.zoom().on('zoom', handleZoom);
+
+        d3.select('#main-svg-{{name}}').append('defs')
+            .append('marker')
+            .attr("id", "arrowhead")
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 43)
+            .attr("refY", 0)
+            .attr("markerWidth", 8)
+            .attr("markerHeight", 8)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("fill", "#9ecae1")
+            .attr("d", 'M0,-5L10,0L0,5');
+
+        var g = d3.select('#main-svg-{{name}}').call(zoom).append('g');
+
+        const simulation = d3.forceSimulation(nodes)
+            .force("link", d3.forceLink(links).distance(300))
+            .force("charge", d3.forceManyBody().strength(100))
+            .force("center", d3.forceCenter(700 / 2, 700 / 2))
+            .force("gravity", d3.forceManyBody().strength(-100))
+            .force("collide", d3.forceCollide().radius(80))
+            .on("tick", tick);
+
+        const link = g.selectAll(".link")
+            .data(links).enter()
+            .append("line")
+            {% if directed %}
+            .attr("marker-end", 'url(#arrowhead)')
+            {% endif %}
+            .attr("class" , "link");
+    
+        const node = g.selectAll(".node")
+            .data(nodes)
+            .enter()
+            .append("g")
+            .attr("class", "node")
+            .attr("id", d => d.name)
+            .attr('onclick', d => `dispatchNodeFocusEvent("${getIdFromName(d.name)}");`)
+            .call(drag(simulation));
+        
+        const radius=25;
+        const textSize=15;
+        d3.selectAll('.node').append('circle')
+            .attr('r', radius+textSize)
+            .style('fill', 'white')
+            .style('stroke', 'black')
+            .style('stroke-width', '1.5px')
+            .each(function(d) {
+                d3.select("g[id=\""+d.name+"\"]")
+                .append('text')
+                .attr('text-anchor','middle')
+                .attr('font-size',textSize)
+                .attr('font-family','sans-serif')
+                .attr('fill','green')
+                .text(d.name);
+            });
+
+        function tick() {
+            link
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y);
+    
+            node.attr("transform", function(d) {
+                return "translate(" + d.x + "," + d.y + ")";
+            })
+        }
+
+        function drag(simulation) {    
+            function dragstarted(event) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            event.subject.fx = event.subject.x;
+            event.subject.fy = event.subject.y;
+            }
+            
+            function dragged(event) {
+            event.subject.fx = event.x;
+            event.subject.fy = event.y;
+            }
+            
+            function dragended(event) {
+            if (!event.active) simulation.alphaTarget(0);
+            event.subject.fx = null;
+            event.subject.fy = null;
+            }
+            
+            return d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended);
+        }
+    }
+    renderSimpleVisualization();
+</script>

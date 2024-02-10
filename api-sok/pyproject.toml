@@ -1,0 +1,10 @@
+[project]
+name = "api"
+dynamic = ["version"]
+dependencies = []
+requires-python = ">= 3.10"
+authors = [
+    {name = "Balsa Bulatović"},
+    {name = "Teodor Vidaković"},
+    {name = "Vladimir Popov"},
+]

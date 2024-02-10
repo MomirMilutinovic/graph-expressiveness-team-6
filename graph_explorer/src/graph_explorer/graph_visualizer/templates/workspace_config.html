@@ -1,0 +1,94 @@
+{% extends "base.html" %} {% block title %}Configure Data Source{% endblock title %} {% block head_css %}
+<style>
+  .main-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .input {
+    width: 35%;
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+
+  h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+  }
+
+  form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+</style>
+{% endblock head_css %} {% block body %}
+<body>
+  <div class="main-form">
+    <h1>Workspace Configuration</h1>
+    <form method="POST">
+      {% csrf_token %}
+      <input required name="workspace-name" class="input" type="text" placeholder="Workspace Name" {% if workspace is not None %}value="{{workspace.name}}" {% endif %} />
+      <div class="select">
+        <select id="data-source-select">
+          {% for data_source in data_sources %} {% if selected_ds is None and forloop.first or selected_ds == data_source %}
+          <option selected value="{{ data_source }}">{{ data_source }}</option>
+          {% else %}
+          <option value="{{ data_source }}">{{ data_source }}</option>
+          {% endif %} {% endfor %}
+        </select>
+      </div>
+      {% for param in parameters %} {% if param.1 == "str" %}
+      <input required name="{{ param.0 }}" class="input" type="text" placeholder="{{ param.0 }}" value="{{ param.2 }}" />
+      {% endif %} {% if param.1 == "int" %}
+      <input required name="{{ param.0 }}" class="input" type="number" min="1" placeholder="{{ param.0 }}" value="{{ param.2 }}" />
+      {% endif %} {% if param.1 == "date" %}
+      <input required name="{{ param.0 }}" class="input" type="date" placeholder="{{ param.0 }}" value="{{ param.2 }}" />
+      {% endif %} {% endfor %}
+      <input class="button" type="submit" value="Confirm" />
+    </form>
+  </div>
+  <div id="error-container">
+    <article id="error" class="message is-normal is-danger is-hidden">
+      <div class="message-header">
+        <p span id="error-title">Invalid filter</p>
+      </div>
+      <div class="message-body">
+        <p><span id="error-message"></span></p>
+      </div>
+    </article>
+  </div>
+</body>
+<script>
+  document.querySelector(".main-form form").addEventListener(
+    "submit",
+    function (e) {
+      e.preventDefault();
+      request = new XMLHttpRequest();
+      request.open("POST", window.location.href, true);
+      request.send(new FormData(this));
+      request.onload = function () {
+        if (request.status === 200) {
+          window.location = request.responseURL;
+        } else if (request.status === 400) {
+          showErrorMessage("Data source error", "Could not fetch graph. <br/>" + request.responseText);
+        }
+      };
+    },
+    true
+  );
+</script>
+{% block script %}
+<script>
+  selectEl = document.getElementById("data-source-select");
+
+  selectEl.addEventListener("change", (event) => {
+    const url = window.location.href;
+    const indexToSlice = url.indexOf("workspace-config") + "workspace-config".length;
+    const baseUrl = `${url.slice(0, indexToSlice)}/${encodeURIComponent(event.target.value.trim())}`;
+    window.location.replace(baseUrl);
+  });
+</script>
+{% endblock script %} {% endblock body %}

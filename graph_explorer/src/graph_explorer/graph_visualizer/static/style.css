@@ -1,0 +1,170 @@
+html, body, #container {
+    height: 100%;
+}
+
+#container {
+    display: flex;
+    padding: 0.5em;
+}
+
+#workspace-bar {
+    margin-right: 1em;
+}
+
+.vertical-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#left-panel {
+    width: 20%;
+    margin-right: 4em;
+}
+
+.vertical-container:last-child {
+    flex-grow: 1;
+}
+
+#visualizer-select-panel .select, #visualizer-select-panel select {
+    width: 100%;
+}
+
+#tree-view-panel {
+    flex-grow: 2;
+}
+#bird-view-panel, #main-view-panel {
+    flex-grow: 1;
+}
+
+a.row, div.row {
+    display: flex;
+    align-items: center;
+}
+
+a#create-workspace .material-symbols-outlined {
+    margin-left: 0.5em;
+}
+
+.panel-block .button {
+    margin-left: 2em;
+    box-sizing: border-box;
+    width: 8em;
+}
+
+.panel-block .filter-form {
+    width: 100%;
+}
+
+#filter-attribute-input, #filter-value-input {
+    width: 42.5%;
+}
+
+.filter-form .select {
+    width: 15%;
+}
+
+.filter-form .select select{
+    width: 100%;
+}
+
+#bird-view-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+#bird-view-panel .panel-heading {
+    flex: 0;
+}
+
+#bird-view-panel .panel-block {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.highlight {
+    background-color: #efefef;
+}
+
+.filter-form {
+    display: flex;
+    align-items: center;
+}
+
+.active-filters {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.active-filters>* {
+    display: flex;
+    align-items: center;
+    padding: 0.5em;
+    margin: 0 0.5em;
+    border-radius: 0.5em;
+}
+
+.link-button {
+    display: inline-flex; /* Keeps the link button's internal alignment */
+    align-items: center;
+    justify-content: center;
+}
+
+.workspace-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.workspace-name {
+    flex-grow: 1;
+}
+
+.icons-container {
+    display: flex;
+    gap: 0;
+}
+#main-view-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+#main-view-panel > div {
+    flex-grow: 1;
+}
+#error-container {
+    position: fixed;
+    left: 0;
+    bottom: 1em;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+#error {
+    -webkit-animation: fadein 0.5s, fadeout 0.5s 4.5s;
+    animation: fadein 0.5s, fadeout 0.5s 4.5s;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 50%;
+}
+
+@-webkit-keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 1em; opacity: 1;}
+}
+
+@keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 1em; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+    from {bottom: 1em; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+    from {bottom: 1em; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+}

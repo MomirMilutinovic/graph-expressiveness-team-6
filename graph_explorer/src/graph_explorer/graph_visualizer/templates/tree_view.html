@@ -1,0 +1,255 @@
+<style>
+  .node {
+    cursor: pointer;
+    color: #3182bd;
+  }
+
+  .link {
+    fill: none;
+    stroke: #9ecae1;
+    stroke-width: 1.5px;
+  }
+
+  text {
+    white-space: pre-line;
+  }
+
+  #svg-container {
+    overflow: scroll;
+  }
+
+  text.focused {
+    font-weight: bold;
+  }
+</style>
+<div id="svg-container">
+  <svg width="350" height="500" id="tree-view-svg"></svg>
+</div>
+{{ tree_view_data|json_script:"tree-view-data" }} {{ nodes_dict|json_script:"nodes-dict" }}
+<script>
+  let data = JSON.parse(document.getElementById("tree-view-data").textContent);
+  let allNodes = JSON.parse(document.getElementById("nodes-dict").textContent);
+
+  // initialization of root node
+  data.children = [];
+  if (data.children_ids) {
+    for (const childrenId of data.children_ids) {
+      const childClone = structuredClone(allNodes[childrenId]);
+      childClone.expanded = false;
+      childClone.children = [];
+      data.children.push(childClone);
+    }
+  }
+
+  function getAncestors(nodeId, currentNode, visitedNodes) {
+    let queue = [];
+    let visited = new Set();
+    queue.push([data]);
+    while (queue.length > 0) {
+      let path = queue.shift();
+      let node = path[path.length - 1];
+      if (node.name == nodeId) return path;
+      for (const childId of node.children_ids) {
+        if (visited.has(childId)) continue;
+        visited.add(childId);
+        let newPath = path.slice(0);
+        newPath.push(allNodes[childId]);
+        queue.push(newPath);
+      }
+    }
+  }
+
+  function emptySvg() {
+    d3.select("#tree-view-svg").selectAll("*").remove();
+  }
+
+  function getYOffset(node) {
+    try {
+      return node.data.expanded ? Object.keys(node.data.data).length + 1 : 1;
+    } catch (error) {
+      return 1;
+    }
+  }
+
+  function calculateSvgHeight(nodes, nodeSize) {
+    const maxIndex = Math.max(...nodes.map((n) => n.index));
+    const maxIndexElem = nodes.filter((n) => n.index == maxIndex)[0];
+
+    const maxIndexKeysOffset = Object.keys(maxIndexElem.data.data).length + 1;
+
+    return (maxIndex + maxIndexKeysOffset) * nodeSize + nodeSize;
+  }
+
+  function calculateSvgWidth(nodes, nodeSize) {
+    let maxWidth = 0;
+
+    for (const node of nodes) {
+      if (node.data.expanded) {
+        for (const [key, value] of Object.entries(node.data.data)) {
+          let elWidth = nodeSize * (node.depth + 2) + 10 * value.toString().length;
+          if (elWidth > maxWidth) maxWidth = elWidth;
+        }
+      }
+      let elWidth = nodeSize * (node.depth + 2) + 10 * node.data.name.toString().length;
+      if (elWidth > maxWidth) maxWidth = elWidth;
+    }
+
+    return maxWidth;
+  }
+
+  function populateNodeChildren(node) {
+    nodeChildrenIds = node.data.children_ids;
+
+    for (const childrenId of nodeChildrenIds) {
+      const childClone = structuredClone(allNodes[childrenId]);
+      childClone.expanded = false;
+      childClone.children = [];
+      node.data.children.push(childClone);
+    }
+  }
+
+  function expandOneInstance(nodeId) {
+    if (
+      d3
+        .selectAll(".tree-view-node")
+        .filter((d) => d.data.name === nodeId && d.data.expanded)
+        .size() > 0
+    )
+      return;
+    let expanded = false;
+    const node = d3
+      .selectAll(".tree-view-node")
+      .select(function (d, i) {
+        return d.data.name === nodeId && !d.data.expanded ? this : null;
+      })
+      .each(function (d, i) {
+        if (!expanded) {
+          d3.select(this).dispatch("expand");
+          expanded = true;
+        }
+      });
+  }
+
+  function handleNodeFocus(nodeId) {
+    d3.selectAll("text").classed("focused", false);
+    let node = d3.selectAll(".tree-view-node").filter((d) => d.data.name === nodeId);
+    if (node.size() == 0) {
+      const ancestors = getAncestors(nodeId);
+      if (ancestors == undefined) return;
+      ancestors.pop();
+      for (const ancestor of ancestors) {
+        expandOneInstance(ancestor.name);
+      }
+    }
+    node = d3.selectAll(".tree-view-node").filter((d) => d.data.name === nodeId);
+    node.select("text").classed("focused", true);
+  }
+
+  function render() {
+    emptySvg();
+
+    if (Object.keys(data).length <= 1) return;
+
+    const nodeSize = 20;
+    const root = d3.hierarchy(data).eachBefore(
+      ((i, beforeOffset) => (d) => {
+        if (d.index == undefined) {
+          i += beforeOffset;
+          beforeOffset = getYOffset(d);
+          return (d.index = i);
+        }
+        return;
+      })(0, 0)
+    );
+    const nodes = root.descendants();
+    let width = calculateSvgWidth(nodes, nodeSize) + 50;
+    let height = calculateSvgHeight(nodes, nodeSize);
+
+    if (width == 0) width = 350;
+    if (height == 0) height = nodeSize * 2;
+
+    const svg = d3.select("#tree-view-svg").attr("width", width).attr("height", height).attr("style", "height: auto; font: 15px sans-serif;");
+
+    const link = svg
+      .append("g")
+      .attr("fill", "none")
+      .attr("stroke", "#999")
+      .selectAll()
+      .data(root.links())
+      .join("path")
+      .attr(
+        "d",
+        (d) => `
+        M${d.source.depth * nodeSize},${d.source.index * nodeSize + nodeSize}
+        V${d.target.index * nodeSize + nodeSize}
+        h${nodeSize}
+      `
+      );
+
+    const toggleExpand = (event, d) => {
+      d.data.expanded = !d.data.expanded;
+      if (d.data.expanded) populateNodeChildren(d);
+      else d.data.children = [];
+      render();
+    };
+
+    const node = svg
+      .append("g")
+      .selectAll()
+      .data(nodes)
+      .join("g")
+      .classed("tree-view-node", true)
+      .attr("transform", (d) => `translate(0,${d.index * nodeSize + nodeSize})`)
+      .on("click", (ev, d) => {
+        toggleExpand(ev, d);
+        dispatchNodeFocusEvent(d.data.name);
+      })
+      .on("expand", (ev, d) => {
+        toggleExpand(ev, d);
+      });
+
+    node
+      .append("rect")
+      .attr("x", (d) => d.depth * nodeSize + 4)
+      .attr("width", 11)
+      .attr("height", 3)
+      .attr("fill", (d) => (d.children ? null : "#999"));
+
+    node
+      .filter((d) => !d.data.expanded)
+      .append("rect")
+      .attr("x", (d) => d.depth * nodeSize + 8)
+      .attr("y", (d) => -4)
+      .attr("width", 3)
+      .attr("height", 12)
+      .attr("fill", (d) => (d.children ? null : "#999"));
+
+    node
+      .append("text")
+      .attr("dy", "0.32em")
+      .attr("cursor", "pointer")
+      .attr("x", (d) => d.depth * nodeSize + 20)
+      .text((d) => d.data.name);
+
+    node
+      .filter((d) => d.data.expanded)
+      .append("text")
+      .attr("dy", "1.6em")
+      .attr("x", (d) => d.depth * nodeSize + 20)
+      .text((d) => {
+        let retStr = "";
+
+        for (const [key, value] of Object.entries(d.data.data)) {
+          retStr += `${key}: ${value}\n`;
+        }
+
+        return retStr;
+      });
+  }
+
+  document.addEventListener("node-focus", function (event) {
+    handleNodeFocus(event.detail);
+  });
+
+  render();
+</script>

@@ -18,3 +18,6 @@ authors = [
     {name = "Teodor Vidaković"},
     {name = "Vladimir Popov"},
 ]
+
+[project.entry-points."graph_visualizer.django_apps"]
+name = "graph_visualizer.apps.GraphExplorerConfig"
